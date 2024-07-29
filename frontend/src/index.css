@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-800 font-body text-white;
+  }
+}
+
+/* #root {
+  padding: 2rem 3rem;
+} */
+
+.container {
+  width: 100vw;
+  height: 100vh;
+  padding: 1rem 3rem;
+}
+
+div {
+  box-sizing: border-box;
+}
+
+.divider {
+  width: 100%;
+  height: 2px;
+  background-color: gray;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.custom-scroll::-webkit-scrollbar {
+  width: 4px;
+  background-color: transparent;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background-color: #f69175;
+  border-radius: 2rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn .5s ease;
+}
+
+.popup-container {
+  position: relative;
+}
+
+.popup {
+  display: none;
+  position: absolute;
+}
+
+.popup-container:hover .popup {
+  display: block;
+}
