@@ -44,8 +44,8 @@ const Header = () => {
               2
             </div>
             {showNotify && (
-              <div className="absolute right-0 bg-gray-800 w-[350px] rounded-md p-2 flex flex-col gap-2">
-                <div className="hover:bg-gray-700 rounded-md p-2">
+              <div className="absolute right-0 bg-gray-800 w-[350px] rounded-md p-2 flex flex-col gap-2 z-50">
+                <div className="hover:bg-gray-700 rounded-md p-2 cursor-default">
                   <div className="flex gap-2 items-center">
                     <div className="rounded-full size-14 overflow-hidden">
                       <img
@@ -54,9 +54,15 @@ const Header = () => {
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <div>
-                      <p className="flex-1">
-                        Nguyễn Nhật Kha vừa gửi lời mời kết bạn
+                    <div className="flex-1">
+                      <p>
+                        <Link
+                          to="/user/2"
+                          className="hover:underline font-bold"
+                        >
+                          Nguyễn Nhật Kha
+                        </Link>{" "}
+                        vừa gửi lời mời kết bạn
                       </p>
                       <p className="text-sm text-gray-400">1 giờ trước</p>
                     </div>
