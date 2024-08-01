@@ -11,14 +11,22 @@ const UserItem = ({ user }) => {
           : "rounded-lg flex items-center gap-3 py-4 px-3 hover:bg-gray-300"
       }
     >
-      <div className="size-8 rounded-full overflow-hidden">
+      <div className="size-8 rounded-full relative">
         <img
           src={user.avatarUrl || "/unknown-avatar.png"}
           alt=""
-          className="object-cover size-full"
+          className="object-cover size-full rounded-full"
         />
+        <div
+          className={`size-2 rounded-full absolute bottom-0 right-0 ${
+            user.realtimeStatus === "ONLINE"
+              ? "bg-secondary"
+              : user.realtimeStatus === "OFFLINE"
+              ? "bg-red-400"
+              : ""
+          }`}
+        ></div>
       </div>
-
       <p className="font-bold">{user.name}</p>
     </NavLink>
   );

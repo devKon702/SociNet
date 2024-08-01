@@ -1,6 +1,8 @@
 import React from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import UserItem from "../conversation/UserItem";
+import { useSelector } from "react-redux";
+import { realtimeSelector } from "../../redux/selectors";
 
 const friendData = [
   { id: 1, name: "Nguyễn Nhật Kha", avatarUrl: "/dev1.png" },
@@ -12,6 +14,7 @@ const friendData = [
 ];
 
 const ConversationLayout = () => {
+  const { realtimeFriends } = useSelector(realtimeSelector);
   return (
     <div className="flex container justify-center items-center gap-5 text-gray-800">
       <section className="flex flex-col rounded-lg w-3/12 h-full bg-white overflow-hidden p-2 gap-2">
@@ -46,8 +49,8 @@ const ConversationLayout = () => {
 
         {/* List */}
         <ul className="overflow-scroll custom-scroll flex-1">
-          {friendData.map((friend) => (
-            <UserItem user={friend}></UserItem>
+          {realtimeFriends.map((friend, index) => (
+            <UserItem user={friend} key={index}></UserItem>
           ))}
         </ul>
       </section>

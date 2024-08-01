@@ -1,19 +1,22 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { userInfoSelector } from "../../redux/selectors";
+import { realtimeSelector, userInfoSelector } from "../../redux/selectors";
 import { signOut } from "../../api/AuthService";
 import { ClickAwayListener } from "@mui/base/ClickAwayListener";
+import InvitationItem from "../notify/InvitationItem";
+import { setNewInvitationNumber } from "../../redux/realtimeSlice";
 
 const Header = () => {
   const [isShow, setIsShow] = useState(false);
   const [showNotify, setShowNotify] = useState(false);
   const user = useSelector(userInfoSelector);
+  const { invitations, newInvitationNumber } = useSelector(realtimeSelector);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   return (
-    <div className="w-full h-[50px] flex justify-between items-center bg-slate-700 py-3 px-10">
+    <div className="w-full h-[60px] flex justify-between items-center bg-slate-700 py-3 px-10 rounded-b-xl">
       <Link
         className="h-full w-fit flex justify-around cursor-pointer gap-1"
         to="/home"
@@ -33,49 +36,43 @@ const Header = () => {
           />
         </div>
       </Link>
+      <div className="rounded-2xl outline-none py-2 px-4 w-1/3 bg-slate-500 flex items-center gap-2">
+        <i className="bx bx-search"></i>
+        <input
+          type="text"
+          placeholder="Tìm kiếm người dùng"
+          className="bg-transparent outline-none flex-1"
+        />
+      </div>
       <div className="flex gap-4 items-center">
         <ClickAwayListener onClickAway={() => setShowNotify(false)}>
           <div
             className="relative cursor-pointer"
-            onClick={() => setShowNotify(true)}
+            onClick={() => {
+              setShowNotify(true);
+              dispatch(setNewInvitationNumber(0));
+            }}
           >
             <i className="bx bxs-bell text-2xl"></i>
-            <div className="rounded-full size-4 bg-red-500 absolute top-0 -right-1.5 text-xs flex items-center justify-center">
-              2
-            </div>
+            {newInvitationNumber !== 0 && (
+              <div className="rounded-full size-4 bg-red-500 absolute top-0 -right-1.5 text-xs flex items-center justify-center">
+                {newInvitationNumber}
+              </div>
+            )}
             {showNotify && (
               <div className="absolute right-0 bg-gray-800 w-[350px] rounded-md p-2 flex flex-col gap-2 z-50">
-                <div className="hover:bg-gray-700 rounded-md p-2 cursor-default">
-                  <div className="flex gap-2 items-center">
-                    <div className="rounded-full size-14 overflow-hidden">
-                      <img
-                        src="/dev1.png"
-                        alt=""
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <p>
-                        <Link
-                          to="/user/2"
-                          className="hover:underline font-bold"
-                        >
-                          Nguyễn Nhật Kha
-                        </Link>{" "}
-                        vừa gửi lời mời kết bạn
-                      </p>
-                      <p className="text-sm text-gray-400">1 giờ trước</p>
-                    </div>
-                  </div>
-                  <div className="flex justify-end gap-4 mt-2">
-                    <button className="p-2 px-3 rounded-md border border-red-500 text-red-500">
-                      Từ chối
-                    </button>
-                    <button className="p-2 px-3 rounded-md bg-third">
-                      Chấp nhận
-                    </button>
-                  </div>
-                </div>
+                {invitations.length != 0 ? (
+                  invitations.map((invite, index) => (
+                    <InvitationItem
+                      key={index}
+                      invitation={invite}
+                    ></InvitationItem>
+                  ))
+                ) : (
+                  <p className="text-gray-400 text-xl py-8 text-center">
+                    Hiện chưa có thông báo nào
+                  </p>
+                )}
               </div>
             )}
           </div>

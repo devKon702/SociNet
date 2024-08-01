@@ -32,7 +32,6 @@ public class AuthController {
 
     @PostMapping("sign-in")
     public ResponseEntity<?> signIn(@Valid @RequestBody SignInRequest body, HttpServletRequest request) throws Exception{
-        log.info(request.getRemoteAddr());
         AuthDto authDto = authService.signIn(body);
         return Helper.returnSuccessResponse("Sign in success", authDto);
     }
@@ -47,6 +46,12 @@ public class AuthController {
     public ResponseEntity<?> sendOtp(@PathVariable String email) throws Exception{
         authService.sendOtp(email);
         return Helper.returnSuccessResponse("OTP has been sent", null);
+    }
+
+    @GetMapping("forgot-password")
+    public ResponseEntity<?> searchByEmail(@RequestParam String email) throws Exception{
+        AccountDto accountDto = authService.searchByEmail(email);
+        return Helper.returnSuccessResponse("Search account success", accountDto);
     }
 
     @PutMapping("forgot-password")

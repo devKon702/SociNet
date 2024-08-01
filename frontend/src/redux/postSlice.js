@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getPost } from "../api/PostService";
+import { editPost, getPost, removePost } from "../api/PostService";
 
 const postSlice = createSlice({
   name: "post",
@@ -34,12 +34,24 @@ const postSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(updatePostThunk.fulfilled, (state, action) => {
-      const index = state.postList.findIndex(
-        (post) => post.id === action.payload.id
-      );
-      state.postList[index] = action.payload;
-    });
+    builder
+      .addCase(updatePostThunk.fulfilled, (state, action) => {
+        const index = state.postList.findIndex(
+          (post) => post.id === action.payload.id
+        );
+        state.postList[index] = action.payload;
+      })
+      .addCase(editPostThunk.fulfilled, (state, action) => {
+        const index = state.postList.findIndex(
+          (post) => post.id === action.payload.id
+        );
+        state.postList[index] = action.payload;
+      })
+      .addCase(removePostThunk.fulfilled, (state, action) => {
+        state.postList = state.postList.filter(
+          (post) => post.id !== action.payload
+        );
+      });
   },
 });
 
@@ -48,6 +60,22 @@ export const updatePostThunk = createAsyncThunk(
   async (postId, _) => {
     const response = await getPost(postId);
     return response.data;
+  }
+);
+
+export const editPostThunk = createAsyncThunk(
+  "post/editPostThunk",
+  async ({ postId, caption, file }) => {
+    const res = await editPost(postId, caption, file, null);
+    return res.data;
+  }
+);
+
+export const removePostThunk = createAsyncThunk(
+  "post/removePostThunk",
+  async (postId) => {
+    const res = await removePost(postId);
+    return postId;
   }
 );
 

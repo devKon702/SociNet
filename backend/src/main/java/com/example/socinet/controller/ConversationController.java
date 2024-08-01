@@ -11,13 +11,13 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/conversation")
+@RequestMapping("/api/v1/conversations")
 @AllArgsConstructor
 public class ConversationController {
     private final ConversationService conversationService;
 
-    @GetMapping("user/{userId}")
-    public ResponseEntity<?> getConversationListWithUser(@PathVariable Long userId,
+    @GetMapping("")
+    public ResponseEntity<?> getConversationListWithUser(@RequestParam Long userId,
                                                      @RequestParam(defaultValue ="0") int page,
                                                      @RequestParam(defaultValue = "50") int size) throws Exception{
         List<ConversationDto> result = conversationService.getConversationList(userId);
@@ -32,8 +32,8 @@ public class ConversationController {
 
     @PostMapping("")
     public ResponseEntity<?> createConversation(@RequestParam Long receiverId,
-                                                @RequestParam String content,
-                                                @RequestParam MultipartFile file) throws Exception{
+                                                @RequestParam(required = false) String content,
+                                                @RequestParam(required = false) MultipartFile file) throws Exception{
         ConversationDto result = conversationService.createConversation(receiverId, content, file);
         return Helper.returnSuccessResponse("Create conversation success", result);
     }
@@ -45,7 +45,7 @@ public class ConversationController {
         return Helper.returnSuccessResponse("Update conversation success", result);
     }
 
-    @DeleteMapping("id")
+    @DeleteMapping("{id}")
     public ResponseEntity<?> removeConversation(@PathVariable Long id) throws Exception{
         ConversationDto result = conversationService.removeConversation(id);
         return Helper.returnSuccessResponse("Remove conversation success", result);

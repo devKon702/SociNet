@@ -151,6 +151,12 @@ public class AuthService {
         emailOtpService.sendOtp(email);
     }
 
+    public AccountDto searchByEmail(String email) throws Exception{
+        Optional<Account> account = accountRepo.findByEmail(email);
+        if(account.isPresent()) return new AccountDto(account.get());
+        else return null;
+    }
+
     public AccountDto forgotPassword(String email, String newPassword, String otp) throws Exception{
         // Kiểm tra OTP hợp lệ
         if(!emailOtpService.checkOpt(email, otp)) throw new Exception("Invalid OTP");

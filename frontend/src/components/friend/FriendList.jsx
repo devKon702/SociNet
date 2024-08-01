@@ -2,22 +2,26 @@ import React, { useEffect, useState } from "react";
 import { getUserInfos } from "../../api/UserService";
 import FriendItem from "./FriendItem";
 import { useSelector } from "react-redux";
+import { personalSelector } from "../../redux/selectors";
 
 const FriendList = () => {
-  const [friendList, setFriendList] = useState([]);
   const user = useSelector((state) => state.auth.user.user);
+  const { friendList } = useSelector(personalSelector);
 
-  useEffect(() => {
-    getUserInfos().then((res) => setFriendList([...res.data]));
-  }, []);
-  return (
-    <>
-      {friendList.map((friend) => {
-        if (friend.id === user.id) return;
-        return <FriendItem user={friend} key={friend.id}></FriendItem>;
-      })}
-    </>
-  );
+  if (friendList.length == 0)
+    return (
+      <div className="h-[150px] w-full flex items-center justify-center text-xl text-gray-500 font-bold">
+        Hiện chưa có bạn bè nào
+      </div>
+    );
+  else
+    return (
+      <div className="grid grid-cols-3 py-4">
+        {friendList.map((friend) => (
+          <FriendItem user={friend} key={friend.id}></FriendItem>
+        ))}
+      </div>
+    );
 };
 
 export default FriendList;

@@ -1,24 +1,31 @@
 import React, { useEffect, useRef, useState } from "react";
-import { NavLink, Outlet, useParams } from "react-router-dom";
+import { Link, NavLink, Outlet, useParams } from "react-router-dom";
 import CreatePostDialog from "../components/dialog/CreatePostDialog";
 import UserInfoDIalog from "../components/dialog/UserInfoDIalog";
 import { useDispatch, useSelector } from "react-redux";
 import { userInfoSelector } from "../redux/selectors";
 import { getUserInfo } from "../api/UserService";
-import { getPersonalInfo, getPersonalPost } from "../redux/personalSlice";
+import {
+  createInvitationThunk,
+  getPersonalInfo,
+  getPersonalPost,
+  preparePersonalInfoThunk,
+} from "../redux/personalSlice";
 
 const PersonalPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const [isShowCreatePostModal, setShowCreatePostModal] = useState(false);
   const [isShowUpdateInfoModal, setShowUpdateInfoModal] = useState(false);
-  const user = useSelector((state) => state.personal.user);
+  const { user, friendStatus } = useSelector((state) => state.personal);
   const currentUser = useSelector((state) => state.auth?.user?.user);
   useEffect(() => {
-    dispatch(getPersonalInfo(id));
-    dispatch(getPersonalPost(id));
-  }, [dispatch, id]);
+    dispatch(preparePersonalInfoThunk(id));
+  }, [id]);
 
+  const handleInvite = () => {
+    dispatch(createInvitationThunk(id));
+  };
   if (!user) return <></>;
   return (
     <div className="px-4 py-3 bg-gray-300">
@@ -87,15 +94,30 @@ const PersonalPage = () => {
             </div>
           ) : (
             <div className="ml-auto flex flex-col gap-3">
-              <button className="bg-gray-200 p-3 rounded-md flex items-center gap-2">
-                <i className="bx bxs-user-check text-xl"></i>Bạn bè
-              </button>
-              <button className="bg-blue-400 text-white font-bold p-3 rounded-md flex items-center gap-2">
-                <i className="bx bxs-user-plus text-xl"></i>Mời kết bạn
-              </button>
-              <button className="bg-secondary text-white font-bold p-3 rounded-md flex items-center gap-2">
+              {friendStatus === "FRIEND" && (
+                <div className="bg-gray-200 p-3 rounded-md flex items-center gap-2 font-bold">
+                  <i className="bx bxs-user-check text-xl"></i>Bạn bè
+                </div>
+              )}
+              {friendStatus === "NO" && (
+                <button
+                  className="bg-blue-400 text-white font-bold p-3 rounded-md flex items-center gap-2"
+                  onClick={handleInvite}
+                >
+                  <i className="bx bxs-user-plus text-xl"></i>Mời kết bạn
+                </button>
+              )}
+              {friendStatus === "INVITED" && (
+                <div className="bg-gray-200 font-bold p-3 rounded-md flex items-center gap-2">
+                  <i className="bx bxs-user-check text-xl"></i>Đã gửi lời mời
+                </div>
+              )}
+              <Link
+                className="bg-secondary text-white font-bold p-3 rounded-md flex items-center gap-2"
+                to={`/conversation/${id}`}
+              >
                 <i className="bx bxs-message-rounded-dots"></i>Nhắn tin
-              </button>
+              </Link>
             </div>
           )}
         </div>

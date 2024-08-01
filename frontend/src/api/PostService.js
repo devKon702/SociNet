@@ -27,6 +27,22 @@ const PostService = {
       )
       .then((res) => res.data),
 
+  editPost: async (postId, caption, image, video) =>
+    axios
+      .put(
+        "api/v1/posts/" + postId,
+        { caption, image, video },
+        { headers: { "Content-Type": "multipart/form-data" } }
+      )
+      .then((res) => res.data)
+      .catch((e) => e.response.data),
+
+  removePost: async (postId) =>
+    axios
+      .delete("/api/v1/posts/" + postId)
+      .then((res) => res.data)
+      .catch((e) => e.response.data),
+
   getPostByUserId: async (userId) =>
     axios.get("api/v1/posts/user/" + userId).then((res) => res.data),
 };
@@ -37,5 +53,7 @@ export const {
   reactPost,
   deleteReactPost,
   createPost,
+  editPost,
+  removePost,
   getPostByUserId,
 } = PostService;

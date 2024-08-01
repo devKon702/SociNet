@@ -1,3 +1,5 @@
+import { format, isToday, isThisWeek } from "date-fns";
+
 export const dateFormated = (dateString) => {
   const inputDate = new Date(dateString);
   const currentDate = new Date();
@@ -14,12 +16,39 @@ export const dateFormated = (dateString) => {
   if (minutesDifference < 1) {
     return "just now";
   } else if (minutesDifference < 60) {
-    return `${minutesDifference} minutes ago`;
+    return `${minutesDifference} phút trước`;
   } else if (hoursDifference < 24) {
-    return `${hoursDifference} hours ago`;
+    return `${hoursDifference} giờ trước`;
   } else if (daysDifference < 7) {
-    return `${daysDifference} days ago`;
+    return `${daysDifference} ngày trước`;
   } else {
     return inputDate.toLocaleDateString(); // Format as day/month/year
   }
+};
+
+const daysMap = {
+  Monday: "T2",
+  Tuesday: "T3",
+  Wednesday: "T4",
+  Thursday: "T5",
+  Friday: "T6",
+  Saturday: "T7",
+  Sunday: "CN",
+};
+
+export const dateDetailFormated = (date) => {
+  // Kiểm tra nếu ngày là hôm nay
+  if (isToday(date)) {
+    return format(date, "HH:mm");
+  }
+
+  // Kiểm tra nếu ngày nằm trong tuần này
+  if (isThisWeek(date, { weekStartsOn: 1 })) {
+    // weekStartsOn: 1 cho biết tuần bắt đầu từ Thứ 2
+    const dayName = format(date, "EEEE");
+    return `${daysMap[dayName]} ${format(date, "HH:mm")}`;
+  }
+
+  // Nếu không phải hôm nay và không nằm trong tuần này
+  return format(date, "dd/MM/yyyy HH:mm");
 };

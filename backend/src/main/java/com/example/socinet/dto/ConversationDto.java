@@ -6,21 +6,30 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Date;
+
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ConversationDto {
-    UserDto sender;
-    UserDto receiver;
+    Long id;
+    Long senderId;
+    Long receiverId;
     String content;
     String fileUrl;
+    Date createdAt;
+    Date updatedAt;
     @JsonProperty("isActive")
     boolean isActive;
 
+
     public ConversationDto(Conversation conversation){
-        this.sender = new UserDto(conversation.getSender());
-        this.receiver = new UserDto(conversation.getReceiver());
+        this.id = conversation.getId();
+        this.senderId = conversation.getSender().getId();
+        this.receiverId = conversation.getReceiver().getId();
         this.content = conversation.getContent();
         this.fileUrl = conversation.getFileUrl();
+        this.createdAt = conversation.getCreatedAt();
+        this.updatedAt = conversation.getUpdatedAt();
         this.isActive = conversation.isActive();
     }
 }

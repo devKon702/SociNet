@@ -24,7 +24,8 @@ const UserService = {
           },
         }
       )
-      .then((res) => res.data),
+      .then((res) => res.data)
+      .catch((e) => e.response.data),
 };
 
 export const { getUserInfo, getUserInfos, updateUserInfo } = UserService;
