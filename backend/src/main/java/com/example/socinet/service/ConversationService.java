@@ -22,7 +22,7 @@ public class ConversationService {
     private final UserRepository userRepository;
     private final FirebaseStorageService storageService;
     private final long MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
-    private final String[] AVAILABLE_EXTENSIONS = {"png", "jpg"};
+    private final String[] AVAILABLE_EXTENSIONS = {"png", "jpg", "jpeg", "jfif"};
 
 
     public List<ConversationDto> getConversationList(Long userId) throws Exception{
@@ -41,20 +41,23 @@ public class ConversationService {
 
     public ConversationDto createConversation(Long receiverId, String content, MultipartFile file) throws Exception{
         User receiver = userRepository.findById(receiverId).orElseThrow(() -> new Exception("User is not exist"));
+        User sender = Helper.getAccountDetail().getUser();
+
+        if(receiver.getId() == sender.getId()) throw new Exception("Can not create conversation");
 
         String fileUrl = null;
         if(file != null){
-            if(file.getSize() > MAX_FILE_SIZE) throw new Exception("File's size must be <= 1MB");
             String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
-
             if(!Arrays.stream(AVAILABLE_EXTENSIONS).anyMatch((item) -> item.equals(extension)))
                 throw new Exception("Extension " + extension + " is not allowed");
+
+            if(file.getSize() > MAX_FILE_SIZE) throw new Exception("File's size must be <= 3MB");
 
             fileUrl = storageService.upload("images", file);
         }
 
         Conversation newConversation = Conversation.builder()
-                .sender(Helper.getAccountDetail().getUser())
+                .sender(sender)
                 .receiver(receiver)
                 .content(content)
                 .fileUrl(fileUrl)

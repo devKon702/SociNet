@@ -1,32 +1,25 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import PostItem from "./PostItem";
-import { postSelector } from "../../redux/selectors";
-import { getPosts } from "../../api/PostService";
 import { useEffect } from "react";
-import {
-  setError,
-  setLoading,
-  setPostList,
-  setSuccess,
-} from "../../redux/postSlice";
-import { getPersonalInfo, getPersonalPost } from "../../redux/personalSlice";
 
 const PersonalPostList = () => {
-  const dispatch = useDispatch();
-  const { postList, isLoading } = useSelector((state) => state.personal);
+  const { postList } = useSelector((state) => state.personal);
   useEffect(() => {}, []);
 
-  return (
-    <div className="flex-1 max-h-full overflow-y-auto custom-scroll flex flex-col items-center py-4 gap-8">
-      {isLoading ? (
-        <div>Loading</div>
-      ) : (
-        postList.map((post, index) => (
+  if (postList.length == 0)
+    return (
+      <div className="h-[150px] w-full flex items-center justify-center text-xl text-gray-500 font-bold">
+        Hiện chưa đăng bài viết nào
+      </div>
+    );
+  else
+    return (
+      <div className="flex-1 max-h-full overflow-y-auto custom-scroll flex flex-col items-center py-4 gap-8">
+        {postList.map((post, index) => (
           <PostItem key={index} post={post}></PostItem>
-        ))
-      )}
-    </div>
-  );
+        ))}
+      </div>
+    );
 };
 
 export default PersonalPostList;

@@ -19,8 +19,9 @@ const AuthService = {
       dispatch(setSuccess());
       dispatch(signin({ token: res.data.accessToken, user: res.data.account }));
       localStorage.setItem("socinet", res.data.refreshToken);
-      navigate("/");
-      return res.data.data;
+      if (res.data.account.roles.includes("USER")) navigate("/");
+      else if (res.data.account.roles.includes("ADMIN")) navigate("/admin");
+      return res;
     } catch (error) {
       console.log(error);
       dispatch(setError(error.response.data.message));
@@ -44,7 +45,7 @@ const AuthService = {
       dispatch(signin({ token: res.data.accessToken, user: res.data.account }));
       localStorage.setItem("socinet", res.data.refreshToken);
     } catch (e) {
-      navigate("/auth/signin");
+      dispatch(signout());
     }
   },
   getOtp: async (email) =>
@@ -52,7 +53,29 @@ const AuthService = {
       .get("api/v1/auth/otp/" + email)
       .then((res) => res.data)
       .catch((e) => e.response.data.message),
+
+  searchAccountByEmail: async (email) =>
+    axios
+      .get("api/v1/auth/forgot-password?email=" + email)
+      .then((res) => res.data),
+  forgotPassword: async (email, newPassword, otp) =>
+    axios
+      .put(
+        "api/v1/auth/forgot-password",
+        { email, newPassword, otp },
+        { headers: { "Content-Type": "multipart/form-data" } }
+      )
+      .then((res) => res.data)
+      .catch((e) => e.response.data.message),
 };
 
-export const { signIn, signOut, signUp, refreshToken, getOtp } = AuthService;
+export const {
+  signIn,
+  signOut,
+  signUp,
+  refreshToken,
+  getOtp,
+  searchAccountByEmail,
+  forgotPassword,
+} = AuthService;
 export default AuthService;

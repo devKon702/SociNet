@@ -3,21 +3,25 @@ import CommentModal from "../comment/CommentModal";
 import ChildPost from "./ChildPost";
 import { dateFormated } from "../../helper";
 import { deleteReactPost, reactPost } from "../../api/PostService";
-import { useDispatch } from "react-redux";
-import { updatePostThunk } from "../../redux/postSlice";
-import { setCurrentPostId, setReply } from "../../redux/commentSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { removePostThunk, updatePostThunk } from "../../redux/postSlice";
+import { setCommentAction, setCurrentPostId } from "../../redux/commentSlice";
 import { createComment } from "../../api/CommentService";
 import { TextareaAutosize } from "@mui/material";
 import { Link } from "react-router-dom";
 import ConfirmDialog from "../dialog/ConfirmDialog";
+import UpdatePostDialog from "../dialog/UpdatePostDialog";
+import { authSelector } from "../../redux/selectors";
 
 const PostItem = ({ post }) => {
   const [isShowComment, setIsShowComment] = useState(false);
   const [isShowEmojies, setIsShowEmojies] = useState(false);
   const [isShowConfirm, setIsShowConfirm] = useState(false);
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [commentValue, setCommentValue] = useState("");
 
   const dispatch = useDispatch();
+  const { user } = useSelector(authSelector);
 
   const handleComment = () => {
     if (commentValue.trim() == "") return;
@@ -27,16 +31,30 @@ const PostItem = ({ post }) => {
     setCommentValue("");
   };
 
+  const handleDelete = () => {
+    const check = confirm("Bạn có chắc muốn xóa bài viết này?");
+    if (check) {
+      dispatch(removePostThunk(post.id));
+    }
+  };
+
   return (
     <>
-      {isShowComment ? (
+      {isShowComment && (
         <CommentModal
           handleClose={() => {
             setIsShowComment(false);
-            dispatch(setReply({ isReplying: false, replyCommentId: null }));
+            dispatch(setCommentAction());
           }}
         ></CommentModal>
-      ) : null}
+      )}
+
+      {showUpdateDialog && (
+        <UpdatePostDialog
+          post={post}
+          handleClose={() => setShowUpdateDialog(false)}
+        ></UpdatePostDialog>
+      )}
       <div className="post-item bg-white w-11/12 rounded-xl p-3 text-gray-800 shadow-lg">
         {/* title */}
         <div className="flex gap-2 items-center">
@@ -56,31 +74,38 @@ const PostItem = ({ post }) => {
               {post.user.name}
             </Link>
             <span className="text-sm text-slate-500">
-              {dateFormated(post.createdAt)}
+              {post.createdAt == post.updatedAt
+                ? dateFormated(post.createdAt)
+                : `Đã chỉnh sửa ${dateFormated(post.updatedAt)}`}
             </span>
           </div>
 
-          <div className="cursor-pointer ml-auto popup-container">
-            <div className="size-8 hover:bg-gray-100 rounded-full grid place-items-center">
-              <i className="bx bx-dots-horizontal-rounded"></i>
-            </div>
-            <div className="popup rounded-md bg-gray-200 top-full right-0 w-36 overflow-hidden p-2">
-              <div className="px-3 py-2 hover:bg-gray-300 flex items-center gap-3 rounded-md">
-                <i className="bx bx-pencil"></i>Chỉnh sửa
+          {user.user.id === post.user.id && (
+            <div className="cursor-pointer ml-auto popup-container">
+              <div className="size-8 hover:bg-gray-100 rounded-full grid place-items-center">
+                <i className="bx bx-dots-horizontal-rounded"></i>
               </div>
-              <div
-                className="px-3 py-2 hover:bg-gray-300 flex items-center gap-3 rounded-md"
-                onClick={() => setIsShowConfirm(true)}
-              >
-                <i className="bx bxs-trash"></i>Gỡ
+              <div className="popup rounded-md bg-gray-200 top-full right-0 w-36 overflow-hidden p-2">
+                <div
+                  className="px-3 py-2 hover:bg-gray-300 flex items-center gap-3 rounded-md"
+                  onClick={() => setShowUpdateDialog(true)}
+                >
+                  <i className="bx bx-pencil"></i>Chỉnh sửa
+                </div>
+                <div
+                  className="px-3 py-2 hover:bg-gray-300 flex items-center gap-3 rounded-md"
+                  onClick={handleDelete}
+                >
+                  <i className="bx bxs-trash"></i>Gỡ
+                </div>
               </div>
+              {isShowConfirm && (
+                <ConfirmDialog
+                  handleClose={() => setIsShowConfirm(false)}
+                ></ConfirmDialog>
+              )}
             </div>
-            {isShowConfirm && (
-              <ConfirmDialog
-                handleClose={() => setIsShowConfirm(false)}
-              ></ConfirmDialog>
-            )}
-          </div>
+          )}
         </div>
         {/* Caption */}
         <p className="my-2">{post.caption}</p>

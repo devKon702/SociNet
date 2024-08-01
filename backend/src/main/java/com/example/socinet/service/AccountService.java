@@ -37,7 +37,7 @@ public class AccountService {
         }
     }
 
-    public void changeEmail(String newEmail, String otp) throws Exception {
+    public AccountDto changeEmail(String newEmail, String otp) throws Exception {
         // Kiểm tra email trùng
         if(accountRepo.existsByEmail(newEmail))
             throw new Exception("Email has already been used");
@@ -48,9 +48,8 @@ public class AccountService {
         Optional<Account> accountOpt = accountRepo.findAccountByUsername(accountDetail.getUsername());
         if(accountOpt.isPresent()){
             accountOpt.get().setEmail(newEmail);
-            accountRepo.save(accountOpt.get());
-        }
+            return new AccountDto(accountRepo.save(accountOpt.get()));
+        } else throw new Exception("Account not exist");
+
     }
-
-
 }

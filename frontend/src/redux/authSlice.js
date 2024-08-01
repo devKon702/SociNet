@@ -1,4 +1,6 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
+import { refreshToken } from "../api/AuthService";
 
 const authSlice = createSlice({
   name: "auth",
@@ -32,9 +34,19 @@ const authSlice = createSlice({
       state.isLoading = false;
       state.error = null;
     },
+    setUser: (state, action) => {
+      state.user = action.payload;
+    },
   },
 });
 
-export const { signin, signout, setPending, setError, setSuccess } =
+export const refreshTokenThunk = createAsyncThunk(
+  "auth/refreshTokenThunk",
+  async (dispatch, navigate) => {
+    await refreshToken(dispatch, navigate);
+  }
+);
+
+export const { signin, signout, setPending, setError, setSuccess, setUser } =
   authSlice.actions;
 export default authSlice.reducer;

@@ -1,11 +1,17 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { signIn } from "../api/AuthService";
 import { authSelector } from "../redux/selectors";
 import { setError } from "../redux/authSlice";
 
 const SigninPage = () => {
+  const [searchParams] = useSearchParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const auth = useSelector(authSelector);
@@ -28,6 +34,10 @@ const SigninPage = () => {
       navigate
     );
   };
+
+  useEffect(() => {
+    usernameInput.current.value = searchParams.get("username") || "";
+  }, [searchParams]);
 
   return (
     <div className="w-screen h-screen grid place-items-center">
@@ -54,7 +64,9 @@ const SigninPage = () => {
               placeholder="Ex: 123"
               type="password"
             />
-            {auth.error ? <p className="text-red-500">{auth.error}</p> : null}
+            {auth.error ? (
+              <p className="text-red-500">Đăng nhập thất bại</p>
+            ) : null}
           </div>
           <Link
             to="/auth/forgot-password"

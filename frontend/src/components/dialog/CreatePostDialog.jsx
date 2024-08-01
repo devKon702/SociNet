@@ -56,9 +56,9 @@ const CreatePostDialog = ({ handleClose }) => {
           </div>
           <TextareaAutosize
             ref={captionRef}
-            minRows={4}
+          minRows={3}
             className="text-black outline-none resize-none w-full border-[1px] p-4"
-            placeholder="Show us your caption"
+            placeholder="Viết tiêu đề tại đây"
           />
           <div>
             {imageSrc ? (
