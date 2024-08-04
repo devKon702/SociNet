@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface ConversationRepository extends JpaRepository<Conversation, Long> {
 
-    @Query("SELECT c FROM Conversation c WHERE (c.sender.id = :userId1 AND c.receiver.id = :userId2) OR (c.sender.id = :userId2 AND c.receiver.id = :userId1)")
+    @Query("SELECT c FROM Conversation c WHERE (c.sender.id = :userId1 AND c.receiver.id = :userId2) OR (c.sender.id = :userId2 AND c.receiver.id = :userId1) ORDER BY c.createdAt")
     List<Conversation> getConversations(@Param("userId1") Long userId1, @Param("userId2") Long userId2);
 
 }

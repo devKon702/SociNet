@@ -2,12 +2,11 @@ package com.example.socinet.controller;
 
 import com.example.socinet.dto.AccountDto;
 import com.example.socinet.dto.PostDto;
-import com.example.socinet.security.AccountDetail;
-import com.example.socinet.security.AccountDetailService;
 import com.example.socinet.service.AdminService;
 import com.example.socinet.service.PostService;
 import com.example.socinet.util.Helper;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,10 +19,35 @@ public class AdminController {
     private final AdminService adminService;
     private final PostService postService;
 
+    @GetMapping("accounts")
+    public ResponseEntity<?> getAccountsByName(@RequestParam(defaultValue = "") String name, Pageable pageable){
+        List<AccountDto> accountsDto = adminService.getAccountsByName(name, pageable);
+        return Helper.returnSuccessResponse("Get account list success", accountsDto);
+    }
+
+    @GetMapping("count/accounts")
+    public ResponseEntity<?> getNumberOfAccountsByName(@RequestParam(defaultValue = "") String name){
+        long count = adminService.getNumberOfAccountByName(name);
+        return Helper.returnSuccessResponse("Count account success", count);
+    }
+
+    @GetMapping("accounts/{username}")
+    public ResponseEntity<?> getAccount(@PathVariable String username) throws Exception{
+        AccountDto accountDto = adminService.getAccount(username);
+        return Helper.returnSuccessResponse("Get account success", accountDto);
+    }
+
     @GetMapping("posts")
-    public ResponseEntity<?> getPosts(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
-        List<PostDto> posts = postService.getPosts(page,size);
+    public ResponseEntity<?> getPostsByUserId(@RequestParam Long userId, Pageable pageable) throws Exception {
+
+        List<PostDto> posts = postService.getPostsByUserId(userId, pageable);
         return Helper.returnSuccessResponse("Get post list success", posts);
+    }
+
+    @GetMapping("count/posts")
+    public ResponseEntity<?> getNumberOfPostByUserId(@RequestParam Long userId){
+        Long count = adminService.getNumberOfPostByUserId(userId);
+        return Helper.returnSuccessResponse("Count post success", count);
     }
 
     @GetMapping("posts/{postId}")
@@ -36,12 +60,6 @@ public class AdminController {
     public ResponseEntity<?> managePost(@PathVariable long postId, @RequestParam String action) throws Exception{
         PostDto postDto = adminService.managePost(postId,action);
         return Helper.returnSuccessResponse(action + " success", postDto);
-    }
-
-    @GetMapping("accounts")
-    public ResponseEntity<?> getAccounts(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
-        List<AccountDto> accountsDto = adminService.getAccounts(page, size);
-        return Helper.returnSuccessResponse("Get user list success", accountsDto);
     }
 
     @PutMapping("accounts/{username}")

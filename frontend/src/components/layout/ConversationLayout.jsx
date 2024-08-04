@@ -4,15 +4,6 @@ import UserItem from "../conversation/UserItem";
 import { useSelector } from "react-redux";
 import { realtimeSelector } from "../../redux/selectors";
 
-const friendData = [
-  { id: 1, name: "Nguyễn Nhật Kha", avatarUrl: "/dev1.png" },
-  { id: 2, name: "PTITer", avatarUrl: "/dev1.png" },
-  { id: 3, name: "Nguyễn Kha", avatarUrl: null },
-  { id: 4, name: "Trần Tuấn Vĩ", avatarUrl: "/logo.png" },
-  { id: 5, name: "Nguyễn Trí Thông", avatarUrl: null },
-  { id: 6, name: "Đỗ Văn Đậu", avatarUrl: null },
-];
-
 const ConversationLayout = () => {
   const { realtimeFriends } = useSelector(realtimeSelector);
   return (

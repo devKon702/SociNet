@@ -8,6 +8,7 @@ import com.example.socinet.repository.AccountRepository;
 import com.example.socinet.repository.PostRepository;
 import com.example.socinet.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,7 +19,6 @@ import java.util.Optional;
 @AllArgsConstructor
 public class AdminService {
     private final PostRepository postRepo;
-    private final UserRepository userRepo;
     private final AccountRepository accountRepo;
 
     public PostDto managePost(Long postId, String action) throws Exception {
@@ -38,11 +38,26 @@ public class AdminService {
         return new PostDto(postRepo.save(postOpt.get()));
     }
 
-    public List<AccountDto> getAccounts(int page, int size){
-        List<Account> accounts = accountRepo.findAll();
+    public long getNumberOfPostByUserId(Long userId){
+        long count = postRepo.countByUser_Id(userId);
+        return count;
+    }
+
+    public List<AccountDto> getAccountsByName(String name, Pageable pageable){
+        List<Account> accounts = accountRepo.findByUser_NameContainingIgnoreCase(name, pageable);
         List<AccountDto> accountsDto = new ArrayList<>();
         accounts.forEach(account -> accountsDto.add(new AccountDto(account)));
         return accountsDto;
+    }
+
+    public AccountDto getAccount(String username) throws Exception{
+        Account account = accountRepo.findAccountByUsername(username).orElseThrow(() -> new Exception("Account is not exist"));
+        return new AccountDto(account);
+    }
+
+    public long getNumberOfAccountByName(String name){
+        long count = accountRepo.countByUser_NameContainingIgnoreCase(name);
+        return count;
     }
 
     public AccountDto manageAccount(String username, String action) throws Exception {

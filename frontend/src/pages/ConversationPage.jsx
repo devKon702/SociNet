@@ -6,7 +6,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { realtimeSelector } from "../redux/selectors";
 import {
   createConversationThunk,
+  editConversationThunk,
   getConversationThunk,
+  setConversationAction,
   setCurrentConversationUser,
 } from "../redux/realtimeSlice";
 
@@ -53,11 +55,11 @@ const ConversationPage = () => {
   const dispatch = useDispatch();
 
   const [content, setContent] = useState("");
-  const [files, setFiles] = useState(null);
+  const [files, setFiles] = useState([]);
   const [imgPreviewSrc, setImgPreviewSrc] = useState(null);
 
   const handleSend = () => {
-    if (!content.trim() || files.length == 0) return;
+    if (!content.trim() && !files) return;
     switch (action) {
       case "CREATE":
         dispatch(
@@ -70,6 +72,8 @@ const ConversationPage = () => {
         setContent("");
         break;
       case "EDIT":
+        dispatch(editConversationThunk({ id: currentMessage.id, content }));
+        dispatch(setConversationAction("CREATE"));
         break;
     }
   };
@@ -87,7 +91,7 @@ const ConversationPage = () => {
   useEffect(() => {
     if (action === "CREATE") setContent("");
     else if (action === "EDIT") setContent(currentMessage.content);
-  }, [action]);
+  }, [action, currentMessage]);
 
   useEffect(() => {
     dispatch(getConversationThunk(id));
@@ -129,21 +133,35 @@ const ConversationPage = () => {
         ))}
       </section>
       <section className="px-3 py-2">
-        <div className="p-2">
-          {action === "CREATE" && (
+        <div className="">
+          {action === "EDIT" && (
             <div className="flex justify-between">
               <p>Đang chỉnh sửa</p>
-              <button className="rounded-full hover:bg-gray-200 size-9 flex items-center justify-center">
+              <button
+                className="rounded-full hover:bg-gray-200 size-9 flex items-center justify-center"
+                onClick={() => dispatch(setConversationAction("CREATE"))}
+              >
                 <i className="bx bx-x text-2xl"></i>
               </button>
             </div>
           )}
           {imgPreviewSrc && (
-            <img
-              src={imgPreviewSrc}
-              alt=""
-              className="max-w-[200px] max-h-[100px] rounded-md shadow-lg"
-            />
+            <div className="relative size-fit">
+              <img
+                src={imgPreviewSrc}
+                alt=""
+                className="max-w-[200px] max-h-[100px] rounded-md shadow-lg m-2"
+              />
+              <button
+                className="rounded-full bg-gray-200 size-9 flex items-center justify-center absolute top-0 right-0 translate-x-1/3 -translate-y-1/3"
+                onClick={() => {
+                  setFiles([]);
+                  setImgPreviewSrc(null);
+                }}
+              >
+                <i className="bx bx-x text-2xl"></i>
+              </button>
+            </div>
           )}
         </div>
         <div className="flex gap-4 items-end">

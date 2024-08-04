@@ -6,6 +6,7 @@ import com.example.socinet.repository.PostRepository;
 import com.example.socinet.security.AccountDetail;
 import com.example.socinet.util.Helper;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,8 +34,8 @@ public class PostService {
         return new PostDto(post.get());
     }
 
-    public List<PostDto> getPostsByUserId(Long userId) throws Exception{
-        List<Post> posts = postRepo.findByUser_Id(userId);
+    public List<PostDto> getPostsByUserId(Long userId, Pageable pageable) throws Exception{
+        List<Post> posts = postRepo.findByUser_Id(userId, pageable);
         List<PostDto> postsDto = new ArrayList<>();
         posts.forEach(post -> postsDto.add(0, new PostDto(post)));
         return postsDto;

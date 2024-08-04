@@ -1,14 +1,11 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Link,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { signIn } from "../api/AuthService";
 import { authSelector } from "../redux/selectors";
-import { setError } from "../redux/authSlice";
+import { setError, signinWithGoogleThunk } from "../redux/authSlice";
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
 const SigninPage = () => {
   const [searchParams] = useSearchParams();
@@ -35,9 +32,30 @@ const SigninPage = () => {
     );
   };
 
+  const handleSignInWithGoogle = (credentialResponse) => {
+    const { email, name, picture, sub } = jwtDecode(
+      credentialResponse.credential
+    );
+    dispatch(
+      signinWithGoogleThunk({
+        email,
+        googleId: sub,
+        name,
+        avatarUrl: picture,
+      })
+    );
+  };
+
   useEffect(() => {
     usernameInput.current.value = searchParams.get("username") || "";
   }, [searchParams]);
+
+  useEffect(() => {
+    if (auth.isAuthenticated) {
+      if (auth.user.roles.includes("USER")) navigate("/");
+      if (auth.user.roles.includes("ADMIN")) navigate("/admin");
+    }
+  }, [auth.isAuthenticated]);
 
   return (
     <div className="w-screen h-screen grid place-items-center">
@@ -81,13 +99,22 @@ const SigninPage = () => {
             Sign in
           </button>
           <p className="text-gray-500 text-center">--------- Hoặc ---------</p>
-          <button
+          {/* <button
             className="flex items-center justify-center gap-4 w-full text-white bg-blue-500 text-center font-bold text-xl p-2 rounded-md my-4 shadow-2xl"
-            onClick={handleSignIn}
+            onClick={handleSignInWithGoogle}
           >
             <i className="bx bxl-google text-2xl"></i>
             Đăng nhập với Google
-          </button>
+          </button> */}
+          <div className="flex justify-center my-3">
+            <GoogleLogin
+              onSuccess={handleSignInWithGoogle}
+              onError={() => {
+                console.log("Login Failed");
+              }}
+              text="Đăng nhập với Google"
+            />
+          </div>
           <p className="text-center">
             Chưa có tài khoản?
             <Link

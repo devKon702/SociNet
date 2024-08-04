@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import { refreshToken } from "../api/AuthService";
+import { refreshToken, signInWithGoogle } from "../api/AuthService";
+import { socket } from "../socket";
 
 const authSlice = createSlice({
   name: "auth",
@@ -21,6 +22,7 @@ const authSlice = createSlice({
       state.token = null;
       state.user = null;
       state.isAuthenticated = false;
+      socket.disconnect();
     },
     setPending: (state) => {
       state.isLoading = true;
@@ -38,12 +40,33 @@ const authSlice = createSlice({
       state.user = action.payload;
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase(signinWithGoogleThunk.fulfilled, (state, action) => {
+      if (action.payload.isSuccess) {
+        const { accessToken, refreshToken, account } = action.payload.data;
+        state.token = accessToken;
+        localStorage.setItem("socinet", refreshToken);
+        state.user = account;
+        state.isAuthenticated = true;
+      } else {
+        console.log(action.payload.message);
+      }
+    });
+  },
 });
 
 export const refreshTokenThunk = createAsyncThunk(
   "auth/refreshTokenThunk",
   async (dispatch, navigate) => {
     await refreshToken(dispatch, navigate);
+  }
+);
+
+export const signinWithGoogleThunk = createAsyncThunk(
+  "auth/signinWithGoogleThunk",
+  async ({ email, googleId, name, avatarUrl }) => {
+    const res = await signInWithGoogle(email, googleId, name, avatarUrl);
+    return { ...res };
   }
 );
 

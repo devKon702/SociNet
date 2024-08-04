@@ -5,6 +5,7 @@ import com.example.socinet.security.AccountDetail;
 import com.example.socinet.service.PostService;
 import com.example.socinet.util.Helper;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,13 +33,13 @@ public class PostController {
     }
 
     @GetMapping("user/{id}")
-    public ResponseEntity<?> getPostByUser(@PathVariable(required = false) Long id) throws Exception{
+    public ResponseEntity<?> getPostByUser(@PathVariable(required = false) Long id, Pageable pageable) throws Exception{
         // Nếu không cung cấp id, lấy của user hiện tại
         if(id == null){
             AccountDetail accountDetail = Helper.getAccountDetail();
             id = accountDetail.getUser().getId();
         }
-        List<PostDto> posts = postService.getPostsByUserId(id);
+        List<PostDto> posts = postService.getPostsByUserId(id, pageable);
         return Helper.returnSuccessResponse("Get posts by user success", posts);
     }
 

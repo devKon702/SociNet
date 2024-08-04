@@ -120,6 +120,54 @@ public class AuthService {
         }
     }
 
+    public AuthDto signInWithGoogle(String email, String name, String avatarUrl, String googleId) throws Exception {
+        Account account = accountRepo.findByEmail(email).orElseGet(() -> {
+            // Build user
+            User newUser = User.builder()
+                    .name(name)
+                    .isMale(true)
+                    .avatarUrl(avatarUrl)
+                    .build();
+            // Build account
+            Set<Role> roles = new HashSet<>();
+            roles.add(new Role("USER"));
+            Account newAccount = Account.builder()
+                    .username(googleId)
+                    .password(passwordEncoder.encode(googleId))
+                    .email(email)
+                    .isActive(true)
+                    .roles(roles)
+                    .isEmailAuth(true)
+                    .user(userRepo.save(newUser))
+                    .build();
+            return accountRepo.save(newAccount);
+        });
+
+        String accessToken = jwtProvider.generateAccessToken(account.getUsername());
+        String refreshToken = jwtProvider.generateRefreshToken(account.getUsername());
+        // Kiểm tra đã có thiết bị đăng nhập chưa = tài khoản đã lưu một refresh token chưa
+        Optional<RefreshToken> refreshTokenOpt = refreshTokenRepo.findByAccount_Username(account.getUsername());
+        if(refreshTokenOpt.isPresent()){
+            // Cập nhật
+            refreshTokenOpt.get().setToken(refreshToken);
+            refreshTokenRepo.save(refreshTokenOpt.get());
+        } else{
+            // Tạo mới
+            RefreshToken newRefreshToken = RefreshToken.builder()
+                    .account(account)
+                    .token(refreshToken)
+                    .build();
+            refreshTokenRepo.save(newRefreshToken);
+        }
+
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return AuthDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .account(new AccountDto(account))
+                .build();
+    }
+
     public AuthDto doRefreshToken(String refreshToken) throws ExpiredJwtException, Exception {
         if(refreshToken != null && jwtProvider.validateToken(refreshToken, true)){
             // Kiểm tra subject trong token hợp lệ

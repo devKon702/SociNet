@@ -19,14 +19,23 @@ const AuthService = {
       dispatch(setSuccess());
       dispatch(signin({ token: res.data.accessToken, user: res.data.account }));
       localStorage.setItem("socinet", res.data.refreshToken);
-      if (res.data.account.roles.includes("USER")) navigate("/");
-      else if (res.data.account.roles.includes("ADMIN")) navigate("/admin");
+      // if (res.data.account.roles.includes("USER")) navigate("/");
+      // else if (res.data.account.roles.includes("ADMIN")) navigate("/admin");
       return res;
     } catch (error) {
       console.log(error);
       dispatch(setError(error.response.data.message));
     }
   },
+  signInWithGoogle: async (email, googleId, name, avatarUrl) =>
+    axios
+      .post(
+        "api/v1/auth/google",
+        { email, googleId, name, avatarUrl },
+        { headers: { "Content-Type": "multipart/form-data" } }
+      )
+      .then((res) => res.data)
+      .catch((e) => e.response.data),
   signOut: async (dispatch, navigate) => {
     dispatch(signout());
     localStorage.removeItem("socinet");
@@ -71,6 +80,7 @@ const AuthService = {
 
 export const {
   signIn,
+  signInWithGoogle,
   signOut,
   signUp,
   refreshToken,

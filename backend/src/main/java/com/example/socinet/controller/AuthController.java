@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @AllArgsConstructor
@@ -34,6 +35,12 @@ public class AuthController {
     public ResponseEntity<?> signIn(@Valid @RequestBody SignInRequest body, HttpServletRequest request) throws Exception{
         AuthDto authDto = authService.signIn(body);
         return Helper.returnSuccessResponse("Sign in success", authDto);
+    }
+
+    @PostMapping("google")
+    public ResponseEntity<?> loginWithGoogle(@RequestParam String email, @RequestParam String googleId, @RequestParam String name, @RequestParam String avatarUrl) throws Exception {
+        AuthDto authDto = authService.signInWithGoogle(email, name, avatarUrl, googleId);
+        return Helper.returnSuccessResponse("Login with google success", authDto);
     }
 
     @GetMapping("refresh-token/{token}")

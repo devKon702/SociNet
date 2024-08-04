@@ -9,8 +9,8 @@ const AuthenticatedPage = () => {
   const { isAuthenticated } = useSelector(authSelector);
   const user = useSelector(userInfoSelector);
   if (isAuthenticated) {
-    socket.connect();
-    socket.emit("NOTIFY ONLINE", user);
+    // socket.connect();
+    // socket.emit("NOTIFY ONLINE", user);
   }
   return isAuthenticated ? <Outlet></Outlet> : <Navigate to={"auth/signin"} />;
 };

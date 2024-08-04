@@ -74,8 +74,8 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**", "/api/v1/test/**").permitAll()
-                        .requestMatchers("/api/v1/**").hasAuthority("USER")
                         .requestMatchers("/api/v1/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/api/v1/**").hasAuthority("USER")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(ssm -> ssm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -108,6 +108,4 @@ public class WebSecurityConfig {
 
         return FirebaseApp.initializeApp(options);
     }
-
-
 }

@@ -11,7 +11,6 @@ import {
   removeConversation,
   updateConversation,
 } from "../api/ConversationService";
-import { ActionCodeURL } from "firebase/auth/web-extension";
 import { socket } from "../socket";
 import { getUserInfo } from "../api/UserService";
 
@@ -19,7 +18,7 @@ const realtimeSlice = createSlice({
   name: "realtime",
   initialState: {
     invitations: [],
-    realtimeFriends: [],
+    realtimeFriends: [], // {...user, realtimeStatus}
     newInvitationNumber: 0,
     conversation: {
       currentUser: null,
@@ -46,6 +45,19 @@ const realtimeSlice = createSlice({
       );
       invite.status = action.payload.status;
     },
+    updateFriendStatus: (state, action) => {
+      const index = state.realtimeFriends.findIndex(
+        (item) => action.payload.user.id === item.id
+      );
+      if (index != -1) {
+        state.realtimeFriends[index].realtimeStatus = action.payload.status;
+        if (
+          state.conversation.currentUser &&
+          state.conversation.currentUser.id === action.payload.user.id
+        )
+          state.conversation.currentUser = state.realtimeFriends[index];
+      }
+    },
     // action.payload : list id các friend online
     setOnlineFriend: (state, action) => {
       state.realtimeFriends.forEach(
@@ -57,11 +69,30 @@ const realtimeSlice = createSlice({
       state.conversation.currentUser = state.realtimeFriends.find(
         (item) => item.id === state.conversation.currentUser?.id
       );
+      state.isLoading = false;
     },
     setCurrentConversationUser: (state, action) => {
       state.conversation.currentUser = state.realtimeFriends.find(
         (item) => item.id === action.payload
       );
+    },
+    setNewMessage: (state, action) => {
+      const newMessage = action.payload;
+      if (newMessage.senderId === state.conversation.currentUser.id) {
+        state.conversation.messageList.unshift(newMessage);
+      }
+    },
+    setUpdateMessage: (state, action) => {
+      const updatedMessage = action.payload;
+      if (
+        state.conversation.currentUser &&
+        updatedMessage.senderId === state.conversation.currentUser.id
+      ) {
+        const index = state.conversation.messageList.findIndex(
+          (item) => item.id === updatedMessage.id
+        );
+        if (index != -1) state.conversation.messageList[index] = updatedMessage;
+      }
     },
   },
   extraReducers: (builder) => {
@@ -78,7 +109,6 @@ const realtimeSlice = createSlice({
           "FILTER ONLINE FRIEND",
           friendResult.data.map((item) => item.id)
         );
-        state.isLoading = false;
       })
       .addCase(responseInvitationThunk.fulfilled, (state, action) => {
         console.log(action.payload.message);
@@ -121,9 +151,9 @@ const realtimeSlice = createSlice({
             (item) => item.id === action.payload.data.id
           );
           if (index !== -1) {
-            state.conversation.messageList[index] = action.payload.data.id;
-            socket.emit("UPDATE MESSAGE", action.payload.data);
+            state.conversation.messageList[index] = action.payload.data;
           }
+          socket.emit("UPDATE MESSAGE", action.payload.data);
         } else {
           console.log(action.payload.message);
           return;
@@ -138,7 +168,7 @@ const realtimeSlice = createSlice({
           (item) => item.id === action.payload.data.id
         );
         if (index !== -1) {
-          state.conversation.messageList[index] = action.payload.data.id;
+          state.conversation.messageList[index] = action.payload.data;
           socket.emit("UPDATE MESSAGE", action.payload.data);
         }
       });
@@ -197,5 +227,10 @@ export const {
   setInvitationStatus,
   setOnlineFriend,
   setCurrentConversationUser,
+  setConversationAction,
+  setCurrentMessage,
+  updateFriendStatus,
+  setNewMessage,
+  setUpdateMessage,
 } = realtimeSlice.actions;
 export default realtimeSlice.reducer;

@@ -16,21 +16,25 @@ const userIo = io.of("/");
 const adminIo = io.of("/admin");
 
 userIo.on("connection", (socket) => {
+  let socketUser = null;
+
   socket.on("NOTIFY ONLINE", (user) => {
-    console.log("User " + user.name + " has just connected");
+    console.log("User " + user.name + " has just connect");
+    socketUser = user;
     socketManager[user.id] = socket.id;
-    userIo.emit("NEW ONLINE USER", user);
+    socket.broadcast.emit("NEW ONLINE USER", user);
   });
 
-  socket.on("NOTIFY OFFLINE", (user) => {
-    socketManager[user.id] = null;
-    userIo.emit("NEW OFFLINE USER", user);
+  socket.on("disconnect", () => {
+    console.log("User " + socketUser?.name + " has just disconnect");
+    delete socketManager[socketUser?.id];
+    socket.broadcast.emit("NEW OFFLINE USER", socketUser);
   });
 
   socket.on("FILTER ONLINE FRIEND", (idList) => {
     socket.emit(
       "FILTER ONLINE FRIEND",
-      idList.filter((item) => Object.keys(socketManager).includes(item))
+      idList.filter((item) => Object.keys(socketManager).includes("" + item))
     );
   });
 
