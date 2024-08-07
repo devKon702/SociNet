@@ -13,22 +13,13 @@ const AdminDashboard = () => {
         Trang chủ
       </NavLink>
       <NavLink
-        to={"/admin/posts"}
-        className={({ isActive }) =>
-          `${isActive ? "bg-primary" : "hover:bg-gray-600"} py-4 px-6`
-        }
-      >
-        <i className="bx bxs-card mr-2"></i>
-        Quản lý bài viết
-      </NavLink>
-      <NavLink
-        to={"/admin/users"}
+        to={"/admin/manage"}
         className={({ isActive }) =>
           `${isActive ? "bg-primary" : "hover:bg-gray-600"} py-4 px-6`
         }
       >
         <i className="bx bxs-user-account mr-2"></i>
-        Quản lý người dùng
+        Quản trị
       </NavLink>
     </div>
   );

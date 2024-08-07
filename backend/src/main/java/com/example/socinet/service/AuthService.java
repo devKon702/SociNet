@@ -92,6 +92,8 @@ public class AuthService {
         // Xác thực thành công
         if(account.isPresent() && authentication.isAuthenticated()){
             AccountDto accountDto = new AccountDto(account.get());
+            // Kiểm tra tài khoản có active không
+            if(!accountDto.isActive()) throw new Exception("Inactive Account");
             String accessToken = jwtProvider.generateAccessToken(accountDto.getUsername());
             String refreshToken = jwtProvider.generateRefreshToken(accountDto.getUsername());
             // Kiểm tra đã có thiết bị đăng nhập chưa = tài khoản đã lưu một refresh token chưa

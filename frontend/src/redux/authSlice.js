@@ -22,6 +22,7 @@ const authSlice = createSlice({
       state.token = null;
       state.user = null;
       state.isAuthenticated = false;
+      localStorage.removeItem("socinet");
       socket.disconnect();
     },
     setPending: (state) => {
@@ -49,7 +50,7 @@ const authSlice = createSlice({
         state.user = account;
         state.isAuthenticated = true;
       } else {
-        console.log(action.payload.message);
+        console.log(action.payload);
       }
     });
   },

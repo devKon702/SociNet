@@ -19,3 +19,12 @@ export const personalSelector = (state) => state.personal;
 
 // REALTIME
 export const realtimeSelector = (state) => state.realtime;
+export const realtimeFriendSelector = (state) => {
+  const filter = state.realtime.conversation.filter;
+  return state.realtime.realtimeFriends.filter((item) =>
+    item.name.toLowerCase().includes(filter.toLowerCase())
+  );
+};
+
+// ADMIN
+export const adminSelector = (state) => state.admin;

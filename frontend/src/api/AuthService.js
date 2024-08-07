@@ -8,23 +8,24 @@ import {
 } from "../redux/authSlice";
 const AuthService = {
   signIn: async ({ username, password }, dispatch, navigate) => {
-    try {
-      dispatch(setPending());
-      const res = await axios
-        .post("api/v1/auth/sign-in", {
-          username,
-          password,
-        })
-        .then((res) => res.data);
+    dispatch(setPending());
+    const res = await axios
+      .post("api/v1/auth/sign-in", {
+        username,
+        password,
+      })
+      .then((res) => res.data)
+      .catch((e) => e.response.data);
+    if (res.isSuccess) {
       dispatch(setSuccess());
       dispatch(signin({ token: res.data.accessToken, user: res.data.account }));
       localStorage.setItem("socinet", res.data.refreshToken);
       // if (res.data.account.roles.includes("USER")) navigate("/");
       // else if (res.data.account.roles.includes("ADMIN")) navigate("/admin");
       return res;
-    } catch (error) {
-      console.log(error);
-      dispatch(setError(error.response.data.message));
+    } else {
+      console.log(res);
+      dispatch(setError(res.message));
     }
   },
   signInWithGoogle: async (email, googleId, name, avatarUrl) =>
@@ -38,7 +39,6 @@ const AuthService = {
       .catch((e) => e.response.data),
   signOut: async (dispatch, navigate) => {
     dispatch(signout());
-    localStorage.removeItem("socinet");
     navigate("/auth/signin");
   },
   signUp: async (username, password, email, name, otp) =>

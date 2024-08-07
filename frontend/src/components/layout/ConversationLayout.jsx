@@ -1,11 +1,15 @@
-import React from "react";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import UserItem from "../conversation/UserItem";
-import { useSelector } from "react-redux";
-import { realtimeSelector } from "../../redux/selectors";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  realtimeFriendSelector,
+  realtimeSelector,
+} from "../../redux/selectors";
+import { setConversationFilter } from "../../redux/realtimeSlice";
 
 const ConversationLayout = () => {
-  const { realtimeFriends } = useSelector(realtimeSelector);
+  const realtimeFriends = useSelector(realtimeFriendSelector);
+  const dispatch = useDispatch();
   return (
     <div className="flex container justify-center items-center gap-5 text-gray-800">
       <section className="flex flex-col rounded-lg w-3/12 h-full bg-white overflow-hidden p-2 gap-2">
@@ -33,6 +37,7 @@ const ConversationLayout = () => {
 
         <div className="divider"></div>
         <input
+          onChange={(e) => dispatch(setConversationFilter(e.target.value))}
           type="text"
           placeholder="Tìm kiếm..."
           className="rounded-3xl outline-none bg-gray-300 p-3"

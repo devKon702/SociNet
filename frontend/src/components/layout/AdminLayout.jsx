@@ -9,7 +9,7 @@ const AdminLayout = () => {
       <AdminHeader></AdminHeader>
       <div className="flex-1 flex overflow-hidden">
         <AdminDashboard></AdminDashboard>
-        <div className="flex-1 overflow-auto custom-scroll bg-white w-full py-3 px-8">
+        <div className="flex-1 overflow-auto custom-scroll bg-gray-100 w-full py-3 px-8">
           <Outlet></Outlet>
         </div>
       </div>

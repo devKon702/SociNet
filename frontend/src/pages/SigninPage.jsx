@@ -99,13 +99,6 @@ const SigninPage = () => {
             Sign in
           </button>
           <p className="text-gray-500 text-center">--------- Hoặc ---------</p>
-          {/* <button
-            className="flex items-center justify-center gap-4 w-full text-white bg-blue-500 text-center font-bold text-xl p-2 rounded-md my-4 shadow-2xl"
-            onClick={handleSignInWithGoogle}
-          >
-            <i className="bx bxl-google text-2xl"></i>
-            Đăng nhập với Google
-          </button> */}
           <div className="flex justify-center my-3">
             <GoogleLogin
               onSuccess={handleSignInWithGoogle}

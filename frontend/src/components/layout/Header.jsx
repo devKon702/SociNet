@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { realtimeSelector, userInfoSelector } from "../../redux/selectors";
@@ -6,14 +6,30 @@ import { signOut } from "../../api/AuthService";
 import { ClickAwayListener } from "@mui/base/ClickAwayListener";
 import InvitationItem from "../notify/InvitationItem";
 import { setNewInvitationNumber } from "../../redux/realtimeSlice";
+import { longFormatters } from "date-fns";
+import { useDebounce } from "@uidotdev/usehooks";
+import { getUsersByName } from "../../api/UserService";
 
 const Header = () => {
-  const [isShow, setIsShow] = useState(false);
-  const [showNotify, setShowNotify] = useState(false);
-  const user = useSelector(userInfoSelector);
-  const { invitations, newInvitationNumber } = useSelector(realtimeSelector);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const user = useSelector(userInfoSelector);
+  const { invitations, newInvitationNumber } = useSelector(realtimeSelector);
+  const [showNotify, setShowNotify] = useState(false);
+  const [isSearching, setSearching] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const searchValueDebouced = useDebounce(searchValue, 500);
+  const [searchedUserList, setSearchedUserList] = useState([]);
+
+  useEffect(() => {
+    if (searchValueDebouced) {
+      getUsersByName(searchValueDebouced).then((res) => {
+        setSearchedUserList(res.data);
+      });
+    } else {
+      setSearchedUserList([]);
+    }
+  }, [searchValueDebouced]);
 
   return (
     <div className="w-full h-[60px] flex justify-between items-center bg-slate-700 py-3 px-10 rounded-b-xl">
@@ -36,14 +52,61 @@ const Header = () => {
           />
         </div>
       </Link>
-      <div className="rounded-2xl outline-none py-2 px-4 w-1/3 bg-slate-500 flex items-center gap-2">
-        <i className="bx bx-search"></i>
-        <input
-          type="text"
-          placeholder="Tìm kiếm người dùng"
-          className="bg-transparent outline-none flex-1"
-        />
-      </div>
+      <ClickAwayListener
+        onClickAway={() => {
+          setSearching(false);
+        }}
+      >
+        <div className="rounded-2xl py-2 px-4 w-1/4 bg-slate-500 flex items-center gap-2 relative">
+          <i className="bx bx-search"></i>
+          <input
+            value={searchValue}
+            type="text"
+            placeholder="Tìm kiếm người dùng"
+            className="bg-transparent outline-none flex-1"
+            onFocus={() => setSearching(true)}
+          />
+          {isSearching && (
+            <div className="absolute top-0 -left-2 -right-2 bg-slate-700 rounded-md shadow-lg z-30 px-2">
+              <div className="rounded-2xl py-2 px-4 bg-slate-500 flex items-center gap-2">
+                <i className="bx bx-search"></i>
+                <input
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                  type="text"
+                  placeholder="Tìm kiếm người dùng"
+                  className="bg-transparent outline-none flex-1"
+                  autoFocus={true}
+                />
+              </div>
+              <div className="custom-scroll p-4 max-h-[200px] overflow-auto flex flex-col gap-2">
+                {searchedUserList.length == 0 ? (
+                  <p className="opacity-50">Hiện không có thông tin</p>
+                ) : (
+                  searchedUserList.map((item, index) => (
+                    <Link
+                      to={`/user/${item.id}`}
+                      className="w-full rounded-md hover:bg-gray-600 flex gap-2 p-2 items-center"
+                      key={index}
+                      onClick={() => {
+                        setSearchValue("");
+                        setSearching(false);
+                      }}
+                    >
+                      <img
+                        src={item.avatarUrl || "/unknown-avatar.png"}
+                        alt=""
+                        className="rounded-full size-8"
+                      />
+                      <p>{item.name}</p>
+                    </Link>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </ClickAwayListener>
       <div className="flex gap-4 items-center">
         <ClickAwayListener onClickAway={() => setShowNotify(false)}>
           <div
@@ -60,7 +123,7 @@ const Header = () => {
               </div>
             )}
             {showNotify && (
-              <div className="absolute right-0 bg-gray-800 w-[350px] rounded-md p-2 flex flex-col gap-2 z-50">
+              <div className="absolute right-0 bg-slate-700 w-[350px] rounded-md p-2 flex flex-col gap-2 z-50">
                 {invitations.length != 0 ? (
                   invitations.map((invite, index) => (
                     <InvitationItem
@@ -69,7 +132,7 @@ const Header = () => {
                     ></InvitationItem>
                   ))
                 ) : (
-                  <p className="text-gray-400 text-xl py-8 text-center">
+                  <p className="opacity-50 text-xl py-8 text-center">
                     Hiện chưa có thông báo nào
                   </p>
                 )}
@@ -77,10 +140,7 @@ const Header = () => {
             )}
           </div>
         </ClickAwayListener>
-        <div
-          className="flex gap-4 items-center cursor-pointer popup-container"
-          onClick={() => setIsShow(!isShow)}
-        >
+        <div className="flex gap-4 items-center cursor-pointer popup-container">
           <span className="font-bold">{user.name}</span>
           <div className="size-8 rounded-full overflow-hidden">
             <img

@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { getUserInfos } from "../../api/UserService";
 import FriendItem from "./FriendItem";
 import { useSelector } from "react-redux";
 import { personalSelector } from "../../redux/selectors";
 
 const FriendList = () => {
-  const user = useSelector((state) => state.auth.user.user);
   const { friendList } = useSelector(personalSelector);
 
   if (friendList.length == 0)

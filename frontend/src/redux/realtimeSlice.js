@@ -26,6 +26,7 @@ const realtimeSlice = createSlice({
       messageList: [],
       isLoading: false,
       action: "CREATE",
+      filter: "",
     },
     isLoading: true,
   },
@@ -38,6 +39,9 @@ const realtimeSlice = createSlice({
     },
     setCurrentMessage: (state, action) => {
       state.conversation.currentMessage = action.payload;
+    },
+    setConversationFilter: (state, action) => {
+      state.conversation.filter = action.payload;
     },
     setInvitationStatus: (state, action) => {
       const invite = state.invitations.find(
@@ -229,6 +233,7 @@ export const {
   setCurrentConversationUser,
   setConversationAction,
   setCurrentMessage,
+  setConversationFilter,
   updateFriendStatus,
   setNewMessage,
   setUpdateMessage,

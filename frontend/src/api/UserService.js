@@ -2,9 +2,16 @@ import axios from "axios";
 
 const UserService = {
   getUserInfo: async (userId) =>
-    axios.get("api/v1/users/" + userId).then((res) => res.data),
+    axios
+      .get("api/v1/users/" + userId)
+      .then((res) => res.data)
+      .catch((e) => e.response.data),
 
-  getUserInfos: async () => axios.get("api/v1/users").then((res) => res.data),
+  getUsersByName: async (name, page, size) =>
+    axios
+      .get("api/v1/users", { params: { name, page, size } })
+      .then((res) => res.data)
+      .catch((e) => e.response.data),
 
   updateUserInfo: async (name, phone, school, address, isMale, avatar) =>
     axios
@@ -28,4 +35,4 @@ const UserService = {
       .catch((e) => e.response.data),
 };
 
-export const { getUserInfo, getUserInfos, updateUserInfo } = UserService;
+export const { getUserInfo, getUsersByName, updateUserInfo } = UserService;

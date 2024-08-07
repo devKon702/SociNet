@@ -28,16 +28,24 @@ const AdminService = {
       .catch((e) => e.response.data),
   manageAccount: async (username, isActive) =>
     axios
-      .put(BASE + "/accounts/" + username, {
-        params: { action: isActive ? "activate" : "inactivate" },
-      })
+      .put(
+        BASE + "/accounts/" + username,
+        {},
+        {
+          params: { action: isActive ? "activate" : "inactivate" },
+        }
+      )
       .then((res) => res.data)
       .catch((e) => e.response.data),
   managePost: async (postId, isActive) =>
     axios
-      .put(BASE + "/posts/" + postId, {
-        params: { action: isActive ? "activate" : "inactivate" },
-      })
+      .put(
+        BASE + "/posts/" + postId,
+        {},
+        {
+          params: { action: isActive ? "activate" : "inactivate" },
+        }
+      )
       .then((res) => res.data)
       .catch((e) => e.response.data),
 };

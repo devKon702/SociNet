@@ -105,6 +105,7 @@ function App() {
               path="users"
               element={<AdminUserPage></AdminUserPage>}
             ></Route>
+            <Route path="account" element={<AccountPage></AccountPage>}></Route>
           </Route>
         </Route>
       </Route>

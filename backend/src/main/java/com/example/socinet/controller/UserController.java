@@ -4,6 +4,7 @@ import com.example.socinet.dto.UserDto;
 import com.example.socinet.service.UserService;
 import com.example.socinet.util.Helper;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,8 +24,8 @@ public class UserController {
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getUserInfos(){
-        List<UserDto> usersDto = userService.getUserInfos();
+    public ResponseEntity<?> getUserInfos(@RequestParam(defaultValue = "") String name, Pageable pageable){
+        List<UserDto> usersDto = userService.getUsersByName(name, pageable);
         return Helper.returnSuccessResponse("Get user list success", usersDto);
     }
 

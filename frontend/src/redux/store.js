@@ -7,6 +7,7 @@ import forgotPasswordReducer from "./forgotPasswordSlice";
 import accountReducer from "./accountSlice";
 import friendReducer from "./friendSlice";
 import realtimeReducer from "./realtimeSlice";
+import adminReducer from "./adminSlice";
 
 const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ const store = configureStore({
     account: accountReducer,
     friend: friendReducer,
     realtime: realtimeReducer,
+    admin: adminReducer,
   },
 });
 

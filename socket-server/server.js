@@ -59,7 +59,7 @@ adminIo.on("connection", (socket) => {
   console.log("ADMIN has just connected");
 
   socket.on("FORCE LOGOUT", (userId) => {
-    userIo.to(socketManager[userId].emit("FORCE LOGOUT"));
+    userIo.to(socketManager[userId]).emit("FORCE LOGOUT");
   });
 });
 

@@ -6,6 +6,7 @@ import com.example.socinet.repository.UserRepository;
 import com.example.socinet.security.AccountDetail;
 import com.example.socinet.util.Helper;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,6 +39,15 @@ public class UserService {
         } else{
             throw new Exception("User not found");
         }
+    }
+
+    public List<UserDto> getUsersByName(String name, Pageable pageable){
+        List<User> users = userRepo.findByNameContaining(name, pageable);
+        List<UserDto> userDto = new ArrayList<>();
+        users.forEach(user -> {
+            if(user.getId() != Helper.getUserId()) userDto.add(new UserDto(user));
+        });
+        return userDto;
     }
 
     public UserDto updateUserInfo(String name,
