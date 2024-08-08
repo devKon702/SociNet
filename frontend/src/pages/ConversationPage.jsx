@@ -44,13 +44,7 @@ const messageData = [
 const ConversationPage = () => {
   const { id } = useParams();
   const {
-    conversation: {
-      messageList,
-      currentUser,
-      isLoading,
-      currentMessage,
-      action,
-    },
+    conversation: { messageList, currentUser, currentMessage, action },
   } = useSelector(realtimeSelector);
   const dispatch = useDispatch();
 
@@ -165,9 +159,11 @@ const ConversationPage = () => {
           )}
         </div>
         <div className="flex gap-4 items-end">
-          <label htmlFor="input-file" className="cursor-pointer">
-            <i className="bx bxs-image text-2xl size-10 flex items-center justify-center rounded-full hover:bg-gray-200"></i>
-          </label>
+          {action != "EDIT" && (
+            <label htmlFor="input-file" className="cursor-pointer">
+              <i className="bx bxs-image text-2xl size-10 flex items-center justify-center rounded-full hover:bg-gray-200"></i>
+            </label>
+          )}
           <input
             type="file"
             id="input-file"

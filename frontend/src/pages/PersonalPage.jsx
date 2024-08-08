@@ -58,7 +58,17 @@ const PersonalPage = () => {
               <InforItem
                 icon="bx bxs-user"
                 label="Giới tính:"
-                info={user?.isMale}
+                info={
+                  user?.isMale ? (
+                    <span>
+                      Nam<i className="bx bx-male-sign ml-1 text-blue-500"></i>
+                    </span>
+                  ) : (
+                    <span>
+                      Nữ<i className="bx bx-female-sign ml-1 text-pink-500"></i>
+                    </span>
+                  )
+                }
               />
               <InforItem
                 icon="bx bxs-school"

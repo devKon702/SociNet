@@ -12,7 +12,7 @@ import AdminPostPage from "./pages/AdminPostPage";
 import { setupInterceptors } from "./axiosConfig";
 import store from "./redux/store";
 import { useDispatch, useSelector } from "react-redux";
-import { authSelector } from "./redux/selectors";
+import { authSelector, snackbarSelector } from "./redux/selectors";
 import { useEffect, useState } from "react";
 import { refreshToken } from "./api/AuthService";
 import PersonalPostList from "./components/post/PersonalPostList";
@@ -24,92 +24,127 @@ import AuthenticatedPage from "./pages/AuthenticatedPage";
 import UnauthPage from "./pages/UnauthPage";
 import UserPage from "./pages/UserPage";
 import AdminPage from "./pages/AdminPage";
+import { Alert, Slide, Snackbar } from "@mui/material";
+import { hideSnackbar } from "./redux/snackbarSlice";
+
+function SlideTransition(props) {
+  return <Slide {...props} direction="up" />;
+}
 
 function App() {
   setupInterceptors(store);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const [pending, setPending] = useState(true);
-  const auth = useSelector(authSelector);
+  const { isLoading } = useSelector(authSelector);
+  const { open, message, type } = useSelector(snackbarSelector);
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") return;
+    dispatch(hideSnackbar());
+  };
 
   useEffect(() => {
-    refreshToken(dispatch, navigate).then(() => {
-      setPending(false);
-    });
+    refreshToken(dispatch);
   }, []);
 
-  if (pending) {
+  if (isLoading) {
     return <div></div>;
   }
 
   return (
-    <Routes>
-      <Route path="/auth" element={<UnauthPage></UnauthPage>}>
-        <Route path="signin" element={<SigninPage></SigninPage>}></Route>
-        <Route path="signup" element={<SignupPage></SignupPage>}></Route>
-        <Route
-          path="forgot-password"
-          element={<ForgotPasswordPage></ForgotPasswordPage>}
-        ></Route>
-      </Route>
-
-      <Route path="" element={<AuthenticatedPage></AuthenticatedPage>}>
-        <Route element={<UserPage></UserPage>}>
-          <Route path="/" element={<Layout></Layout>}>
-            <Route path="" element={<Navigate to="/home" replace />}></Route>
-            <Route path="home" element={<HomePage></HomePage>}></Route>
-            <Route path="user/:id" element={<PersonalPage></PersonalPage>}>
-              <Route path="" element={<Navigate to="posts" replace />}></Route>
-              <Route
-                path="posts"
-                element={<PersonalPostList></PersonalPostList>}
-              ></Route>
-              <Route path="friends" element={<FriendList></FriendList>}></Route>
-            </Route>
-            <Route path="account" element={<AccountPage></AccountPage>}></Route>
-          </Route>
+    <>
+      <Routes>
+        <Route path="/auth" element={<UnauthPage></UnauthPage>}>
+          <Route path="signin" element={<SigninPage></SigninPage>}></Route>
+          <Route path="signup" element={<SignupPage></SignupPage>}></Route>
           <Route
-            path="/conversation"
-            element={<ConversationLayout></ConversationLayout>}
-          >
-            <Route
-              path=""
-              element={
-                <div className="flex flex-col items-center justify-center h-full opacity-50">
-                  <i className="bx bx-search-alt text-[100px]"></i>
-                  <p className="text-2xl">
-                    Hãy tìm một người bạn và bắt đầu cuộc trò chuyện
-                  </p>
-                </div>
-              }
-            ></Route>
-            <Route
-              path=":id"
-              element={<ConversationPage></ConversationPage>}
-            ></Route>
-          </Route>
+            path="forgot-password"
+            element={<ForgotPasswordPage></ForgotPasswordPage>}
+          ></Route>
         </Route>
 
-        <Route path="/admin" element={<AdminPage></AdminPage>}>
-          <Route path="" element={<AdminLayout></AdminLayout>}>
-            <Route path="" element={<Navigate to="home" replace />}></Route>
+        <Route path="" element={<AuthenticatedPage></AuthenticatedPage>}>
+          <Route element={<UserPage></UserPage>}>
+            <Route path="/" element={<Layout></Layout>}>
+              <Route path="" element={<Navigate to="/home" replace />}></Route>
+              <Route path="home" element={<HomePage></HomePage>}></Route>
+              <Route path="user/:id" element={<PersonalPage></PersonalPage>}>
+                <Route
+                  path=""
+                  element={<Navigate to="posts" replace />}
+                ></Route>
+                <Route
+                  path="posts"
+                  element={<PersonalPostList></PersonalPostList>}
+                ></Route>
+                <Route
+                  path="friends"
+                  element={<FriendList></FriendList>}
+                ></Route>
+              </Route>
+              <Route
+                path="account"
+                element={<AccountPage></AccountPage>}
+              ></Route>
+            </Route>
             <Route
-              path="home"
-              element={<AdminHomePage></AdminHomePage>}
-            ></Route>
-            <Route
-              path="posts"
-              element={<AdminPostPage></AdminPostPage>}
-            ></Route>
-            <Route
-              path="users"
-              element={<AdminUserPage></AdminUserPage>}
-            ></Route>
-            <Route path="account" element={<AccountPage></AccountPage>}></Route>
+              path="/conversation"
+              element={<ConversationLayout></ConversationLayout>}
+            >
+              <Route
+                path=""
+                element={
+                  <div className="flex flex-col items-center justify-center h-full opacity-50">
+                    <i className="bx bx-search-alt text-[100px]"></i>
+                    <p className="text-2xl">
+                      Hãy tìm một người bạn và bắt đầu cuộc trò chuyện
+                    </p>
+                  </div>
+                }
+              ></Route>
+              <Route
+                path=":id"
+                element={<ConversationPage></ConversationPage>}
+              ></Route>
+            </Route>
+          </Route>
+
+          <Route path="/admin" element={<AdminPage></AdminPage>}>
+            <Route path="" element={<AdminLayout></AdminLayout>}>
+              <Route path="" element={<Navigate to="home" replace />}></Route>
+              <Route
+                path="home"
+                element={<AdminHomePage></AdminHomePage>}
+              ></Route>
+              <Route
+                path="manage"
+                element={<AdminUserPage></AdminUserPage>}
+              ></Route>
+              <Route
+                path="account"
+                element={<AccountPage></AccountPage>}
+              ></Route>
+            </Route>
           </Route>
         </Route>
-      </Route>
-    </Routes>
+      </Routes>
+      <Snackbar
+        open={open}
+        autoHideDuration={1500}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
+        TransitionComponent={SlideTransition}
+        key={SlideTransition.name}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={type}
+          variant="standard"
+          sx={{ width: "100%" }}
+        >
+          {message}
+        </Alert>
+      </Snackbar>
+    </>
   );
 }
 

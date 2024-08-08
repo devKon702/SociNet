@@ -1,47 +1,89 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import { useDispatch } from "react-redux";
+import { signInThunk, signinWithGoogleThunk } from "../../redux/authSlice";
+import { Link, useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
 const schema = Yup.object({
-  username: Yup.string().required("Vui lòng điền username"),
+  username: Yup.string().required("Vui lòng điền tên tài khoản"),
   password: Yup.string().required("Vui lòng điền mật khẩu"),
 });
 
 const SignInForm = () => {
+  const [searchParams] = useSearchParams();
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
     formState: { errors },
+    getValues,
+    setValue,
   } = useForm({
     defaultValues: {
       username: "",
       password: "",
     },
     resolver: yupResolver(schema),
-    mode: "all",
+    mode: "onSubmit",
   });
 
-  const submit = () => {};
+  useEffect(() => {
+    setValue("username", searchParams.get("username") || "");
+  }, [searchParams]);
+
+  const submit = () => {
+    console.log(searchParams.get("username"));
+
+    const { username, password } = getValues();
+    dispatch(signInThunk({ username, password }));
+  };
+
+  const handleSignInWithGoogle = (credentialResponse) => {
+    const { email, name, picture, sub } = jwtDecode(
+      credentialResponse.credential
+    );
+    dispatch(
+      signinWithGoogleThunk({
+        email,
+        googleId: sub,
+        name,
+        avatarUrl: picture,
+      })
+    );
+  };
 
   return (
     <form onSubmit={handleSubmit(submit)}>
       <div className="w-full flex flex-col">
-        <p className="font-bold text-start mb-1">Username</p>
-        <input
-          className="rounded-md border-[2px] outline-none px-2 py-3 text-black mb-2"
-          placeholder="Ex: abc@"
-          {...register("username")}
-        />
+        <h1 className="text-primary text-center text-5xl font-bold mb-10">
+          Đăng nhập
+        </h1>
+        <div className="rounded-md border-[2px] outline-none p-3 text-gray-800 mb-2 flex items-center gap-3">
+          <i className="bx bx-user text-xl"></i>
+          <input
+            autoFocus={true}
+            className="outline-none flex-1"
+            placeholder="Tên tài khoản"
+            {...register("username")}
+          />
+        </div>
         {errors?.username && (
-          <p className="text-red-400 text-sm">{errors.username.message}</p>
+          <p className="text-red-400 text-sm mb-4">{errors.username.message}</p>
         )}
-        <p className="font-bold text-start mb-1">Password</p>
-        <input
-          className="rounded-md border-[2px] outline-none px-2 py-3 text-black mb-2"
-          placeholder="Ex: 123"
-          type="password"
-          {...register("password")}
-        />
+        <div className="rounded-md border-[2px] outline-none p-3 text-gray-800 mb-2 flex items-center gap-3">
+          <i className="bx bx-lock text-xl"></i>
+          <input
+            type="password"
+            className="outline-none flex-1"
+            placeholder="Mật khẩu"
+            {...register("password")}
+          />
+        </div>
+
         {errors?.password && (
           <p className="text-red-400 text-sm">{errors.password.message}</p>
         )}
@@ -56,8 +98,28 @@ const SignInForm = () => {
         className="inline-block w-full bg-primary text-white text-center font-bold text-xl p-2 rounded-md my-4"
         type="submit"
       >
-        Sign in
+        Đăng nhập
       </button>
+      <p className="text-gray-500 text-center">--------- Hoặc ---------</p>
+      <div className="flex justify-center my-3 rounded-full overflow-hidden">
+        <GoogleLogin
+          onSuccess={handleSignInWithGoogle}
+          onError={() => {
+            console.log("Login Failed");
+          }}
+          text="Đăng nhập với Google"
+          type="icon"
+        />
+      </div>
+      <p className="text-center">
+        Chưa có tài khoản?
+        <Link
+          to="/auth/signup"
+          className="text-secondary font-bold ms-1 cursor-pointer"
+        >
+          Đăng ký
+        </Link>
+      </p>
     </form>
   );
 };

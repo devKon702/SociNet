@@ -8,6 +8,7 @@ import accountReducer from "./accountSlice";
 import friendReducer from "./friendSlice";
 import realtimeReducer from "./realtimeSlice";
 import adminReducer from "./adminSlice";
+import snackbarReducer from "./snackbarSlice";
 
 const store = configureStore({
   reducer: {
@@ -20,6 +21,7 @@ const store = configureStore({
     friend: friendReducer,
     realtime: realtimeReducer,
     admin: adminReducer,
+    snackbar: snackbarReducer,
   },
 });
 

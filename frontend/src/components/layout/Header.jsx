@@ -61,6 +61,7 @@ const Header = () => {
           <i className="bx bx-search"></i>
           <input
             value={searchValue}
+            readOnly={true}
             type="text"
             placeholder="Tìm kiếm người dùng"
             className="bg-transparent outline-none flex-1"
@@ -151,6 +152,13 @@ const Header = () => {
           </div>
 
           <div className="popup top-full right-0 rounded-lg bg-gray-700 p-3 w-[200px] shadow-md z-50">
+            <Link
+              to={`/user/${user.id}`}
+              className="hover:bg-gray-600 rounded-md p-3 flex items-center gap-2"
+            >
+              <i className="bx bxs-home-circle text-xl"></i>
+              Trang cá nhân
+            </Link>
             <Link
               to="/account"
               className="hover:bg-gray-600 rounded-md p-3 flex items-center gap-2"

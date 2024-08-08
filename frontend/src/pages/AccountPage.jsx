@@ -259,7 +259,7 @@ const AccountPage = () => {
           </div>
         )}
         <div
-          className="flex justify-between items-center p-4 w-full rounded-md hover:bg-gray-100 cursor-pointer shadow-lg"
+          className="flex justify-between items-center p-4 w-full rounded-md hover:bg-gray-100 cursor-pointer shadow-lg mt-auto"
           onClick={handleSignOut}
         >
           <p>

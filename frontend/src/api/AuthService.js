@@ -6,28 +6,35 @@ import {
   signin,
   signout,
 } from "../redux/authSlice";
+
+const BASE = "api/v1/auth";
 const AuthService = {
-  signIn: async ({ username, password }, dispatch, navigate) => {
-    dispatch(setPending());
-    const res = await axios
-      .post("api/v1/auth/sign-in", {
-        username,
-        password,
-      })
+  // signIn: async ({ username, password }, dispatch) => {
+  //   dispatch(setPending());
+  //   const res = await axios
+  //     .post("api/v1/auth/sign-in", {
+  //       username,
+  //       password,
+  //     })
+  //     .then((res) => res.data)
+  //     .catch((e) => e.response.data);
+  //   if (res.isSuccess) {
+  //     dispatch(setSuccess());
+  //     dispatch(signin({ token: res.data.accessToken, user: res.data.account }));
+  //     localStorage.setItem("socinet", res.data.refreshToken);
+  //     // if (res.data.account.roles.includes("USER")) navigate("/");
+  //     // else if (res.data.account.roles.includes("ADMIN")) navigate("/admin");
+  //     return res;
+  //   } else {
+  //     console.log(res);
+  //     dispatch(setError(res.message));
+  //   }
+  // },
+  signIn: async (username, password) =>
+    axios
+      .post(BASE + "/sign-in", { username, password })
       .then((res) => res.data)
-      .catch((e) => e.response.data);
-    if (res.isSuccess) {
-      dispatch(setSuccess());
-      dispatch(signin({ token: res.data.accessToken, user: res.data.account }));
-      localStorage.setItem("socinet", res.data.refreshToken);
-      // if (res.data.account.roles.includes("USER")) navigate("/");
-      // else if (res.data.account.roles.includes("ADMIN")) navigate("/admin");
-      return res;
-    } else {
-      console.log(res);
-      dispatch(setError(res.message));
-    }
-  },
+      .catch((e) => e.response.data),
   signInWithGoogle: async (email, googleId, name, avatarUrl) =>
     axios
       .post(
@@ -44,17 +51,22 @@ const AuthService = {
   signUp: async (username, password, email, name, otp) =>
     axios
       .post("api/v1/auth/sign-up", { username, password, email, name, otp })
-      .then((res) => res.data),
-  refreshToken: async (dispatch, navigate) => {
-    try {
-      const token = localStorage.getItem("socinet");
-      const res = await axios
+      .then((res) => res.data)
+      .catch((e) => e.response.data),
+  refreshToken: async (dispatch) => {
+    const token = localStorage.getItem("socinet");
+    if (!token) dispatch(signout());
+    else {
+      axios
         .get(`api/v1/auth/refresh-token/${token}`)
-        .then((res) => res.data);
-      dispatch(signin({ token: res.data.accessToken, user: res.data.account }));
-      localStorage.setItem("socinet", res.data.refreshToken);
-    } catch (e) {
-      dispatch(signout());
+        .then((res) => {
+          const { accessToken, refreshToken, account } = res.data.data;
+          dispatch(signin({ token: accessToken, user: account }));
+          localStorage.setItem("socinet", refreshToken);
+        })
+        .catch(() => {
+          dispatch(signout());
+        });
     }
   },
   getOtp: async (email) =>

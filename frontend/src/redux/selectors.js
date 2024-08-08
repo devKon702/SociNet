@@ -28,3 +28,6 @@ export const realtimeFriendSelector = (state) => {
 
 // ADMIN
 export const adminSelector = (state) => state.admin;
+
+// SNACKBAR
+export const snackbarSelector = (state) => state.snackbar;

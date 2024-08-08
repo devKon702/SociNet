@@ -55,7 +55,7 @@ const ForgotPasswordPage = () => {
           >
             <div className="size-10 rounded-full overflow-hidden">
               <img
-                src={searchedAccount?.user?.avatarUrl || "unknown-avatar.png"}
+                src={searchedAccount?.user?.avatarUrl || "/unknown-avatar.png"}
                 alt=""
                 className="size-full object-cover"
               />
