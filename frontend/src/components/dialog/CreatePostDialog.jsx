@@ -17,7 +17,7 @@ const CreatePostDialog = ({ handleClose }) => {
   function handleFileChange(e) {
     const file = e.target.files[0];
     const fileSize = (file.size / 1024 / 1024).toFixed(2);
-    if (file.type.startsWith("image/")) {
+    if (!file.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = (e) => {
         setImageSrc(e.target.result);
@@ -56,18 +56,21 @@ const CreatePostDialog = ({ handleClose }) => {
           </div>
           <TextareaAutosize
             ref={captionRef}
-          minRows={3}
+            minRows={3}
             className="text-black outline-none resize-none w-full border-[1px] p-4"
             placeholder="Viết tiêu đề tại đây"
           />
           <div>
             {imageSrc ? (
               <div className="w-full h-[200px] relative">
-                <img
+                {/* <img
                   src={imageSrc}
                   alt=""
                   className="object-cover w-full h-full"
-                />
+                /> */}
+                <video controls>
+                  <source src={imageSrc} />
+                </video>
                 <button
                   className="rounded-full absolute top-0 right-0 bg-slate-500 text-white p-3 size-10 translate-x-1/4 -translate-y-1/4 flex items-center justify-center"
                   onClick={() => {

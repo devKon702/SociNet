@@ -11,13 +11,14 @@ const UserPage = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    socket.connect();
-    socket.emit("NOTIFY ONLINE", user.user);
-    dispatch(prepareRealtimeDataThunk());
-
-    return () => {
-      socket.disconnect();
-    };
+    if (user.roles.includes("USER")) {
+      socket.connect();
+      socket.emit("NOTIFY ONLINE", user.user);
+      dispatch(prepareRealtimeDataThunk());
+      return () => {
+        socket.disconnect();
+      };
+    }
   }, []);
 
   if (!user.roles.includes("USER")) return <Navigate to={"/admin"} />;

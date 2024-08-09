@@ -31,12 +31,12 @@ const SigninPage = () => {
     );
   };
 
-  useEffect(() => {
-    if (auth.isAuthenticated) {
-      if (auth.user.roles.includes("USER")) navigate("/");
-      if (auth.user.roles.includes("ADMIN")) navigate("/admin");
-    }
-  }, [auth.isAuthenticated]);
+  // useEffect(() => {
+  //   if (auth.isAuthenticated) {
+  //     if (auth.userrole.includes("USER")) navigate("/");
+  //     if (auth.user.roles.includes("ADMIN")) navigate("/admin");
+  //   }
+  // }, [auth.isAuthenticated]);
 
   return (
     <div className="w-screen h-screen grid place-items-center">
