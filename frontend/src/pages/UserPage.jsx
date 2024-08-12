@@ -21,7 +21,7 @@ const UserPage = () => {
     }
   }, []);
 
-  if (!user.roles.includes("USER")) return <Navigate to={"/admin"} />;
+  if (user.roles.includes("ADMIN")) return <Navigate to={"/admin"} />;
   if (!isLoading) return <Outlet></Outlet>;
 };
 

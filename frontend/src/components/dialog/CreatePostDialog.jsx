@@ -1,27 +1,30 @@
 import { useEffect, useRef, useState } from "react";
 import Dialog from "./Dialog";
 import { useDispatch, useSelector } from "react-redux";
-import { userInfoSelector } from "../../redux/selectors";
+import { postSelector, userInfoSelector } from "../../redux/selectors";
 import { createPost } from "../../api/PostService";
 import { TextareaAutosize } from "@mui/material";
-import { addPost } from "../../redux/postSlice";
+import { addPost, createPostThunk } from "../../redux/postSlice";
 
 const CreatePostDialog = ({ handleClose }) => {
-  const [imageSrc, setImageSrc] = useState(null);
-  const [imageSize, setImageSize] = useState(null);
+  const [fileSrc, setFileSrc] = useState(null);
+  const [fileSize, setFileSize] = useState(null);
   const fileInputRef = useRef(null);
   const captionRef = useRef(null);
   const currentUser = useSelector(userInfoSelector);
   const dispatch = useDispatch();
+  const {
+    action: { create },
+  } = useSelector(postSelector);
 
   function handleFileChange(e) {
     const file = e.target.files[0];
-    const fileSize = (file.size / 1024 / 1024).toFixed(2);
-    if (!file.type.startsWith("image/")) {
+    const size = (file.size / 1024 / 1024).toFixed(2);
+    if (file.type.startsWith("image/") || file.type.startsWith("video/")) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setImageSrc(e.target.result);
-        setImageSize(fileSize);
+        setFileSrc(e.target.result);
+        setFileSize(size);
       };
       reader.readAsDataURL(file);
     }
@@ -30,11 +33,18 @@ const CreatePostDialog = ({ handleClose }) => {
   function handlePost() {
     const caption = captionRef.current.value;
     const file = fileInputRef.current.files[0];
-    createPost(caption, file, null, null).then((res) => {
-      dispatch(addPost(res.data));
-      handleClose();
-    });
+    if (!caption.trim() && !file) return;
+    dispatch(createPostThunk({ caption, file }));
+    // createPost(caption, file, null).then((res) => {
+    //   if (res.isSuccess) {
+    //     dispatch(addPost(res.data));
+    //     handleClose();
+    //   }
+    // });
   }
+  useEffect(() => {
+    if (create == "created") handleClose();
+  }, [create]);
 
   return (
     <Dialog handleClose={handleClose} title="Tạo bài đăng">
@@ -61,21 +71,25 @@ const CreatePostDialog = ({ handleClose }) => {
             placeholder="Viết tiêu đề tại đây"
           />
           <div>
-            {imageSrc ? (
+            {fileInputRef.current?.files[0] ? (
               <div className="w-full h-[200px] relative">
-                {/* <img
-                  src={imageSrc}
-                  alt=""
-                  className="object-cover w-full h-full"
-                /> */}
-                <video controls>
-                  <source src={imageSrc} />
-                </video>
+                {fileInputRef.current.files[0].type.startsWith("image/") && (
+                  <img
+                    src={fileSrc}
+                    alt=""
+                    className="object-cover w-full h-full"
+                  />
+                )}
+                {fileInputRef.current.files[0].type.startsWith("video/") && (
+                  <video controls className="w-full h-full">
+                    <source src={fileSrc} />
+                  </video>
+                )}
                 <button
                   className="rounded-full absolute top-0 right-0 bg-slate-500 text-white p-3 size-10 translate-x-1/4 -translate-y-1/4 flex items-center justify-center"
                   onClick={() => {
                     // Xóa file trong input
-                    setImageSrc(null);
+                    setFileSrc(null);
                     document.getElementById("file-input").value = null;
                   }}
                 >
@@ -85,14 +99,14 @@ const CreatePostDialog = ({ handleClose }) => {
             ) : null}
 
             <span className="ml-3 text-sm float-end py-2">
-              {imageSrc ? `${imageSize}MB` : null}
+              {fileSrc ? `${fileSize}MB` : null}
             </span>
             <label
               htmlFor="file-input"
               className="w-full hover:bg-gray-100 cursor-pointer p-3 flex items-center"
             >
               <i className="bx bxs-image-add text-2xl text-secondary"></i>
-              Thêm ảnh hoặc video
+              Chọn ảnh hoặc video
             </label>
             <input
               ref={fileInputRef}
@@ -100,14 +114,16 @@ const CreatePostDialog = ({ handleClose }) => {
               id="file-input"
               hidden={true}
               onChange={handleFileChange}
+              accept="image/*,video/*"
             />
           </div>
         </div>
         <button
           className="w-full py-2 bg-secondary text-white font-bold rounded-md"
           onClick={handlePost}
+          disabled={create === "creating"}
         >
-          Đăng
+          {create === "creating" ? "Dang đăng..." : "Đăng"}
         </button>
       </>
     </Dialog>

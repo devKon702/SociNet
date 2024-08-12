@@ -1,23 +1,27 @@
 import { useState } from "react";
 import CommentModal from "../comment/CommentModal";
 import ChildPost from "./ChildPost";
-import { dateFormated } from "../../helper";
+import { dateFormated, isImage, isVideo } from "../../helper";
 import { deleteReactPost, reactPost } from "../../api/PostService";
 import { useDispatch, useSelector } from "react-redux";
-import { removePostThunk, updatePostThunk } from "../../redux/postSlice";
+import {
+  removePostThunk,
+  setAction,
+  updatePostThunk,
+} from "../../redux/postSlice";
 import { setCommentAction, setCurrentPostId } from "../../redux/commentSlice";
 import { createComment } from "../../api/CommentService";
 import { TextareaAutosize } from "@mui/material";
 import { Link } from "react-router-dom";
-import ConfirmDialog from "../dialog/ConfirmDialog";
 import UpdatePostDialog from "../dialog/UpdatePostDialog";
 import { authSelector } from "../../redux/selectors";
+import SharePostDialog from "../dialog/SharePostDialog";
 
 const PostItem = ({ post }) => {
   const [isShowComment, setIsShowComment] = useState(false);
   const [isShowEmojies, setIsShowEmojies] = useState(false);
-  const [isShowConfirm, setIsShowConfirm] = useState(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
   const [commentValue, setCommentValue] = useState("");
 
   const dispatch = useDispatch();
@@ -52,8 +56,20 @@ const PostItem = ({ post }) => {
       {showUpdateDialog && (
         <UpdatePostDialog
           post={post}
-          handleClose={() => setShowUpdateDialog(false)}
+          handleClose={() => {
+            dispatch(setAction({ share: "", edit: "" }));
+            setShowUpdateDialog(false);
+          }}
         ></UpdatePostDialog>
+      )}
+      {showShareDialog && (
+        <SharePostDialog
+          post={post}
+          handleClose={() => {
+            dispatch(setAction({ create: "", share: "" }));
+            setShowShareDialog(false);
+          }}
+        ></SharePostDialog>
       )}
       <div className="post-item bg-white w-11/12 rounded-xl p-3 text-gray-800 shadow-lg">
         {/* title */}
@@ -79,19 +95,21 @@ const PostItem = ({ post }) => {
                 : `Đã chỉnh sửa ${dateFormated(post.updatedAt)}`}
             </span>
           </div>
-
+          {/* Actions */}
           {user.user.id === post.user.id && (
             <div className="cursor-pointer ml-auto popup-container">
               <div className="size-8 hover:bg-gray-100 rounded-full grid place-items-center">
                 <i className="bx bx-dots-horizontal-rounded"></i>
               </div>
-              <div className="popup rounded-md bg-gray-200 top-full right-0 w-36 overflow-hidden p-2">
-                <div
-                  className="px-3 py-2 hover:bg-gray-300 flex items-center gap-3 rounded-md"
-                  onClick={() => setShowUpdateDialog(true)}
-                >
-                  <i className="bx bx-pencil"></i>Chỉnh sửa
-                </div>
+              <div className="popup rounded-md bg-gray-200 top-full right-0 w-36 overflow-hidden p-2 z-10">
+                {post.isActive && (
+                  <div
+                    className="px-3 py-2 hover:bg-gray-300 flex items-center gap-3 rounded-md"
+                    onClick={() => setShowUpdateDialog(true)}
+                  >
+                    <i className="bx bx-pencil"></i>Chỉnh sửa
+                  </div>
+                )}
                 <div
                   className="px-3 py-2 hover:bg-gray-300 flex items-center gap-3 rounded-md"
                   onClick={handleDelete}
@@ -99,101 +117,130 @@ const PostItem = ({ post }) => {
                   <i className="bx bxs-trash"></i>Gỡ
                 </div>
               </div>
-              {isShowConfirm && (
-                <ConfirmDialog
-                  handleClose={() => setIsShowConfirm(false)}
-                ></ConfirmDialog>
-              )}
             </div>
           )}
         </div>
-        {/* Caption */}
-        <p className="my-2">{post.caption}</p>
-        {/* Image / video */}
-        {post.sharedPost ? (
-          <div className="h-auto w-full rounded-lg overflow-hidden">
-            <ChildPost post={post.sharedPost}></ChildPost>
-          </div>
-        ) : post.imageUrl ? (
-          <div className="h-80 w-full rounded-lg overflow-hidden">
-            <img
-              src={post.imageUrl ? post.imageUrl : "/dev1.png"}
-              alt=""
-              className="w-full h-full object-cover"
-            />
-          </div>
-        ) : null}
-        {/* Reaction & Comment count */}
-        <div className="w-full flex justify-end gap-4 text-slate-500 my-2">
-          <span>
-            {`
+        {post.isActive ? (
+          <>
+            {/* Caption */}
+            <p className="my-2">{post.caption}</p>
+            {/* Image / video */}
+            {post.sharedPost ? (
+              <div className="h-auto w-full rounded-lg overflow-hidden">
+                <ChildPost post={post.sharedPost}></ChildPost>
+              </div>
+            ) : (
+              post.imageUrl && (
+                <div className="h-80 w-full rounded-lg overflow-hidden">
+                  {/* Image */}
+                  {isImage(post.imageUrl) && (
+                    <img
+                      src={post.imageUrl}
+                      alt="Ảnh bài viết"
+                      onError={(e) => (e.target.src = "/black-img.jpg")}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                  {/* Video */}
+                  {isVideo(post.imageUrl) && (
+                    <video controls className="w-full h-full">
+                      <source src={post.imageUrl}></source>
+                    </video>
+                  )}
+                </div>
+              )
+            )}
+            {/* Reaction & Comment count */}
+            <div className="w-full flex justify-end gap-4 text-slate-500 my-2">
+              <span>
+                {`
             ${Object.values(post.numberOfReactions).reduce(
               (pre, current) => current + pre,
               0
             )} tương tác`}
-          </span>
-          <span>{post.numberOfComments} bình luận</span>
-        </div>
-        {/* Buttons */}
-        <div className="h-[2px] w-full bg-slate-200 my-2"></div>
-        <div className="w-full grid grid-cols-3 text-slate-500">
-          {post.selfReaction ? (
-            <ReactionButton
-              type={post.selfReaction}
-              postId={post.id}
-              handleEnter={() => setIsShowEmojies(true)}
-              handleLeave={() => setIsShowEmojies(false)}
+              </span>
+              <span>{post.numberOfComments} bình luận</span>
+            </div>
+            {/* Buttons */}
+            <div className="h-[2px] w-full bg-slate-200 my-2"></div>
+            <div
+              className={`w-full grid text-slate-500 ${
+                post.sharedPost ? "grid-cols-2" : "grid-cols-3"
+              }`}
             >
-              {isShowEmojies ? <EmojiList postId={post.id}></EmojiList> : null}
-            </ReactionButton>
-          ) : (
-            <button
-              className=" hover:bg-slate-100 flex items-center justify-center gap-1 py-2 relative"
-              onMouseEnter={() => {
-                setIsShowEmojies(true);
-              }}
-              onMouseLeave={() => {
-                setIsShowEmojies(false);
-              }}
-            >
-              {isShowEmojies ? <EmojiList postId={post.id}></EmojiList> : null}
-              <i className="bx bx-like"></i>
-              Tương tác
-            </button>
-          )}
-          <button
-            className=" hover:bg-slate-100 flex items-center justify-center gap-1"
-            onClick={() => {
-              dispatch(setCurrentPostId(post.id));
-              setIsShowComment(true);
-            }}
-          >
-            <i className="bx bx-chat"></i>
-            Bình luận
-          </button>
-          <button className=" hover:bg-slate-100 flex items-center justify-center gap-1">
-            <i className="bx bx-share-alt"></i>
-            Chia sẻ
-          </button>
-        </div>
-        {/* Comment input */}
-        <div className="h-[2px] w-full bg-slate-200 my-2"></div>
-        <div className="flex w-full gap-2">
-          <TextareaAutosize
-            type="text"
-            className="rounded-lg p-2 bg-slate-100 flex-1 outline-none text-wrap resize-none"
-            placeholder="Type your comment"
-            value={commentValue}
-            onChange={(e) => setCommentValue(e.target.value)}
-            onKeyDown={(e) => (e.code === "Enter" ? handleComment() : null)}
-          />
-          <button
-            className="py-2 px-3 bg-backgroundSecondary"
-            onClick={handleComment}
-          >
-            <i className="bx bxs-send text-secondary"></i>
-          </button>
-        </div>
+              {post.selfReaction ? (
+                <ReactionButton
+                  type={post.selfReaction}
+                  postId={post.id}
+                  handleEnter={() => setIsShowEmojies(true)}
+                  handleLeave={() => setIsShowEmojies(false)}
+                >
+                  {isShowEmojies ? (
+                    <EmojiList postId={post.id}></EmojiList>
+                  ) : null}
+                </ReactionButton>
+              ) : (
+                <button
+                  className=" hover:bg-slate-100 flex items-center justify-center gap-1 py-2 relative"
+                  onMouseEnter={() => {
+                    setIsShowEmojies(true);
+                  }}
+                  onMouseLeave={() => {
+                    setIsShowEmojies(false);
+                  }}
+                >
+                  {isShowEmojies ? (
+                    <EmojiList postId={post.id}></EmojiList>
+                  ) : null}
+                  <i className="bx bx-like"></i>
+                  Tương tác
+                </button>
+              )}
+              <button
+                className=" hover:bg-slate-100 flex items-center justify-center gap-1"
+                onClick={() => {
+                  dispatch(setCurrentPostId(post.id));
+                  setIsShowComment(true);
+                }}
+              >
+                <i className="bx bx-chat"></i>
+                Bình luận
+              </button>
+              {!post.sharedPost && (
+                <button
+                  className=" hover:bg-slate-100 flex items-center justify-center gap-1"
+                  onClick={() => setShowShareDialog(true)}
+                >
+                  <i className="bx bx-share-alt"></i>
+                  Chia sẻ
+                </button>
+              )}
+            </div>
+            {/* Comment input */}
+            <div className="h-[2px] w-full bg-slate-200 my-2"></div>
+            <div className="flex w-full gap-2">
+              <TextareaAutosize
+                type="text"
+                className="rounded-lg p-2 bg-slate-100 flex-1 outline-none text-wrap resize-none"
+                placeholder="Type your comment"
+                value={commentValue}
+                onChange={(e) => setCommentValue(e.target.value)}
+                onKeyDown={(e) => (e.code === "Enter" ? handleComment() : null)}
+              />
+              <button
+                className="py-2 px-3 bg-backgroundSecondary"
+                onClick={handleComment}
+              >
+                <i className="bx bxs-send text-secondary"></i>
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="flex bg-gray-100 p-3 rounded-md items-center justify-center gap-2 mt-4">
+            <i className="bx bxs-lock-alt text-xl"></i>
+            <p>Bài viết đã bị khóa</p>
+          </div>
+        )}
       </div>
     </>
   );

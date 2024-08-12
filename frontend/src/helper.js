@@ -14,7 +14,7 @@ export const dateFormated = (dateString) => {
   );
 
   if (minutesDifference < 1) {
-    return "just now";
+    return "vài giây trước";
   } else if (minutesDifference < 60) {
     return `${minutesDifference} phút trước`;
   } else if (hoursDifference < 24) {
@@ -51,4 +51,26 @@ export const dateDetailFormated = (date) => {
 
   // Nếu không phải hôm nay và không nằm trong tuần này
   return format(date, "dd/MM/yyyy HH:mm");
+};
+
+export const isImage = (url) => {
+  const typeList = [
+    ".apng",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".jfif",
+    ".pjpeg",
+    ".pjp",
+    ".svg",
+    ".webp",
+    ".avif",
+    ".gif",
+  ];
+  return typeList.some((item) => url.includes(item));
+};
+
+export const isVideo = (url) => {
+  const typeList = [".mp4", ".webm", ".avi", ".mov", ".wmv"];
+  return typeList.some((item) => url.includes(item));
 };

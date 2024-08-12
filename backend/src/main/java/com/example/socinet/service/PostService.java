@@ -24,13 +24,17 @@ public class PostService {
 
     public List<PostDto> getPosts(int page, int size){
         List<PostDto> postsDto = new ArrayList<>();
-        postRepo.findAll().forEach(post -> postsDto.add(0, new PostDto(post)));
+        postRepo.findAll().forEach(post -> {
+            if(post.isActive()){
+                postsDto.add(0, new PostDto(post));
+            }
+        });
         return postsDto;
     }
 
     public PostDto getPost(Long id) throws Exception{
         Optional<Post> post = postRepo.findById(id);
-        if(post.isEmpty()) throw new Exception("No post found");
+        if(post.isEmpty()) throw new Exception("POST NOT FOUND");
         return new PostDto(post.get());
     }
 
@@ -41,58 +45,68 @@ public class PostService {
         return postsDto;
     }
 
-    public PostDto createPost(String caption, MultipartFile image, MultipartFile video, Long sharedPostId) throws Exception{
+    public PostDto createPost(String caption, MultipartFile file, Long sharedPostId) throws Exception{
         AccountDetail accountDetail = Helper.getAccountDetail();
         Post sharedPost = null;
         if(sharedPostId != null) {
             Optional<Post> sharedPostOptional = postRepo.findById(sharedPostId);
-            if(sharedPostOptional.isEmpty()) throw new Exception("Shared post not found");
+            if(sharedPostOptional.isEmpty()) throw new Exception("SHARED POST NOT FOUND");
             else sharedPost = sharedPostOptional.get();
         }
 
         // Upload file lên firebase
-        String imageUrl = "";
-        String videoUrl = "";
-        if(image != null && image.getSize() <= MAX_IMAGE_SIZE){
-            imageUrl = storageService.upload("images", image);
+        String fileUrl = "";
+        if(file != null && file.getContentType().startsWith("image")){
+            if(file.getSize() > MAX_IMAGE_SIZE) throw new Exception("OVERSIZE IMAGE");
+            fileUrl = storageService.upload("images", file);
         }
 
-        if(video != null && video.getSize() <= MAX_VIDEO_SIZE){
-            videoUrl = storageService.upload("videos", video);
+        if(file != null && file.getContentType().startsWith("video")){
+            if(file.getSize() > MAX_VIDEO_SIZE) throw new Exception("OVERSIZE VIDEO");
+            fileUrl = storageService.upload("videos", file);
         }
+        // Type of file is unsupported
+        if(file != null && fileUrl=="") throw new Exception("UNSUPPORTED FILE");
 
         Post post = Post.builder()
                 .caption(caption)
                 .user(accountDetail.getUser())
                 .sharedPost(sharedPost)
-                .imageUrl(imageUrl)
-                .videoUrl(videoUrl)
+                .imageUrl(fileUrl)
                 .isActive(true)
                 .build();
         return new PostDto(postRepo.save(post));
     }
 
-    public PostDto updatePost(Long postId, String caption, MultipartFile image, MultipartFile video) throws Exception{
+    public PostDto updatePost(Long postId, String caption, MultipartFile file) throws Exception{
         AccountDetail accountDetail = Helper.getAccountDetail();
         Optional<Post> postOptional = postRepo.findByIdAndUser_Id(postId, accountDetail.getUser().getId());
-        if(postOptional.isEmpty()) throw new Exception("No post found");
+        if(postOptional.isEmpty()) throw new Exception("POST NOT FOUND");
         Post post = postOptional.get();
         post.setCaption(caption);
-        if(image != null){
-            String imageUrl = storageService.upload("images", image);
-            post.setImageUrl(imageUrl);
+        // Upload file lên firebase
+        String fileUrl = "";
+        if(file != null && file.getContentType().startsWith("image")){
+            if(file.getSize() > MAX_IMAGE_SIZE) throw new Exception("OVERSIZE IMAGE");
+            fileUrl = storageService.upload("images", file);
+            post.setImageUrl(fileUrl);
         }
-        if(video != null){
-            String videoUrl = storageService.upload("images", video);
-            post.setImageUrl(videoUrl);
+
+        if(file != null && file.getContentType().startsWith("video")){
+            if(file.getSize() > MAX_VIDEO_SIZE) throw new Exception("OVERSIZE VIDEO");
+            fileUrl = storageService.upload("videos", file);
+            post.setImageUrl(fileUrl);
         }
+        // Type of file is unsupported
+        if(file != null && fileUrl=="") throw new Exception("UNSUPPORTED FILE");
+
         return new PostDto(postRepo.save(post));
     }
 
     public void deleteUserPost(Long postId) throws Exception {
         Long userId = Helper.getUserId();
         Optional<Post> post = postRepo.findByIdAndUser_Id(postId, userId);
-        if(post.isEmpty()) throw new Exception("No post found");
+        if(post.isEmpty()) throw new Exception("POST NOT FOUND");
         postRepo.delete(post.get());
     }
 

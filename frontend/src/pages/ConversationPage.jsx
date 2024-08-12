@@ -1,5 +1,5 @@
-import { TextareaAutosize } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { ClickAwayListener, TextareaAutosize } from "@mui/material";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import MessageItem from "../components/conversation/MessageItem";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,37 +9,8 @@ import {
   editConversationThunk,
   getConversationThunk,
   setConversationAction,
-  setCurrentConversationUser,
 } from "../redux/realtimeSlice";
-
-const messageData = [
-  { isSelf: false, content: "Hôm này thế nào" },
-  { isSelf: true, content: "Nay tôi đi cafe với bạn 😁" },
-  {
-    isSelf: true,
-    content: "Nhưng mà trời mưa nên phải ngồi lại đó tận 8h đêm",
-  },
-  { isSelf: false, content: "Vậy à, bạn cấp 3 hay sao?" },
-  {
-    isSelf: true,
-    content: "Đúng r, có dịp nó lên sài gòn nên t rủ nó đi chơi",
-  },
-  {
-    isSelf: true,
-    content: "Mà có việc gì à, thường ngày đâu có tự dưng nhắn tin t đâu",
-  },
-  { isSelf: false, content: "À, tôi định hỏi về cái vụ hôm trước trên trường" },
-  { isSelf: false, content: "Rồi sau đó giải quyết như nào rồi" },
-  {
-    isSelf: true,
-    content: "À, tôi làm gần xong rồi, chắc mai là xong",
-  },
-  {
-    isSelf: true,
-    content: "Xem thử hình này",
-    fileUrl: "/dev1.png",
-  },
-];
+import EmojiPicker from "emoji-picker-react";
 
 const ConversationPage = () => {
   const { id } = useParams();
@@ -51,6 +22,7 @@ const ConversationPage = () => {
   const [content, setContent] = useState("");
   const [files, setFiles] = useState([]);
   const [imgPreviewSrc, setImgPreviewSrc] = useState(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const handleSend = () => {
     if (!content.trim() && !files) return;
@@ -111,7 +83,7 @@ const ConversationPage = () => {
             {currentUser.name}
           </Link>
           {currentUser.realtimeStatus === "ONLINE" ? (
-            <p className="text-sm font-bold text-secondary">Online</p>
+            <p className="text-sm font-bold text-green-400">Online</p>
           ) : currentUser.realtimeStatus === "OFFLINE" ? (
             <p className="text-sm font-bold text-red-400">Offline</p>
           ) : (
@@ -171,7 +143,7 @@ const ConversationPage = () => {
             hidden
             onChange={handleFileChange}
           />
-          <div className="flex-1 bg-gray-300 rounded-3xl flex items-center">
+          <div className="flex-1 bg-gray-300 rounded-3xl flex items-center relative">
             <TextareaAutosize
               maxRows={5}
               placeholder="Soạn nội dung"
@@ -179,7 +151,22 @@ const ConversationPage = () => {
               value={content}
               onChange={(e) => setContent(e.target.value)}
             ></TextareaAutosize>
-            <i className="bx bx-smile mr-3 cursor-pointer text-xl"></i>
+            <i
+              className="bx bx-smile mr-3 cursor-pointer text-xl"
+              onClick={() => setShowEmojiPicker(true)}
+            ></i>
+            {showEmojiPicker && (
+              <ClickAwayListener onClickAway={() => setShowEmojiPicker(false)}>
+                <div className="absolute right-0 top-0 -translate-y-full">
+                  <EmojiPicker
+                    open={true}
+                    onEmojiClick={(e) => {
+                      setContent((prev) => (prev += e.emoji));
+                    }}
+                  ></EmojiPicker>
+                </div>
+              </ClickAwayListener>
+            )}
           </div>
           <button
             className="bg-secondary px-4 py-2 rounded-lg text-white h-fit"

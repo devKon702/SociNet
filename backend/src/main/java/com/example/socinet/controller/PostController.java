@@ -45,19 +45,17 @@ public class PostController {
 
     @PostMapping("")
     public ResponseEntity<?> createPost(@RequestParam String caption,
-                                        @RequestParam(required = false) MultipartFile image,
-                                        @RequestParam(required = false) MultipartFile video,
+                                        @RequestParam(required = false) MultipartFile file,
                                         @RequestParam(required = false) Long sharedPostId) throws Exception {
-        PostDto createdPost = postService.createPost(caption, image,video,sharedPostId);
+        PostDto createdPost = postService.createPost(caption, file, sharedPostId);
         return Helper.returnSuccessResponse("Create post success", createdPost);
     }
 
     @PutMapping("{id}")
     public ResponseEntity<?> updatePost(@PathVariable Long id,
                                         @RequestParam(required = false) String caption,
-                                        @RequestParam(required = false) MultipartFile image,
-                                        @RequestParam(required = false) MultipartFile video) throws Exception{
-        PostDto updatedPost = postService.updatePost(id, caption, image, video);
+                                        @RequestParam(required = false) MultipartFile file) throws Exception{
+        PostDto updatedPost = postService.updatePost(id, caption, file);
         return Helper.returnSuccessResponse("Update post success", updatedPost);
     }
 
@@ -66,5 +64,4 @@ public class PostController {
         postService.deleteUserPost(id);
         return Helper.returnSuccessResponse("Delete post success", null);
     }
-
 }

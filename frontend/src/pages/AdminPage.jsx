@@ -9,6 +9,9 @@ const AdminPage = () => {
 
   useEffect(() => {
     socketAdmin.connect();
+    return () => {
+      socketAdmin.disconnect();
+    };
   }, []);
 
   if (!user.roles.includes("ADMIN")) return <Navigate to={"/"} />;

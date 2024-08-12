@@ -1,13 +1,16 @@
 import { io } from "socket.io-client";
 import store from "./redux/store";
 import {
+  setHasUnreadStatus,
+  setNewInvitation,
   setNewMessage,
-  setOnlineFriend,
+  setFriendsStatus,
   setUpdateMessage,
   updateFriendStatus,
+  getRealtimeFriendsThunk,
 } from "./redux/realtimeSlice";
-import { signOut } from "./api/AuthService";
 import { signout } from "./redux/authSlice";
+import { setFriendStatus } from "./redux/personalSlice";
 
 const USER_URL = "http://localhost:3000";
 const ADMIN_URL = "http://localhost:3000/admin";
@@ -20,8 +23,8 @@ export const socketAdmin = io(ADMIN_URL, {
 });
 
 const onConnect = () => {
-  socket.on("FILTER ONLINE FRIEND", (onlineIdList) => {
-    store.dispatch(setOnlineFriend(onlineIdList));
+  socket.on("FILTER STATUS FRIEND", (onlineIdList, unreadList) => {
+    store.dispatch(setFriendsStatus({ onlineIdList, unreadList }));
   });
 
   socket.on("NEW ONLINE USER", (user) => {
@@ -33,7 +36,27 @@ const onConnect = () => {
   });
 
   socket.on("NEW MESSAGE", (conversation) => {
-    store.dispatch(setNewMessage(conversation));
+    const currentUser = store.getState().auth.user.user;
+    const currentChatUser = store.getState().realtime.conversation.currentUser;
+    // Đang mở chat với người đó -> thông báo socket đã đọc tin nhắn
+    if (
+      (conversation.senderId == currentUser.id &&
+        conversation.receiverId == currentChatUser?.id) ||
+      (conversation.senderId == currentChatUser?.id &&
+        conversation.receiverId == currentUser.id)
+    ) {
+      store.dispatch(setNewMessage(conversation));
+      socket.emit("READ CONVERSATION", currentUser.id);
+    }
+    // Đang không mở chat và là người nhận tin nhắn -> thông báo tin nhắn mới
+    else if (
+      conversation.receiverId == currentUser.id &&
+      (!currentChatUser || conversation.senderId != currentChatUser.id)
+    ) {
+      store.dispatch(
+        setHasUnreadStatus({ id: conversation.senderId, status: true })
+      );
+    }
   });
 
   socket.on("UPDATE MESSAGE", (conversation) => {
@@ -43,6 +66,25 @@ const onConnect = () => {
   socket.on("FORCE LOGOUT", () => {
     store.dispatch(signout());
     location.reload();
+  });
+
+  socket.on("NEW INVITATION", (invitation) => {
+    store.dispatch(setNewInvitation(invitation));
+
+    const personal = store.getState().personal;
+    if (personal.user?.id == invitation.user.id) {
+      store.dispatch(setFriendStatus("INVITED"));
+    }
+  });
+
+  socket.on("RESPONSE INVITATION", (userId, isAccept) => {
+    console.log(isAccept);
+
+    if (isAccept) store.dispatch(getRealtimeFriendsThunk());
+
+    if (store.getState().personal.user?.id == userId) {
+      store.dispatch(setFriendStatus(isAccept ? "FRIEND" : "NO"));
+    }
   });
 };
 

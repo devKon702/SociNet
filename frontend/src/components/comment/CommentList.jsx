@@ -9,16 +9,16 @@ const CommentList = () => {
   const commentList = useSelector((state) => state.comment.commentList);
   const dispatch = useDispatch();
   useEffect(() => {
-    try {
-      getCommentsOfPost(postId).then((res) => {
+    getCommentsOfPost(postId).then((res) => {
+      if (res.isSuccess) {
         dispatch(setCommentList(res.data));
-      });
-    } catch (e) {
-      console.log(e);
-    }
+      } else {
+        dispatch(setCommentList([]));
+      }
+    });
   }, [dispatch, postId]);
   return (
-    <div className="w-[600px] flex-1 p-3 overflow-auto custom-scroll">
+    <div className="w-[600px] flex-1 p-3 overflow-auto custom-scroll pr-24">
       {commentList.map((comment) => (
         <CommentItem key={comment.id} comment={comment}></CommentItem>
       ))}

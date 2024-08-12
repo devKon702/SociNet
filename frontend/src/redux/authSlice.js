@@ -47,6 +47,9 @@ const authSlice = createSlice({
     setUserInfo: (state, action) => {
       state.user.user = action.payload;
     },
+    setAccountEmail: (state, action) => {
+      state.user.email = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -85,7 +88,21 @@ export const signInThunk = createAsyncThunk(
         showSnackbar({ message: "Đăng nhập thành công", type: "success" })
       );
     } else {
-      dispatch(showSnackbar({ message: "Đăng nhập thất bại", type: "error" }));
+      let message = "";
+      switch (res.message) {
+        case "ACCOUNT NOT FOUND":
+          message = "Không tìm thấy tài khoản";
+          break;
+        case "INACTIVE ACCOUNT":
+          message = "Tài khoản đã bị khóa";
+          break;
+        case "INCORRECT PASSWORD":
+          message = "Mật khẩu không đúng";
+          break;
+        default:
+          message = "Đăng nhập thất bại";
+      }
+      dispatch(showSnackbar({ message, type: "error" }));
     }
     return res;
   }
@@ -102,10 +119,11 @@ export const signinWithGoogleThunk = createAsyncThunk(
   "auth/signinWithGoogleThunk",
   async ({ email, googleId, name, avatarUrl }, { dispatch }) => {
     const res = await signInWithGoogle(email, googleId, name, avatarUrl);
-    if (res.isSuccess)
+    if (res.isSuccess) {
       dispatch(
         showSnackbar({ message: "Đăng nhập thành công", type: "success" })
       );
+    }
     return res;
   }
 );
@@ -118,5 +136,6 @@ export const {
   setSuccess,
   setUser,
   setUserInfo,
+  setAccountEmail,
 } = authSlice.actions;
 export default authSlice.reducer;

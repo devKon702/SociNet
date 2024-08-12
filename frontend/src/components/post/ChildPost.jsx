@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { dateFormated } from "../../helper";
+import { dateFormated, isImage, isVideo } from "../../helper";
 
 const ChildPost = ({ post }) => {
   return (
@@ -15,7 +15,10 @@ const ChildPost = ({ post }) => {
         </div>
 
         <div className="flex flex-col">
-          <Link className="font-bold" to={`/user/${post.user.id}`}>
+          <Link
+            className="font-bold hover:underline"
+            to={`/user/${post.user.id}`}
+          >
             {post.user.name}
           </Link>
           <span className="text-xs text-slate-500">
@@ -28,11 +31,18 @@ const ChildPost = ({ post }) => {
       {/* Image / video */}
       {post.imageUrl ? (
         <div className="h-80 w-full rounded-lg overflow-hidden">
-          <img
-            src={post.imageUrl}
-            alt=""
-            className="w-full h-full object-cover"
-          />
+          {isImage(post.imageUrl) && (
+            <img
+              src={post.imageUrl}
+              alt=""
+              className="w-full h-full object-cover"
+            />
+          )}
+          {isVideo(post.imageUrl) && (
+            <video controls className="size-full">
+              <source src={post.imageUrl}></source>
+            </video>
+          )}
         </div>
       ) : null}
     </div>

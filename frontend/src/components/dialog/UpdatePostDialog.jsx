@@ -1,25 +1,29 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { userInfoSelector } from "../../redux/selectors";
+import { postSelector, userInfoSelector } from "../../redux/selectors";
 import Dialog from "./Dialog";
 import { TextareaAutosize } from "@mui/material";
 import { editPostThunk } from "../../redux/postSlice";
+import { isImage, isVideo } from "../../helper";
 
 const UpdatePostDialog = ({ handleClose, post }) => {
-  const [imageSrc, setImageSrc] = useState(post.imageUrl);
-  const [imageSize, setImageSize] = useState(null);
+  const [fileSrc, setFileSrc] = useState(post.imageUrl);
+  const [fileSize, setFileSize] = useState(null);
   const fileInputRef = useRef(null);
   const [caption, setCaption] = useState(post.caption);
   const dispatch = useDispatch();
+  const {
+    action: { edit },
+  } = useSelector(postSelector);
 
   function handleFileChange(e) {
     const file = e.target.files[0];
-    const fileSize = (file.size / 1024 / 1024).toFixed(2);
-    if (file.type.startsWith("image/")) {
+    const size = (file.size / 1024 / 1024).toFixed(2);
+    if (file.type.startsWith("image/") || file.type.startsWith("video/")) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setImageSrc(e.target.result);
-        setImageSize(fileSize);
+        setFileSrc(e.target.result);
+        setFileSize(size);
       };
       reader.readAsDataURL(file);
     }
@@ -33,8 +37,11 @@ const UpdatePostDialog = ({ handleClose, post }) => {
         file: fileInputRef.current.files[0],
       })
     );
-    handleClose();
   }
+
+  useEffect(() => {
+    if (edit === "edited") handleClose();
+  }, [edit]);
 
   return (
     <Dialog handleClose={handleClose} title="Chỉnh sửa bài viết">
@@ -58,28 +65,42 @@ const UpdatePostDialog = ({ handleClose, post }) => {
             onChange={(e) => setCaption(e.target.value)}
           />
           <div>
-            {imageSrc ? (
+            {fileSrc && (
               <div className="w-full h-[200px] relative">
-                <img
-                  src={imageSrc}
-                  alt=""
-                  className="object-cover w-full h-full"
-                />
+                {(isImage(fileSrc) ||
+                  fileInputRef.current?.files[0]?.type.startsWith(
+                    "image/"
+                  )) && (
+                  <img
+                    src={fileSrc}
+                    alt=""
+                    className="object-cover w-full h-full"
+                  />
+                )}
+                {(isVideo(fileSrc) ||
+                  fileInputRef.current?.files[0]?.type.startsWith(
+                    "video/"
+                  )) && (
+                  <video controls className="w-full h-full">
+                    <source src={fileSrc} />
+                  </video>
+                )}
                 <button
                   className="rounded-full absolute top-0 right-0 bg-slate-500 text-white p-3 size-10 translate-x-1/4 -translate-y-1/4 flex items-center justify-center"
                   onClick={() => {
                     // Xóa file trong input
-                    setImageSrc(null);
+                    setFileSrc(null);
+                    setFileSize(null);
                     document.getElementById("file-input").value = null;
                   }}
                 >
                   <i className="bx bx-x text-3xl"></i>
                 </button>
               </div>
-            ) : null}
+            )}
 
             <span className="ml-3 text-sm float-end py-2">
-              {imageSize ? `${imageSize}MB` : null}
+              {fileSize ? `${fileSize}MB` : null}
             </span>
             <label
               htmlFor="file-input"
@@ -100,8 +121,9 @@ const UpdatePostDialog = ({ handleClose, post }) => {
         <button
           className="w-full py-2 bg-secondary text-white font-bold rounded-md"
           onClick={handleUpdate}
+          disabled={edit === "editing"}
         >
-          Cập nhật
+          {edit === "editting" ? "Đang cập nhật..." : "Cập nhật"}
         </button>
       </>
     </Dialog>

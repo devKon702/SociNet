@@ -1,5 +1,5 @@
 import React from "react";
-import { dateFormated } from "../../helper";
+import { dateFormated, isImage, isVideo } from "../../helper";
 import { managePostThunk } from "../../redux/adminSlice";
 import { useDispatch } from "react-redux";
 
@@ -23,7 +23,7 @@ const AdminPostItem = ({ post }) => {
           ></i>
         ) : (
           <i
-            className="bx bxs-lock-alt text-red-500 text-xl"
+            className="bx bxs-lock-alt text-red-500 text-xl hover:bg-gray-100 grid place-items-center cursor-pointer size-9 rounded-full"
             onClick={() => {
               dispatch(managePostThunk({ postId: post.id, isActive: true }));
             }}
@@ -31,8 +31,13 @@ const AdminPostItem = ({ post }) => {
         )}
       </div>
       <div>{post.caption}</div>
-      {post.imageUrl && (
+      {post.imageUrl && isImage(post.imageUrl) && (
         <img src={post.imageUrl} alt="" className="rounded-md w-full" />
+      )}
+      {post.imageUrl && isVideo(post.imageUrl) && (
+        <video className="w-full h-full rounded-md" controls>
+          <source src={post.imageUrl}></source>
+        </video>
       )}
       <div className="grid grid-cols-2 gap-3 mt-auto">
         <button className="rounded-md p-2 shadow-lg">{`${Object.values(

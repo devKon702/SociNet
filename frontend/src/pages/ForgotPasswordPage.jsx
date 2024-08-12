@@ -26,6 +26,13 @@ const ForgotPasswordPage = () => {
 
   return (
     <div className="w-screen h-screen grid place-items-center text-gray-800">
+      {isShowModal ? (
+        <ForgotPasswordDialog
+          handleClose={() => {
+            setShowModal(false);
+          }}
+        ></ForgotPasswordDialog>
+      ) : null}
       <div className="flex flex-col bg-white rounded-lg py-8 px-20 gap-2 relative h-3/4 w-2/5">
         <p className="text-primary font-bold text-3xl text-center">
           Quên mật khẩu
@@ -49,23 +56,28 @@ const ForgotPasswordPage = () => {
 
         <div className="divider"></div>
         {searchedAccount ? (
-          <div
-            className="flex gap-4 items-center rounded-md p-2 hover:bg-gray-200 cursor-pointer shadow-lg"
-            onClick={handleShowModal}
-          >
-            <div className="size-10 rounded-full overflow-hidden">
-              <img
-                src={searchedAccount?.user?.avatarUrl || "/unknown-avatar.png"}
-                alt=""
-                className="size-full object-cover"
-              />
+          <>
+            <div
+              className="flex gap-4 items-center rounded-md p-2 hover:bg-gray-200 cursor-pointer shadow-lg"
+              onClick={handleShowModal}
+            >
+              <div className="size-10 rounded-full overflow-hidden">
+                <img
+                  src={
+                    searchedAccount?.user?.avatarUrl || "/unknown-avatar.png"
+                  }
+                  alt=""
+                  className="size-full object-cover"
+                />
+              </div>
+              <p>{searchedAccount.user.name}</p>
             </div>
-            <p>{searchedAccount.user.name}</p>
-          </div>
+            <p className="text-center text-sm text-primary">Nhấn để tiếp tục</p>
+          </>
         ) : (
           <div className="text-center">Không tìm thấy tài khoản nào</div>
         )}
-        <p className="text-center text-sm text-primary">Nhấn để tiếp tục</p>
+
         <Link
           to="/auth/signin"
           className="mt-auto flex gap-1 items-center justify-center py-2 rounded-md cursor-pointer hover:bg-gray-200"
@@ -74,13 +86,6 @@ const ForgotPasswordPage = () => {
           Quay lại trang đăng nhập
         </Link>
       </div>
-      {isShowModal ? (
-        <ForgotPasswordDialog
-          handleClose={() => {
-            setShowModal(false);
-          }}
-        ></ForgotPasswordDialog>
-      ) : null}
     </div>
   );
 };

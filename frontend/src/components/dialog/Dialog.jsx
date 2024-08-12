@@ -5,7 +5,7 @@ const Dialog = ({ title, handleClose, ...props }) => {
   return (
     <>
       {createPortal(
-        <div className="dialog fixed inset-0 flex justify-center items-center">
+        <div className="dialog fixed inset-0 flex justify-center items-center z-50">
           <div
             className="wrapper opacity-70 bg-black absolute w-full h-full"
             onClick={handleClose}

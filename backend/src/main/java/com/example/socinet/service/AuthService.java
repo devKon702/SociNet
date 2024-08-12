@@ -41,19 +41,20 @@ public class AuthService {
     public Response signUp(SignUpRequest signUpRequest) throws Exception {
         // Kiểm tra username có trùng không
         if(accountRepo.existsByUsername(signUpRequest.getUsername())){
-            throw new Exception("Username has been used");
+            throw new Exception("USED USERNAME");
         }
         // Kiểm tra độ dài password
         if(signUpRequest.getPassword().length() < 6){
-            throw new Exception("Password must > 6 characters");
+            throw new Exception("INVALID PASSWORD");
         }
         // Kiểm tra email có trùng không
         if(accountRepo.existsByEmail(signUpRequest.getEmail())){
-            throw new Exception("Email has bean used");
+            throw new Exception("USED EMAIL");
         }
+
         // Kiểm tra OTP
         if(!emailOtpService.checkOpt(signUpRequest.getEmail(), signUpRequest.getOtp())){
-            throw new Exception("Invalid OTP");
+            throw new Exception("INVALID OTP");
         }
 
         // Build user
@@ -89,11 +90,12 @@ public class AuthService {
                         signInRequest.getUsername(),
                         signInRequest.getPassword()));
         Optional<Account> account = accountRepo.findAccountByUsername(signInRequest.getUsername());
+        if(account.isEmpty()) throw new Exception("ACCOUNT NOT FOUND");
         // Xác thực thành công
-        if(account.isPresent() && authentication.isAuthenticated()){
+        if(authentication.isAuthenticated()){
             AccountDto accountDto = new AccountDto(account.get());
             // Kiểm tra tài khoản có active không
-            if(!accountDto.isActive()) throw new Exception("Inactive Account");
+            if(!accountDto.isActive()) throw new Exception("INACTIVE ACCOUNT");
             String accessToken = jwtProvider.generateAccessToken(accountDto.getUsername());
             String refreshToken = jwtProvider.generateRefreshToken(accountDto.getUsername());
             // Kiểm tra đã có thiết bị đăng nhập chưa = tài khoản đã lưu một refresh token chưa
@@ -118,7 +120,7 @@ public class AuthService {
                     .account(accountDto)
                     .build();
         } else{
-            throw new Exception("Authentication failed");
+            throw new Exception("INCORRECT PASSWORD");
         }
     }
 
@@ -209,15 +211,15 @@ public class AuthService {
 
     public AccountDto forgotPassword(String email, String newPassword, String otp) throws Exception{
         // Kiểm tra OTP hợp lệ
-        if(!emailOtpService.checkOpt(email, otp)) throw new Exception("Invalid OTP");
+        if(!emailOtpService.checkOpt(email, otp)) throw new Exception("INVALID OTP");
         // Kiểm tra độ dài password
-        if(newPassword.length() < 6) throw new Exception("Password must be >= 6 characters");
+        if(newPassword.length() < 6) throw new Exception("TOO SHORT PASSWORD");
         Optional<Account> accountOpt = accountRepo.findByEmail(email);
         if(accountOpt.isPresent()){
             accountOpt.get().setPassword(passwordEncoder.encode(newPassword));
             return new AccountDto(accountRepo.save(accountOpt.get()));
         } else{
-            throw new Exception("Not found account with email: " + email);
+            throw new Exception("ACCOUNT NOT FOUND");
         }
     }
 }

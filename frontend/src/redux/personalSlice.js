@@ -6,6 +6,8 @@ import {
   getFriendList,
   makeInvitation,
 } from "../api/FriendService";
+import { socket } from "../socket";
+import { showSnackbar } from "./snackbarSlice";
 
 const personalSlice = createSlice({
   name: "personal",
@@ -19,6 +21,25 @@ const personalSlice = createSlice({
   reducers: {
     setInfo: (state, action) => {
       state.user = action.payload;
+    },
+    setFriendStatus: (state, action) => {
+      state.friendStatus = action.payload;
+    },
+    addNewPost: (state, action) => {
+      !state.postList.some((item) => item.id == action.payload.id)
+        ? state.postList.unshift(action.payload)
+        : null;
+    },
+    removePersonalPost: (state, action) => {
+      state.postList = state.postList.filter(
+        (post) => post.id != action.payload
+      );
+    },
+    updatePersonalPost: (state, action) => {
+      const index = state.postList.findIndex(
+        (item) => item.id == action.payload.id
+      );
+      if (index != -1) state.postList[index] = action.payload;
     },
   },
 
@@ -48,12 +69,17 @@ const personalSlice = createSlice({
       .addCase(preparePersonalInfoThunk.rejected, (state, action) => {
         console.log(action.error);
       })
-      .addCase(createInvitationThunk.pending, (state, action) => {
+      .addCase(createInvitationThunk.pending, (state) => {
         state.friendStatus = "INVITED";
       })
       .addCase(createInvitationThunk.fulfilled, (state, action) => {
         if (action.payload.isSuccess) {
-          console.log(action.payload.message);
+          socket.emit(
+            "NEW INVITATION",
+            action.payload.data,
+            action.payload.sender,
+            action.payload.receiverId
+          );
         } else {
           console.log(action.payload.message);
         }
@@ -99,10 +125,18 @@ export const preparePersonalInfoThunk = createAsyncThunk(
 
 export const createInvitationThunk = createAsyncThunk(
   "personal/createInvitationThunk",
-  async (userId) => {
-    return await makeInvitation(userId);
+  async (userId, { getState }) => {
+    const res = await makeInvitation(userId);
+    const storeState = getState();
+    return { ...res, sender: storeState.auth.user.user, receiverId: +userId };
   }
 );
 
-export const { setInfo } = personalSlice.actions;
+export const {
+  setInfo,
+  setFriendStatus,
+  addNewPost,
+  removePersonalPost,
+  updatePersonalPost,
+} = personalSlice.actions;
 export default personalSlice.reducer;

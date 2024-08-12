@@ -30,6 +30,6 @@ public class Comment extends AbstractEntity {
     @JoinColumn(name = "parent_id")
     Comment parentComment;
 
-    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Comment> childComments;
 }

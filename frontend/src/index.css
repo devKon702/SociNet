@@ -60,9 +60,11 @@ div {
 
 .popup {
   display: none;
+  visibility: hidden;
   position: absolute;
 }
 
 .popup-container:hover .popup {
   display: block;
+  visibility: visible;
 }

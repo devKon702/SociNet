@@ -11,18 +11,14 @@ const InvitationItem = ({ invitation }) => {
   const dispatch = useDispatch();
 
   const handleReject = () => {
-    dispatch(
-      responseInvitationThunk({ invitationId: invitation.id, isAccept: false })
-    );
+    dispatch(responseInvitationThunk({ invitation, isAccept: false }));
     dispatch(
       setInvitationStatus({ inviteId: invitation.id, status: "rejected" })
     );
   };
 
   const handleAccept = () => {
-    dispatch(
-      responseInvitationThunk({ invitationId: invitation.id, isAccept: true })
-    );
+    dispatch(responseInvitationThunk({ invitation, isAccept: true }));
     dispatch(
       setInvitationStatus({ inviteId: invitation.id, status: "accepted" })
     );
@@ -33,7 +29,7 @@ const InvitationItem = ({ invitation }) => {
       <div className="flex gap-2 items-center">
         <div className="rounded-full size-14 overflow-hidden">
           <img
-            src={invitation.user.avatarUrl || "unknown-avatar.png"}
+            src={invitation.user.avatarUrl || "/unknown-avatar.png"}
             alt=""
             className="w-full h-full object-cover"
           />

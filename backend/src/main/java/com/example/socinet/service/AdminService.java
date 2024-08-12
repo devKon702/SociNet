@@ -23,7 +23,7 @@ public class AdminService {
 
     public PostDto managePost(Long postId, String action) throws Exception {
         Optional<Post> postOpt = postRepo.findById(postId);
-        if(postOpt.isEmpty()) throw new Exception("Post not found");
+        if(postOpt.isEmpty()) throw new Exception("POST NOT FOUND");
         switch (action){
             case "activate":
                 // update isActive = true
@@ -44,7 +44,7 @@ public class AdminService {
     }
 
     public List<AccountDto> getAccountsByName(String name, Pageable pageable){
-        List<Account> accounts = accountRepo.findByUser_NameContainingIgnoreCase(name, pageable);
+        List<Account> accounts = accountRepo.findUserByNameContaining(name, "USER" , pageable);
         List<AccountDto> accountsDto = new ArrayList<>();
         accounts.forEach(account -> accountsDto.add(new AccountDto(account)));
         return accountsDto;
@@ -56,7 +56,7 @@ public class AdminService {
     }
 
     public long getNumberOfAccountByName(String name){
-        long count = accountRepo.countByUser_NameContainingIgnoreCase(name);
+        long count = accountRepo.countUserByName(name, "USER");
         return count;
     }
 

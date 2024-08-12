@@ -44,11 +44,11 @@ public class FriendService {
 
     public FriendDto makeFriendInvitation(Long id) throws Exception{
         Long currentUserId = Helper.getUserId();
-        if(id == currentUserId) throw new Exception("Can not make friend with yourself");
+        if(id == currentUserId) throw new Exception("CANNOT CREATE INVITATION");
 
         // Kiểm tra người nhận tồn tại
         Optional<User> receiverOpt = userRepository.findById(id);
-        if(receiverOpt.isEmpty()) throw new Exception("User is not exist");
+        if(receiverOpt.isEmpty()) throw new Exception("USER NOT EXIST");
 
         // Kiểm tra đã mời
         Optional<Friend> friendOpt = friendRepository.findInvitation(currentUserId, id);
@@ -60,7 +60,7 @@ public class FriendService {
                     .build();
             return new FriendDto(friendRepository.save(invitation));
         } else{
-            throw new Exception("Friend invitation is exist");
+            throw new Exception("INVITATION EXISTED");
         }
     }
 
@@ -70,6 +70,8 @@ public class FriendService {
             // Kiểm tra có phải người gửi lời mời
             if(friendOpt.get().getSender().getId() == Helper.getUserId()) throw new Exception("Sender cannot response");
 
+            if(friendOpt.get().isAccepted()) throw new Exception("ACCEPTED INVITATION");
+
             // Chấp nhận
             if(isAccept){
                 friendOpt.get().setAccepted(true);
@@ -77,11 +79,12 @@ public class FriendService {
             }
             // Từ chối
             else{
+                friendOpt.get().setAccepted(false);
                 friendRepository.delete(friendOpt.get());
                 return null;
             }
         } else{
-            throw new Exception("Invitation is not exist");
+            throw new Exception("INVITATION NOT EXIST");
         }
     }
 

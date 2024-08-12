@@ -2,7 +2,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getOtp } from "../api/AuthService";
 import { changeEmail, changePassword } from "../api/AccountService";
 import store from "./store";
-import { setUser } from "./authSlice";
+import { setAccountEmail, setUser } from "./authSlice";
+import { showSnackbar } from "./snackbarSlice";
 
 const accountSlice = createSlice({
   name: "account",
@@ -32,6 +33,16 @@ const accountSlice = createSlice({
     setOtp: (state, action) => {
       state.manageEmail.otp = action.payload.otp;
     },
+    clearEmailManage: (state) => {
+      state.manageEmail = {
+        newEmail: "",
+        otp: "",
+        progress: 1,
+        errorMessage: "",
+        otpPending: false,
+        emailPending: false,
+      };
+    },
     setOldPassword: (state, action) => {
       state.managePassword.oldPassword = action.payload.oldPassword;
     },
@@ -50,28 +61,30 @@ const accountSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(sendOtpThunk.pending, (state, action) => {
+      .addCase(sendOtpThunk.pending, (state) => {
         state.manageEmail.otpPending = true;
       })
-      .addCase(sendOtpThunk.fulfilled, (state, action) => {
+      .addCase(sendOtpThunk.fulfilled, (state) => {
         state.manageEmail.otpPending = false;
       })
-      .addCase(changeEmailThunk.pending, (state, action) => {
+      .addCase(changeEmailThunk.pending, (state) => {
         state.manageEmail.emailPending = true;
       })
       .addCase(changeEmailThunk.fulfilled, (state, action) => {
         state.manageEmail.emailPending = false;
         if (!action.payload.isSuccess) {
           switch (action.payload.message) {
-            case "Email has already been used":
+            case "USED EMAIL":
               state.manageEmail.errorMessage = "Email đã được sử dụng";
               break;
-            case "OTP invalid":
+            case "INVALID OTP":
               state.manageEmail.errorMessage = "OTP không hợp lệ";
               break;
             default:
               break;
           }
+        } else {
+          state.manageEmail.progress = 3;
         }
       })
       .addCase(changePasswordThunk.fulfilled, (state, action) => {
@@ -88,7 +101,6 @@ const accountSlice = createSlice({
             confirmPassword: "",
             errorMessage: "",
           };
-          alert("Đổi mật khẩu thành công");
         }
       });
   },
@@ -104,16 +116,30 @@ export const sendOtpThunk = createAsyncThunk(
 
 export const changeEmailThunk = createAsyncThunk(
   "account/changeEmailThunk",
-  async ({ newEmail, otp }) => {
+  async ({ newEmail, otp }, { dispatch }) => {
     const res = await changeEmail(newEmail, otp);
+    if (res.isSuccess) {
+      dispatch(
+        showSnackbar({ message: "Cập nhật email thành công", type: "success" })
+      );
+      dispatch(setAccountEmail(newEmail));
+    }
     return res;
   }
 );
 
 export const changePasswordThunk = createAsyncThunk(
   "account/changePasswordThunk",
-  async ({ oldPassword, newPassword }) => {
+  async ({ oldPassword, newPassword }, { dispatch }) => {
     const res = await changePassword(oldPassword, newPassword);
+    if (res.isSuccess) {
+      dispatch(
+        showSnackbar({
+          message: "Cập nhật mật khẩu thành công",
+          type: "success",
+        })
+      );
+    }
     return res;
   }
 );
@@ -122,6 +148,7 @@ export const {
   setNewEmail,
   setOtp,
   setProgress,
+  clearEmailManage,
   setOldPassword,
   setNewPassword,
   setConfirmPassword,

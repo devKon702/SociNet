@@ -20,14 +20,19 @@ const UserItem = ({ user }) => {
         <div
           className={`size-2 rounded-full absolute bottom-0 right-0 ${
             user.realtimeStatus === "ONLINE"
-              ? "bg-secondary"
+              ? "bg-green-400"
               : user.realtimeStatus === "OFFLINE"
               ? "bg-red-400"
               : ""
           }`}
         ></div>
       </div>
-      <p className="font-bold">{user.name}</p>
+      <div>
+        <p className="font-bold">{user.name}</p>
+        <p className="opacity-50 font-bold">
+          {user.hasUnreadMessage && "Tin nhắn mới"}
+        </p>
+      </div>
     </NavLink>
   );
 };

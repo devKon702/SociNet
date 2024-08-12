@@ -31,7 +31,7 @@ const OtherMessage = ({ message }) => {
         </div>
         <span className="text-xs ml-3">
           {message.createdAt !== message.updatedAt
-            ? `Đã chỉnh sửa ${dateDetailFormated(message.updatedAt)}`
+            ? `Đã thu hồi ${dateDetailFormated(message.updatedAt)}`
             : dateDetailFormated(message.createdAt)}
         </span>
       </div>

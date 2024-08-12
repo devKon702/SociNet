@@ -2,12 +2,16 @@ import axios from "axios";
 
 const CommentService = {
   getCommentsOfPost: async (postId) =>
-    axios.get("api/v1/comments/post/" + postId).then((res) => res.data),
+    axios
+      .get("api/v1/comments/post/" + postId)
+      .then((res) => res.data)
+      .catch((e) => e.response.data),
 
   createComment: async (postId, content, parentCommentId) =>
     axios
       .post("api/v1/comments", { postId, content, parentCommentId })
-      .then((res) => res.data),
+      .then((res) => res.data)
+      .catch((e) => e.response.data),
 
   editComment: async (commentId, content) =>
     axios

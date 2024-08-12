@@ -87,7 +87,7 @@ const AuthService = {
         { headers: { "Content-Type": "multipart/form-data" } }
       )
       .then((res) => res.data)
-      .catch((e) => e.response.data.message),
+      .catch((e) => e.response.data),
 };
 
 export const {

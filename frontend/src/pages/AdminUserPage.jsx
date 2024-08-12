@@ -3,7 +3,11 @@ import AdminPostItem from "../components/admin/AdminPostItem";
 import AdminUserItem from "../components/admin/AdminUserItem";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { clearPostList, getAccountListThunk } from "../redux/adminSlice";
+import {
+  clearPostList,
+  getAccountListThunk,
+  setCurrentAccount,
+} from "../redux/adminSlice";
 import { adminSelector } from "../redux/selectors";
 import { useDebounce } from "@uidotdev/usehooks";
 
@@ -31,7 +35,7 @@ const AdminUserPage = () => {
           className="bg-gray-200 py-2 px-3 rounded-lg w-full outline-none mb-6"
           onChange={(e) => setSearchValue(e.target.value)}
         />
-        <div className="grid grid-cols-2 grid-rows-1 gap-3">
+        <div className="grid grid-cols-2 grid-rows-2 gap-3 min-h-36">
           {accountList.map((item, index) => (
             <AdminUserItem key={index} account={item}></AdminUserItem>
           ))}
@@ -45,6 +49,7 @@ const AdminUserPage = () => {
           }
           onPageChange={(e) => {
             dispatch(clearPostList());
+            dispatch(setCurrentAccount(null));
             dispatch(getAccountListThunk({ name: "", page: e.selected }));
           }}
           pageRangeDisplayed={3}

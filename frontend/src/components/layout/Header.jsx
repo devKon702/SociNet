@@ -6,7 +6,6 @@ import { signOut } from "../../api/AuthService";
 import { ClickAwayListener } from "@mui/base/ClickAwayListener";
 import InvitationItem from "../notify/InvitationItem";
 import { setNewInvitationNumber } from "../../redux/realtimeSlice";
-import { longFormatters } from "date-fns";
 import { useDebounce } from "@uidotdev/usehooks";
 import { getUsersByName } from "../../api/UserService";
 
@@ -68,7 +67,7 @@ const Header = () => {
             onFocus={() => setSearching(true)}
           />
           {isSearching && (
-            <div className="absolute top-0 -left-2 -right-2 bg-slate-700 rounded-md shadow-lg z-30 px-2">
+            <div className="absolute top-0 -left-2 -right-2 bg-gray-700 rounded-md shadow-lg z-30 px-2">
               <div className="rounded-2xl py-2 px-4 bg-slate-500 flex items-center gap-2">
                 <i className="bx bx-search"></i>
                 <input
@@ -113,7 +112,7 @@ const Header = () => {
           <div
             className="relative cursor-pointer"
             onClick={() => {
-              setShowNotify(true);
+              setShowNotify(!showNotify);
               dispatch(setNewInvitationNumber(0));
             }}
           >
@@ -124,7 +123,7 @@ const Header = () => {
               </div>
             )}
             {showNotify && (
-              <div className="absolute right-0 bg-slate-700 w-[350px] rounded-md p-2 flex flex-col gap-2 z-50">
+              <div className="absolute right-0 bg-gray-700 w-[350px] rounded-md p-2 flex flex-col gap-2 z-50">
                 {invitations.length != 0 ? (
                   invitations.map((invite, index) => (
                     <InvitationItem
@@ -168,7 +167,10 @@ const Header = () => {
             </Link>
             <button
               className="hover:bg-gray-600 rounded-md p-3 flex items-center gap-2 w-full"
-              onClick={() => signOut(dispatch, navigate)}
+              onClick={() => {
+                const check = confirm("Bạn chắc chắc muốn đăng xuất");
+                if (check) signOut(dispatch, navigate);
+              }}
             >
               <i className="bx bx-log-out-circle text-xl"></i>
               Đăng xuất

@@ -3,9 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { accountSelector } from "../redux/selectors";
 import { signOut } from "../api/AuthService";
+import * as Yup from "yup";
 import {
   changeEmailThunk,
   changePasswordThunk,
+  clearEmailManage,
   sendOtpThunk,
   setConfirmPassword,
   setEmailError,
@@ -16,6 +18,13 @@ import {
   setPasswordError,
   setProgress,
 } from "../redux/accountSlice";
+import { Collapse } from "@mui/material";
+
+const emailSchema = Yup.object({
+  email: Yup.string()
+    .required("Vui lòng điền email")
+    .email("Email không hợp lệ"),
+});
 
 const AccountPage = () => {
   const account = useSelector((state) => state.auth.user);
@@ -23,7 +32,6 @@ const AccountPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [changeEmailProgress, setChangeEmailProgress] = useState(1);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
 
@@ -67,12 +75,16 @@ const AccountPage = () => {
           <i className="bx bxs-pencil"></i>
         </div>
         {/* Update Email Progress */}
-        {showEmailForm && (
-          <div>
+
+        <div>
+          <Collapse in={showEmailForm} unmountOnExit>
             <div className="progress flex items-center justify-center w-3/4 mx-auto">
               <button
                 className=" shadow-md rounded-full border-[8px] border-secondary font-bold size-10 flex items-center justify-center"
-                onClick={() => dispatch(setProgress({ progress: 1 }))}
+                onClick={() =>
+                  manageEmail.progress == 3 ||
+                  dispatch(setProgress({ progress: 1 }))
+                }
               >
                 1
               </button>
@@ -85,10 +97,10 @@ const AccountPage = () => {
                 className={`shadow-md rounded-full border-[8px] ${
                   manageEmail.progress >= 2 ? "border-secondary" : ""
                 } font-bold size-10 flex items-center justify-center`}
-                onClick={() =>
-                  manageEmail.progress > 2 &&
-                  dispatch(setProgress({ progress: 2 }))
-                }
+                // onClick={() =>
+                //   manageEmail.progress > 2 &&
+                //   dispatch(setProgress({ progress: 2 }))
+                // }
               >
                 2
               </button>
@@ -99,7 +111,7 @@ const AccountPage = () => {
               ></div>
               <button
                 className={`shadow-md rounded-full border-[8px] ${
-                  changeEmailProgress >= 3 ? "border-secondary" : ""
+                  manageEmail.progress >= 3 ? "border-secondary" : ""
                 } font-bold size-10 flex items-center justify-center`}
               >
                 3
@@ -128,16 +140,19 @@ const AccountPage = () => {
                 <button
                   className="mx-auto py-2 px-6 bg-secondary rounded-lg text-white font-bold"
                   onClick={() => {
-                    if (manageEmail.newEmail.trim()) {
-                      dispatch(sendOtpThunk(manageEmail.newEmail.trim()));
-                      dispatch(setProgress({ progress: 2 }));
-                    } else {
-                      dispatch(
-                        setEmailError({
-                          errorMessage: "Hãy điền email muốn thay đổi",
-                        })
-                      );
-                    }
+                    emailSchema
+                      .validate({ email: manageEmail.newEmail })
+                      .then(() => {
+                        dispatch(sendOtpThunk(manageEmail.newEmail.trim()));
+                        dispatch(setProgress({ progress: 2 }));
+                      })
+                      .catch((e) => {
+                        dispatch(
+                          setEmailError({
+                            errorMessage: e.errors[0],
+                          })
+                        );
+                      });
                   }}
                 >
                   Tiếp theo
@@ -177,6 +192,7 @@ const AccountPage = () => {
                   <button
                     className="mx-auto py-2 px-6 bg-secondary rounded-lg text-white font-bold ms-6"
                     onClick={handleChangeEmail}
+                    disabled={manageEmail.otpPending}
                   >
                     Xác nhận
                   </button>
@@ -190,13 +206,19 @@ const AccountPage = () => {
                   <i className="bx bx-check-circle text-4xl"></i>
                   Hoàn thành
                 </p>
-                <button className="bg-secondary py-2 px-6 text-white rounded-lg">
+                <button
+                  className="bg-secondary py-2 px-6 text-white rounded-lg"
+                  onClick={() => {
+                    setShowEmailForm(false);
+                    dispatch(clearEmailManage());
+                  }}
+                >
                   Xác nhận
                 </button>
               </div>
             )}
-          </div>
-        )}
+          </Collapse>
+        </div>
 
         <div
           className="flex justify-between items-center p-4 w-full rounded-md hover:bg-gray-100 cursor-pointer shadow-lg"
@@ -209,55 +231,59 @@ const AccountPage = () => {
         </div>
 
         {/* Change Password */}
-        {showPasswordForm && (
-          <div className="mx-auto flex flex-col gap-1 w-1/3 my-3">
-            <label htmlFor="" className="font-bold mr-4">
-              Mật khẩu cũ:
-            </label>
-            <input
-              type="password"
-              className="p-3 bg-gray-100 rounded-lg outline-none mb-3"
-              value={managePassword.oldPassword}
-              onChange={(e) =>
-                dispatch(setOldPassword({ oldPassword: e.target.value }))
-              }
-            />
 
-            <label htmlFor="" className="font-bold mr-4">
-              Mật khẩu mới:
-            </label>
-            <input
-              type="password"
-              className="p-3 bg-gray-100 rounded-lg outline-none mb-3"
-              value={managePassword.newPassword}
-              onChange={(e) =>
-                dispatch(setNewPassword({ newPassword: e.target.value }))
-              }
-            />
-            <label htmlFor="" className="font-bold mr-4">
-              Xác nhận lại:
-            </label>
-            <input
-              type="password"
-              className="p-3 bg-gray-100 rounded-lg outline-none mb-3"
-              value={managePassword.confirmPassword}
-              onChange={(e) =>
-                dispatch(
-                  setConfirmPassword({ confirmPassword: e.target.value })
-                )
-              }
-            />
-            <p className="text-red-500 text-sm text-center">
-              {managePassword.errorMessage}
-            </p>
-            <button
-              className="bg-primary text-white p-3 rounded-md w-1/2 mx-auto"
-              onClick={handleChangePassword}
-            >
-              Cập nhật
-            </button>
-          </div>
-        )}
+        <div>
+          <Collapse in={showPasswordForm}>
+            <div className="mx-auto flex flex-col gap-1 w-1/3 my-3">
+              <label htmlFor="" className="font-bold mr-4">
+                Mật khẩu cũ:
+              </label>
+              <input
+                type="password"
+                className="p-3 bg-gray-100 rounded-lg outline-none mb-3"
+                value={managePassword.oldPassword}
+                onChange={(e) =>
+                  dispatch(setOldPassword({ oldPassword: e.target.value }))
+                }
+              />
+
+              <label htmlFor="" className="font-bold mr-4">
+                Mật khẩu mới:
+              </label>
+              <input
+                type="password"
+                className="p-3 bg-gray-100 rounded-lg outline-none mb-3"
+                value={managePassword.newPassword}
+                onChange={(e) =>
+                  dispatch(setNewPassword({ newPassword: e.target.value }))
+                }
+              />
+              <label htmlFor="" className="font-bold mr-4">
+                Xác nhận lại:
+              </label>
+              <input
+                type="password"
+                className="p-3 bg-gray-100 rounded-lg outline-none mb-3"
+                value={managePassword.confirmPassword}
+                onChange={(e) =>
+                  dispatch(
+                    setConfirmPassword({ confirmPassword: e.target.value })
+                  )
+                }
+              />
+              <p className="text-red-500 text-sm text-center">
+                {managePassword.errorMessage}
+              </p>
+              <button
+                className="bg-primary text-white p-3 rounded-md w-1/2 mx-auto"
+                onClick={handleChangePassword}
+              >
+                Cập nhật
+              </button>
+            </div>
+          </Collapse>
+        </div>
+
         <div
           className="flex justify-between items-center p-4 w-full rounded-md hover:bg-gray-100 cursor-pointer shadow-lg mt-auto"
           onClick={handleSignOut}

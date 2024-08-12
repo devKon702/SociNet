@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getPersonalInfo, getPersonalPost } from "../../redux/personalSlice";
 import { authSelector } from "../../redux/selectors";
 import { setUserInfo } from "../../redux/authSlice";
+import { showSnackbar } from "../../redux/snackbarSlice";
 
 const schema = Yup.object({
   name: Yup.string().max(50, "Tên hiển thị không quá 50 kí tự"),
@@ -43,8 +44,10 @@ const UpdateInfoForm = ({ user, handleClose }) => {
   const auth = useSelector(authSelector);
   const [avatarSrc, setAvatarSrc] = useState(user.avatarUrl);
   const fileWatch = watch("file");
+  const [updating, setUpdating] = useState(false);
   function handleUpdate() {
     const { name, phone, school, address, genre, file } = getValues();
+    setUpdating(true);
     updateUserInfo(
       name,
       phone,
@@ -53,25 +56,38 @@ const UpdateInfoForm = ({ user, handleClose }) => {
       genre == "male",
       file && file[0]
     ).then((res) => {
-      console.log(res);
-
+      setUpdating(false);
       if (res.isSuccess) {
+        dispatch(
+          showSnackbar({
+            message: "Chỉnh sửa thông tin thành công",
+            type: "success",
+          })
+        );
         dispatch(getPersonalInfo(user.id));
         dispatch(getPersonalPost(user.id));
         if (user.id === auth.user.user.id) {
           dispatch(setUserInfo(res.data));
         }
-
         handleClose();
       } else {
-        console.log(res);
+        let message = "";
+        switch (res.message) {
+          case "UNSUPPORTED FILE":
+            message = "Định dạng file không hỗ trợ";
+            break;
+          case "OVERSIZE IMAGE":
+            message = "Avatar quá lớn";
+            break;
+          default:
+            message = "Chỉnh sửa thất bại";
+        }
+        dispatch(showSnackbar({ message, type: "error" }));
       }
     });
   }
 
   useEffect(() => {
-    console.log(fileWatch);
-
     if (!fileWatch || !fileWatch.length) {
       setAvatarSrc(user.avatarUrl);
       return;
@@ -151,8 +167,9 @@ const UpdateInfoForm = ({ user, handleClose }) => {
         type="button"
         className="w-full py-2 bg-secondary text-white font-bold rounded-md"
         onClick={handleUpdate}
+        disabled={updating}
       >
-        Cập nhật
+        {updating ? "Đang xử lí..." : "Cập nhật"}
       </button>
     </form>
   );

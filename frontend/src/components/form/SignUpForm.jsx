@@ -4,6 +4,8 @@ import * as Yup from "yup";
 import { useState } from "react";
 import { getOtp, signUp } from "../../api/AuthService";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { showSnackbar } from "../../redux/snackbarSlice";
 
 const schema = Yup.object({
   username: Yup.string()
@@ -40,6 +42,7 @@ const SignUpForm = () => {
     resolver: yupResolver(schema),
   });
   const [otpNotify, setOtpNotify] = useState("Gửi mã OTP đến email!");
+  const dispatch = useDispatch();
 
   const handleSendOtp = async (e) => {
     const isValid = await trigger("email", { shouldFocus: true });
@@ -58,9 +61,29 @@ const SignUpForm = () => {
     const { username, password, email, name, otp } = formValues;
     const res = await signUp(username, password, email, name, otp);
     if (res.isSuccess) {
+      dispatch(
+        showSnackbar({ message: "Đăng ký thành công", type: "success" })
+      );
       navigate("/auth/signin");
     } else {
-      console.log(res);
+      let message = "";
+      switch (res.message) {
+        case "USED USERNAME":
+          message = "Tên tài khoản đã được sử dụng";
+          break;
+        case "USED EMAIL":
+          message = "Email đã được sử dụng";
+          break;
+        case "INVALID PASSWORD":
+          message = "Mật khẩu quá ngắn";
+          break;
+        case "INVALID OTP":
+          message = "Mã OTP không hợp lệ";
+          break;
+        default:
+          message = "Đăng ký thất bại";
+      }
+      dispatch(showSnackbar({ message, type: "error" }));
     }
   };
 

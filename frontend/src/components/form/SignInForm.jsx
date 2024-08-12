@@ -36,8 +36,6 @@ const SignInForm = () => {
   }, [searchParams]);
 
   const submit = () => {
-    console.log(searchParams.get("username"));
-
     const { username, password } = getValues();
     dispatch(signInThunk({ username, password }));
   };

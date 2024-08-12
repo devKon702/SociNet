@@ -3,6 +3,8 @@ package com.example.socinet.repository;
 import com.example.socinet.entity.Account;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,6 +16,8 @@ public interface AccountRepository extends JpaRepository<Account, String> {
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
     Optional<Account> findByEmail(String email);
-    long countByUser_NameContainingIgnoreCase(String name);
-    List<Account> findByUser_NameContainingIgnoreCase(String name, Pageable pageable);
+    @Query("SELECT COUNT(a) FROM Account a JOIN a.roles r WHERE a.user.name LIKE %:name% AND r.role = :role")
+    long countUserByName(@Param("name") String name, @Param("role") String role);
+    @Query("SELECT a FROM Account a JOIN a.roles r WHERE a.user.name LIKE %:name% AND r.role = :role")
+    List<Account> findUserByNameContaining(@Param("name") String name,@Param("role") String role, Pageable pageable);
 }

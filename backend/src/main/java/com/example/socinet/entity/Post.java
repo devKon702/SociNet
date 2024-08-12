@@ -23,9 +23,13 @@ public class Post extends AbstractEntity{
     String imageUrl;
     @Column(name = "video_url")
     String videoUrl;
+
     @ManyToOne
     @JoinColumn(name = "shared_post_id")
     Post sharedPost;
+
+    @OneToMany(mappedBy = "sharedPost")
+    List<Post> postShare;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     List<Comment> comments;
@@ -35,4 +39,11 @@ public class Post extends AbstractEntity{
 
     @Column(name = "is_active")
     boolean isActive;
+    @PreRemove
+    private void preRemove() {
+        for (Post post : postShare) {
+            post.setSharedPost(null);
+        }
+    }
+
 }

@@ -109,11 +109,11 @@ function App() {
 
           <Route path="/admin" element={<AdminPage></AdminPage>}>
             <Route path="" element={<AdminLayout></AdminLayout>}>
-              <Route path="" element={<Navigate to="home" replace />}></Route>
-              <Route
+              <Route path="" element={<Navigate to="manage" replace />}></Route>
+              {/* <Route
                 path="home"
                 element={<AdminHomePage></AdminHomePage>}
-              ></Route>
+              ></Route> */}
               <Route
                 path="manage"
                 element={<AdminUserPage></AdminUserPage>}

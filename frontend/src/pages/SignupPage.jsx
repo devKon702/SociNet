@@ -31,22 +31,7 @@ const SignupPage = () => {
       setError(e.response.data.message);
     }
   };
-  const handleSendOtp = async (e) => {
-    e.preventDefault();
-    if (email.length == 0) {
-      setError("Vui lòng điền email");
-      return;
-    }
-    setOtpNotify("Đang gửi...");
-    try {
-      const res = await getOtp(email);
-    } catch (e) {
-      console.log(e);
-      setOtpNotify(`Gửi OTP thất bại. Gửi lại?`);
-    }
-    setOtpNotify(`Đã gửi đến ${email}. Gửi lại?`);
-  };
-
+  
   return (
     <div className="w-screen h-screen grid place-items-center">
       <div className="w-8/12 h-[500px] bg-white m-auto rounded-md flex">

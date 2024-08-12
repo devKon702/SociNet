@@ -11,6 +11,7 @@ import {
   getPersonalPost,
   preparePersonalInfoThunk,
 } from "../redux/personalSlice";
+import { setAction } from "../redux/postSlice";
 
 const PersonalPage = () => {
   const { id } = useParams();
@@ -26,13 +27,17 @@ const PersonalPage = () => {
   const handleInvite = () => {
     dispatch(createInvitationThunk(id));
   };
+
   if (!user) return <></>;
   return (
     <div className="px-4 py-3 bg-gray-300">
       <div className="flex h-full bg-slate-200">
         {isShowCreatePostModal ? (
           <CreatePostDialog
-            handleClose={() => setShowCreatePostModal(false)}
+            handleClose={() => {
+              dispatch(setAction({ create: "", share: "" }));
+              setShowCreatePostModal(false);
+            }}
           ></CreatePostDialog>
         ) : null}
 
@@ -96,7 +101,7 @@ const PersonalPage = () => {
                 <i className="bx bxs-edit-alt text-xl"></i>Chỉnh sửa
               </button>
               <button
-                className="bg-secondary p-3 rounded-md flex items-center gap-2"
+                className="bg-secondary text-white p-3 rounded-md flex items-center gap-2"
                 onClick={() => setShowCreatePostModal(true)}
               >
                 <i className="bx bxs-duplicate text-xl"></i>Tạo bài đăng

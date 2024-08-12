@@ -9,8 +9,9 @@ import {
 } from "../api/AdminService";
 import { setPostList } from "./postSlice";
 import { socket, socketAdmin } from "../socket";
+import { showSnackbar } from "./snackbarSlice";
 
-const ACCOUNT_PAGE_SIZE = 2;
+const ACCOUNT_PAGE_SIZE = 4;
 const POST_PAGE_SIZE = 6;
 
 const adminSlice = createSlice({
@@ -130,8 +131,16 @@ export const manageAccountThunk = createAsyncThunk(
 
 export const managePostThunk = createAsyncThunk(
   "admin/managePostThunk",
-  async ({ postId, isActive }) => {
-    return await managePost(postId, isActive);
+  async ({ postId, isActive }, { dispatch }) => {
+    const res = await managePost(postId, isActive);
+    if (!res.isSuccess) {
+      res.message === "POST NOT FOUND"
+        ? dispatch(
+            showSnackbar({ message: "Bài viết không tồn tại", type: "error" })
+          )
+        : dispatch(showSnackbar({ message: "Thất bại", type: "error" }));
+    }
+    return res;
   }
 );
 

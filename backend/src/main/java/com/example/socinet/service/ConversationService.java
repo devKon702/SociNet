@@ -26,7 +26,7 @@ public class ConversationService {
 
 
     public List<ConversationDto> getConversationList(Long userId) throws Exception{
-        userRepository.findById(userId).orElseThrow(() -> new Exception("User is not exist"));
+        userRepository.findById(userId).orElseThrow(() -> new Exception("USER NOT FOUND"));
 
         List<Conversation> conversationList = conversationRepository.getConversations(Helper.getUserId(), userId);
         List<ConversationDto> result = new ArrayList<>();
@@ -40,18 +40,19 @@ public class ConversationService {
     }
 
     public ConversationDto createConversation(Long receiverId, String content, MultipartFile file) throws Exception{
-        User receiver = userRepository.findById(receiverId).orElseThrow(() -> new Exception("User is not exist"));
+        User receiver = userRepository.findById(receiverId).orElseThrow(() -> new Exception("USER NOT EXIST"));
         User sender = Helper.getAccountDetail().getUser();
 
-        if(receiver.getId() == sender.getId()) throw new Exception("Can not create conversation");
+        if(receiver.getId() == sender.getId()) throw new Exception("CANNOT CREATE");
 
         String fileUrl = null;
         if(file != null){
-            String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
-            if(!Arrays.stream(AVAILABLE_EXTENSIONS).anyMatch((item) -> item.equals(extension)))
-                throw new Exception("Extension " + extension + " is not allowed");
+//            String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
+//            if(!Arrays.stream(AVAILABLE_EXTENSIONS).anyMatch((item) -> item.equals(extension)))
+//                throw new Exception("UNSUPPORTED FILE");
+            if(!file.getContentType().startsWith("image")) throw new Exception("UNSUPPORTED FILE");
 
-            if(file.getSize() > MAX_FILE_SIZE) throw new Exception("File's size must be <= 3MB");
+            if(file.getSize() > MAX_FILE_SIZE) throw new Exception("OVERSIZE FILE");
 
             fileUrl = storageService.upload("images", file);
         }

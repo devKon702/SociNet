@@ -23,10 +23,10 @@ public class ReactionService {
 
     public ReactionDto createReaction(ReactionRequest reactionRequest) throws Exception {
         Optional<Post> postOptional = postRepo.findById(reactionRequest.getPostId());
-        if(postOptional.isEmpty()) throw new Exception("Post not found");
+        if(postOptional.isEmpty()) throw new Exception("POST NOT FOUND");
 
         Optional<React> reactOptional = reactRepo.findById(reactionRequest.getType());
-        if(reactOptional.isEmpty()) throw new Exception("Reaction's type not found");
+        if(reactOptional.isEmpty()) throw new Exception("TYPE NOT FOUND");
 
         Reaction reaction;
         Optional<Reaction> reactionOptional = reactionRepo.findByUser_IdAndPost_Id(Helper.getUserId(), reactionRequest.getPostId());
@@ -48,7 +48,7 @@ public class ReactionService {
 
     public void deleteReaction(Long postId) throws Exception {
         Optional<Reaction> reactionOptional = reactionRepo.findByUser_IdAndPost_Id(Helper.getUserId(), postId);
-        if(reactionOptional.isEmpty()) throw new Exception("Reaction not found");
+        if(reactionOptional.isEmpty()) throw new Exception("REACTION NOT FOUND");
         reactionRepo.delete(reactionOptional.get());
     }
 }

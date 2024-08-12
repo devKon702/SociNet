@@ -31,7 +31,10 @@ const AdminUserItem = ({ account }) => {
           alt=""
           className="rounded-full size-7"
         />
-        <p className="font-bold">{account.user.name}</p>
+        <div>
+          <p className="font-bold">{account.user.name}</p>
+          <p className="text-sm opacity-50">{`ID: ${account.user.id}`}</p>
+        </div>
       </div>
       {account.isActive ? (
         <i

@@ -37,7 +37,7 @@ public class UserService {
         if(user.isPresent()){
             return new UserDto(user.get());
         } else{
-            throw new Exception("User not found");
+            throw new Exception("USER NOT FOUND");
         }
     }
 
@@ -58,7 +58,6 @@ public class UserService {
                                   MultipartFile avatar) throws Exception{
         AccountDetail accountDetail = Helper.getAccountDetail();
         User user = accountDetail.getUser();
-        if(user == null) throw new Exception("Cannot find user info");
         if(name != null) user.setName(name);
         if(phone != null) user.setPhone(phone);
         if(school != null) user.setSchool(school);
@@ -66,7 +65,8 @@ public class UserService {
         if(isMale != null) user.setMale(isMale);
         // Save avatar to firebase
         if(avatar != null){
-            if(avatar.getSize() > MAX_IMAGE_SIZE) throw new Exception("Avatar size must <= 3MB");
+            if(!avatar.getContentType().startsWith("image")) throw new Exception("UNSUPPORTED FILE");
+            if(avatar.getSize() > MAX_IMAGE_SIZE) throw new Exception("OVERSIZE IMAGE");
             String avatarUrl = storageService.upload("images", avatar);
             user.setAvatarUrl(avatarUrl);
         }

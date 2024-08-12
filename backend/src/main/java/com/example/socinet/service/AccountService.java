@@ -40,9 +40,9 @@ public class AccountService {
     public AccountDto changeEmail(String newEmail, String otp) throws Exception {
         // Kiểm tra email trùng
         if(accountRepo.existsByEmail(newEmail))
-            throw new Exception("Email has already been used");
+            throw new Exception("USED EMAIL");
         if(!emailOtpService.checkOpt(newEmail, otp))
-            throw new Exception("OTP invalid");
+            throw new Exception("INVALID OTP");
         // Thỏa mãn điều kiện
         AccountDetail accountDetail = Helper.getAccountDetail();
         Optional<Account> accountOpt = accountRepo.findAccountByUsername(accountDetail.getUsername());

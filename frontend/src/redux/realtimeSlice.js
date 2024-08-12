@@ -13,12 +13,14 @@ import {
 } from "../api/ConversationService";
 import { socket } from "../socket";
 import { getUserInfo } from "../api/UserService";
+import { showSnackbar } from "./snackbarSlice";
+import { setFriendStatus } from "./personalSlice";
 
 const realtimeSlice = createSlice({
   name: "realtime",
   initialState: {
     invitations: [],
-    realtimeFriends: [], // {...user, realtimeStatus}
+    realtimeFriends: [], // {...user, realtimeStatus, hasUnreadMessage}
     newInvitationNumber: 0,
     conversation: {
       currentUser: null,
@@ -34,6 +36,12 @@ const realtimeSlice = createSlice({
     setNewInvitationNumber: (state, action) => {
       state.newInvitationNumber = action.payload;
     },
+    setNewInvitation: (state, action) => {
+      if (!state.invitations.find((item) => item.id == action.payload.id)) {
+        state.invitations.unshift(action.payload);
+        state.newInvitationNumber += 1;
+      }
+    },
     setConversationAction: (state, action) => {
       state.conversation.action = action.payload;
     },
@@ -47,9 +55,10 @@ const realtimeSlice = createSlice({
       const invite = state.invitations.find(
         (item) => item.id === action.payload.inviteId
       );
-      invite.status = action.payload.status;
+      invite ? (invite.status = action.payload.status) : null;
     },
     updateFriendStatus: (state, action) => {
+      if (!action.payload.user) return;
       const index = state.realtimeFriends.findIndex(
         (item) => action.payload.user.id === item.id
       );
@@ -63,13 +72,13 @@ const realtimeSlice = createSlice({
       }
     },
     // action.payload : list id các friend online
-    setOnlineFriend: (state, action) => {
-      state.realtimeFriends.forEach(
-        (item) =>
-          (item.realtimeStatus = action.payload.includes(item.id)
-            ? "ONLINE"
-            : "OFFLINE")
-      );
+    setFriendsStatus: (state, action) => {
+      state.realtimeFriends.forEach((item) => {
+        item.realtimeStatus = action.payload.onlineIdList.includes(item.id)
+          ? "ONLINE"
+          : "OFFLINE";
+        item.hasUnreadMessage = action.payload.unreadList.includes(item.id);
+      });
       state.conversation.currentUser = state.realtimeFriends.find(
         (item) => item.id === state.conversation.currentUser?.id
       );
@@ -80,23 +89,57 @@ const realtimeSlice = createSlice({
         (item) => item.id === action.payload
       );
     },
+    clearConversation: (state) => {
+      state.conversation = {
+        currentUser: null,
+        currentMessage: null,
+        messageList: [],
+        isLoading: false,
+        action: "CREATE",
+        filter: "",
+      };
+    },
     setNewMessage: (state, action) => {
       const newMessage = action.payload;
-      if (newMessage.senderId === state.conversation.currentUser.id) {
+      if (
+        newMessage.senderId === state.conversation.currentUser.id ||
+        newMessage.receiverId === state.conversation.currentUser.id
+      ) {
         state.conversation.messageList.unshift(newMessage);
+      }
+    },
+    setHasUnreadStatus: (state, { payload: { id, status } }) => {
+      const index = state.realtimeFriends.findIndex((item) => item.id === id);
+
+      // Tồn tại thì cập nhật trạng thái
+      if (index != -1) {
+        state.realtimeFriends[index].hasUnreadMessage = status;
+      } // Chưa thì thêm vào realtime Friend List
+      else {
+        getUserInfo(id).then((res) => {
+          if (res.isSuccess) {
+            state.realtimeFriends.unshift({
+              ...res.data,
+              realtimeStatus: "STRANGE",
+              hasUnreadMessage: status,
+            });
+          } else {
+            console.log(res);
+          }
+        });
       }
     },
     setUpdateMessage: (state, action) => {
       const updatedMessage = action.payload;
-      if (
-        state.conversation.currentUser &&
-        updatedMessage.senderId === state.conversation.currentUser.id
-      ) {
-        const index = state.conversation.messageList.findIndex(
-          (item) => item.id === updatedMessage.id
-        );
-        if (index != -1) state.conversation.messageList[index] = updatedMessage;
-      }
+      // if (
+      //   state.conversation.currentUser &&
+      //   updatedMessage.senderId === state.conversation.currentUser.id
+      // ) {
+      const index = state.conversation.messageList.findIndex(
+        (item) => item.id === updatedMessage.id
+      );
+      if (index != -1) state.conversation.messageList[index] = updatedMessage;
+      // }
     },
   },
   extraReducers: (builder) => {
@@ -110,21 +153,34 @@ const realtimeSlice = createSlice({
         state.realtimeFriends = friendResult.data;
         state.newInvitationNumber = invitationResult.data.length;
         socket.emit(
-          "FILTER ONLINE FRIEND",
+          "FILTER STATUS FRIEND",
           friendResult.data.map((item) => item.id)
         );
+      })
+      .addCase(getRealtimeFriendsThunk.fulfilled, (state, action) => {
+        if (action.payload.isSuccess) {
+          state.realtimeFriends = action.payload.data;
+          socket.emit(
+            "FILTER STATUS FRIEND",
+            action.payload.data.map((item) => item.id)
+          );
+        }
       })
       .addCase(responseInvitationThunk.fulfilled, (state, action) => {
         console.log(action.payload.message);
       })
       .addCase(getConversationThunk.fulfilled, (state, action) => {
-        if (Array.isArray(action.payload)) {
+        if (
+          Array.isArray(action.payload) &&
+          action.payload.every((item) => item.isSuccess)
+        ) {
           const [userResult, conversationResult] = action.payload;
-          const friend = state.realtimeFriends.find(
+          const index = state.realtimeFriends.findIndex(
             (item) => item.id === userResult.data.id
           );
-          if (friend) {
-            state.conversation.currentUser = friend;
+          if (index != -1) {
+            state.realtimeFriends[index].hasUnreadMessage = false;
+            state.conversation.currentUser = state.realtimeFriends[index];
           } else {
             state.conversation.currentUser = {
               ...userResult.data,
@@ -136,27 +192,24 @@ const realtimeSlice = createSlice({
             });
           }
           state.conversation.messageList = conversationResult.data;
-        } else {
-          console.log(action.payload.message);
+          socket.emit("READ CONVERSATION", userResult.data.id);
         }
       })
       .addCase(createConversationThunk.fulfilled, (state, action) => {
         if (action.payload.isSuccess) {
-          state.conversation.messageList.unshift(action.payload.data);
+          // state.conversation.messageList.unshift(action.payload.data);
           state.conversation.action = "CREATE";
           socket.emit("NEW MESSAGE", action.payload.data);
-        } else {
-          alert(action.payload.message);
         }
       })
       .addCase(editConversationThunk.fulfilled, (state, action) => {
         if (action.payload.isSuccess) {
-          const index = state.conversation.messageList.findIndex(
-            (item) => item.id === action.payload.data.id
-          );
-          if (index !== -1) {
-            state.conversation.messageList[index] = action.payload.data;
-          }
+          // const index = state.conversation.messageList.findIndex(
+          //   (item) => item.id === action.payload.data.id
+          // );
+          // if (index !== -1) {
+          //   state.conversation.messageList[index] = action.payload.data;
+          // }
           socket.emit("UPDATE MESSAGE", action.payload.data);
         } else {
           console.log(action.payload.message);
@@ -168,13 +221,13 @@ const realtimeSlice = createSlice({
           console.log(action.payload.message);
           return;
         }
-        const index = state.conversation.messageList.findIndex(
-          (item) => item.id === action.payload.data.id
-        );
-        if (index !== -1) {
-          state.conversation.messageList[index] = action.payload.data;
-          socket.emit("UPDATE MESSAGE", action.payload.data);
-        }
+        // const index = state.conversation.messageList.findIndex(
+        //   (item) => item.id === action.payload.data.id
+        // );
+        // if (index !== -1) {
+        //   state.conversation.messageList[index] = action.payload.data;
+        // }
+        socket.emit("UPDATE MESSAGE", action.payload.data);
       });
   },
 });
@@ -187,28 +240,109 @@ export const prepareRealtimeDataThunk = createAsyncThunk(
   }
 );
 
+export const getRealtimeFriendsThunk = createAsyncThunk(
+  "realtime/getFriendListThunk",
+  async () => {
+    const user = store.getState().auth.user?.user;
+    return await getFriendList(user.id);
+  }
+);
+
 export const responseInvitationThunk = createAsyncThunk(
   "realtime/responseInvitationThunk",
-  async ({ invitationId, isAccept }) => {
-    const res = await responseInvitation(invitationId, isAccept);
+  async ({ invitation, isAccept }, { dispatch }) => {
+    const res = await responseInvitation(invitation.id, isAccept);
+    if (res.isSuccess) {
+      dispatch(getRealtimeFriendsThunk());
+      if (store.getState().personal.user?.id == invitation.user.id) {
+        dispatch(setFriendStatus(isAccept ? "FRIEND" : "NO"));
+      }
+      socket.emit("RESPONSE INVITATION", invitation.user.id, isAccept);
+    } else {
+      if (res.message == "ACCEPTED INVITATION" && !isAccept) {
+        dispatch(
+          setInvitationStatus({ inviteId: invitation.id, status: "accepted" })
+        );
+        dispatch(
+          showSnackbar({
+            message: "Lời mời đã được chấp nhận, không thể từ chối",
+            type: "error",
+          })
+        );
+      } else if (res.message == "INVITATION NOT EXIST" && isAccept) {
+        dispatch(
+          setInvitationStatus({ inviteId: invitation.id, status: "rejected" })
+        );
+        dispatch(
+          showSnackbar({
+            message: "Lời mời đã được từ chối",
+            type: "error",
+          })
+        );
+      }
+    }
     return res;
   }
 );
 
 export const getConversationThunk = createAsyncThunk(
   "realtime/getConversationThunk",
-  async (userId) => {
-    return await Promise.all([
-      getUserInfo(userId),
-      getConversationList(userId),
-    ]).catch((e) => e.response.data);
+  async (userId, { dispatch }) => {
+    return await Promise.all([getUserInfo(userId), getConversationList(userId)])
+      .then((res) => {
+        const failResponse = res.find((item) => !item.isSuccess);
+        if (failResponse) {
+          switch (failResponse.message) {
+            case "USER NOT FOUND":
+              dispatch(
+                showSnackbar({
+                  message: "Người dùng không tồn tại",
+                  type: "error",
+                })
+              );
+              break;
+            default:
+              dispatch(
+                showSnackbar({
+                  message: "Mở đoạn tin nhắn thất bại",
+                  type: "error",
+                })
+              );
+          }
+        }
+        return res;
+      })
+      .catch((e) => {
+        return e.response.data;
+      });
   }
 );
 
 export const createConversationThunk = createAsyncThunk(
   "realtime/createConversationThunk",
-  async ({ receiverId, content, file }) => {
-    return await createConversation(receiverId, content, file);
+  async ({ receiverId, content, file }, { dispatch }) => {
+    const res = await createConversation(receiverId, content, file);
+    if (!res.isSuccess) {
+      let message = "";
+      switch (res.message) {
+        case "USER NOT EXIST":
+          message = "Người dùng không tồn tại";
+          break;
+        case "UNSUPPORTED FILE":
+          message = "Định dạng file không hỗ trợ";
+          break;
+        case "OVERSIZE FILE":
+          message = "File quá lớn";
+          break;
+        case "CANNOT CREATE":
+          message = "Không thể tạo gửi tin nhắn này";
+          break;
+        default:
+          message = "Tạo tin nhắn thất bại";
+      }
+      dispatch(showSnackbar({ message, type: "error" }));
+    }
+    return res;
   }
 );
 
@@ -228,14 +362,17 @@ export const removeConversationThunk = createAsyncThunk(
 
 export const {
   setNewInvitationNumber,
+  setNewInvitation,
   setInvitationStatus,
-  setOnlineFriend,
+  setFriendsStatus,
   setCurrentConversationUser,
   setConversationAction,
   setCurrentMessage,
   setConversationFilter,
   updateFriendStatus,
   setNewMessage,
+  setHasUnreadStatus,
   setUpdateMessage,
+  clearConversation,
 } = realtimeSlice.actions;
 export default realtimeSlice.reducer;

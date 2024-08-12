@@ -1,15 +1,13 @@
 import { Link, Outlet } from "react-router-dom";
 import UserItem from "../conversation/UserItem";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  realtimeFriendSelector,
-  realtimeSelector,
-} from "../../redux/selectors";
+import { realtimeFriendSelector } from "../../redux/selectors";
 import { setConversationFilter } from "../../redux/realtimeSlice";
 
 const ConversationLayout = () => {
   const realtimeFriends = useSelector(realtimeFriendSelector);
   const dispatch = useDispatch();
+
   return (
     <div className="flex container justify-center items-center gap-5 text-gray-800">
       <section className="flex flex-col rounded-lg w-3/12 h-full bg-white overflow-hidden p-2 gap-2">
