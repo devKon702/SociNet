@@ -37,6 +37,7 @@ userIo.on("connection", (socket) => {
     // delete connectedUsers[socketUser?.id];
     // update online status
     socketUser ? (connectedUsers[socketUser.id].isOnline = false) : null;
+    socketUser ? socket.leave(socketUser.id) : null;
     socket.broadcast.emit("NEW OFFLINE USER", socketUser);
   });
 

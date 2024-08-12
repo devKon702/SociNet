@@ -123,7 +123,7 @@ const CreatePostDialog = ({ handleClose }) => {
           onClick={handlePost}
           disabled={create === "creating"}
         >
-          {create === "creating" ? "Dang đăng..." : "Đăng"}
+          {create === "creating" ? "Đang đăng..." : "Đăng"}
         </button>
       </>
     </Dialog>

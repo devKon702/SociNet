@@ -6,6 +6,7 @@ import {
   signin,
   signout,
 } from "../redux/authSlice";
+import { socket } from "../socket";
 
 const BASE = "api/v1/auth";
 const AuthService = {
@@ -47,6 +48,7 @@ const AuthService = {
   signOut: async (dispatch, navigate) => {
     dispatch(signout());
     navigate("/auth/signin");
+    socket.disconnect();
   },
   signUp: async (username, password, email, name, otp) =>
     axios

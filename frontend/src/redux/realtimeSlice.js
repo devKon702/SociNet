@@ -108,24 +108,20 @@ const realtimeSlice = createSlice({
         state.conversation.messageList.unshift(newMessage);
       }
     },
-    setHasUnreadStatus: (state, { payload: { id, status } }) => {
-      const index = state.realtimeFriends.findIndex((item) => item.id === id);
+    setHasUnreadStatus: (state, { payload: { sender, status } }) => {
+      const index = state.realtimeFriends.findIndex(
+        (item) => item.id === sender.id
+      );
 
       // Tồn tại thì cập nhật trạng thái
       if (index != -1) {
         state.realtimeFriends[index].hasUnreadMessage = status;
       } // Chưa thì thêm vào realtime Friend List
       else {
-        getUserInfo(id).then((res) => {
-          if (res.isSuccess) {
-            state.realtimeFriends.unshift({
-              ...res.data,
-              realtimeStatus: "STRANGE",
-              hasUnreadMessage: status,
-            });
-          } else {
-            console.log(res);
-          }
+        state.realtimeFriends.unshift({
+          ...sender,
+          realtimeStatus: "STRANGE",
+          hasUnreadMessage: status,
         });
       }
     },

@@ -52,8 +52,11 @@ const adminSlice = createSlice({
         state.account.isLoading = false;
         if (Array.isArray(action.payload)) {
           const [accountResult, countResult] = action.payload;
-          state.account.totalPage =
-            Math.floor(countResult.data / ACCOUNT_PAGE_SIZE) + 1;
+          state.account.totalPage = Math.floor(
+            countResult.data / ACCOUNT_PAGE_SIZE
+          );
+          if (countResult.data % ACCOUNT_PAGE_SIZE != 0)
+            state.account.totalPage += 1;
           state.account.accountList = accountResult.data;
         } else {
           console.log(action.payload);

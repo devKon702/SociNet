@@ -74,3 +74,16 @@ export const isVideo = (url) => {
   const typeList = [".mp4", ".webm", ".avi", ".mov", ".wmv"];
   return typeList.some((item) => url.includes(item));
 };
+
+export const removeAllListenersExcept = (socket, eventNameToKeep) => {
+  // Lưu lại tất cả các listeners của event
+  const listeners = socket.listeners(eventNameToKeep);
+
+  // Xóa tất cả event listeners
+  socket.removeAllListeners();
+
+  // Gán lại các listeners của event
+  listeners.forEach((listener) => {
+    socket.on(eventNameToKeep, listener);
+  });
+};

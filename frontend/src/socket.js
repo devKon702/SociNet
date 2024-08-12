@@ -11,6 +11,8 @@ import {
 } from "./redux/realtimeSlice";
 import { signout } from "./redux/authSlice";
 import { setFriendStatus } from "./redux/personalSlice";
+import { removeAllListenersExcept } from "./helper";
+import { getUserInfo } from "./api/UserService";
 
 const USER_URL = "http://localhost:3000";
 const ADMIN_URL = "http://localhost:3000/admin";
@@ -46,16 +48,20 @@ const onConnect = () => {
         conversation.receiverId == currentUser.id)
     ) {
       store.dispatch(setNewMessage(conversation));
-      socket.emit("READ CONVERSATION", currentUser.id);
+      socket.emit("READ CONVERSATION", currentChatUser.id);
     }
     // Đang không mở chat và là người nhận tin nhắn -> thông báo tin nhắn mới
     else if (
       conversation.receiverId == currentUser.id &&
       (!currentChatUser || conversation.senderId != currentChatUser.id)
     ) {
-      store.dispatch(
-        setHasUnreadStatus({ id: conversation.senderId, status: true })
-      );
+      getUserInfo(conversation.senderId).then((res) => {
+        if (res.isSuccess) {
+          store.dispatch(
+            setHasUnreadStatus({ sender: res.data, status: true })
+          );
+        }
+      });
     }
   });
 
@@ -78,14 +84,14 @@ const onConnect = () => {
   });
 
   socket.on("RESPONSE INVITATION", (userId, isAccept) => {
-    console.log(isAccept);
-
     if (isAccept) store.dispatch(getRealtimeFriendsThunk());
 
     if (store.getState().personal.user?.id == userId) {
       store.dispatch(setFriendStatus(isAccept ? "FRIEND" : "NO"));
     }
   });
+
+  socket.on("disconnect", () => [removeAllListenersExcept(socket, "connect")]);
 };
 
 socket.on("connect", onConnect);
