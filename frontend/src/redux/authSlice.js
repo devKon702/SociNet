@@ -54,7 +54,6 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(signInThunk.fulfilled, (state, action) => {
-        console.log(action.payload);
         if (action.payload.isSuccess) {
           const { accessToken, refreshToken, account } = action.payload.data;
           state.token = accessToken;
@@ -110,7 +109,7 @@ export const signInThunk = createAsyncThunk(
 
 export const refreshTokenThunk = createAsyncThunk(
   "auth/refreshTokenThunk",
-  async (dispatch, navigate) => {
+  async ({ dispatch, navigate }) => {
     await refreshToken(dispatch, navigate);
   }
 );
