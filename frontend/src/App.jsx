@@ -25,6 +25,7 @@ import UserPage from "./pages/UserPage";
 import AdminPage from "./pages/AdminPage";
 import { Alert, Slide, Snackbar } from "@mui/material";
 import { hideSnackbar } from "./redux/snackbarSlice";
+import RoomPage from "./pages/RoomPage";
 
 function SlideTransition(props) {
   return <Slide {...props} direction="up" />;
@@ -104,6 +105,7 @@ function App() {
                 path=":id"
                 element={<ConversationPage></ConversationPage>}
               ></Route>
+              <Route path="room/:id" element={<RoomPage></RoomPage>}></Route>
             </Route>
           </Route>
 

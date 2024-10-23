@@ -4,7 +4,13 @@ import { Navigate, Outlet } from "react-router-dom";
 
 const AuthenticatedPage = () => {
   const { isAuthenticated } = useSelector(authSelector);
-  return isAuthenticated ? <Outlet></Outlet> : <Navigate to={"auth/signin"} />;
+  return isAuthenticated ? (
+    <Outlet></Outlet>
+  ) : location.pathname.includes("auth/") ? (
+    <Outlet></Outlet>
+  ) : (
+    <Navigate to={"auth/signin"} />
+  );
 };
 
 export default AuthenticatedPage;

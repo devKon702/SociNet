@@ -28,6 +28,7 @@ export const setupInterceptors = (store) => {
     async (error) => {
       const originalRequest = error.config;
       const message = error.response?.data?.message;
+      console.log(error);
 
       if (message === "TOKEN EXPIRED" && !originalRequest._retry) {
         originalRequest._retry = true;

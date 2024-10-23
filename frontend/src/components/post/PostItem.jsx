@@ -71,7 +71,7 @@ const PostItem = ({ post }) => {
           }}
         ></SharePostDialog>
       )}
-      <div className="post-item bg-white w-11/12 rounded-xl p-3 text-gray-800 shadow-lg">
+      <div className="post-item bg-white w-full rounded-xl p-3 text-gray-800">
         {/* title */}
         <div className="flex gap-2 items-center">
           <div className="size-12 rounded-full overflow-hidden">
@@ -193,7 +193,7 @@ const PostItem = ({ post }) => {
                     <EmojiList postId={post.id}></EmojiList>
                   ) : null}
                   <i className="bx bx-like"></i>
-                  Tương tác
+                  <span className="hidden md:inline-block">Tương tác</span>
                 </button>
               )}
               <button
@@ -204,7 +204,7 @@ const PostItem = ({ post }) => {
                 }}
               >
                 <i className="bx bx-chat"></i>
-                Bình luận
+                <span className="hidden md:inline-block">Bình luận</span>
               </button>
               {!post.sharedPost && (
                 <button
@@ -212,7 +212,7 @@ const PostItem = ({ post }) => {
                   onClick={() => setShowShareDialog(true)}
                 >
                   <i className="bx bx-share-alt"></i>
-                  Chia sẻ
+                  <span className="hidden md:inline-block">Chia sẻ</span>
                 </button>
               )}
             </div>
@@ -278,7 +278,7 @@ const ReactionButton = ({
           <div className="size-6">
             <img src="/like.png" alt="" className="size-full object-cover" />
           </div>
-          Thích
+          <span className="hidden md:inline-block">Thích</span>
         </button>
       );
     case "LOVE":
@@ -293,7 +293,7 @@ const ReactionButton = ({
           <div className="size-6">
             <img src="/love.png" alt="" className="size-full object-cover" />
           </div>
-          Yêu thích
+          <span className="hidden md:inline-block">Yêu thích</span>
         </button>
       );
     case "HAHA":
@@ -308,7 +308,7 @@ const ReactionButton = ({
           <div className="size-6">
             <img src="/haha.png" alt="" className="size-full object-cover" />
           </div>
-          Haha
+          <span className="hidden md:inline-block">Haha</span>
         </button>
       );
     case "SAD":
@@ -323,7 +323,7 @@ const ReactionButton = ({
           <div className="size-6">
             <img src="/sad.png" alt="" className="size-full object-cover" />
           </div>
-          Buồn
+          <span className="hidden md:inline-block">Buồn</span>
         </button>
       );
     default:

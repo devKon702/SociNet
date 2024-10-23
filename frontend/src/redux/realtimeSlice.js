@@ -15,6 +15,14 @@ import { socket } from "../socket";
 import { getUserInfo } from "../api/UserService";
 import { showSnackbar } from "./snackbarSlice";
 import { setFriendStatus } from "./personalSlice";
+import {
+  createRoom,
+  getActivitiesOfRoom,
+  getJoinedRoom,
+  getRoom,
+  inviteJoinRoom,
+  updateRoom,
+} from "../api/RoomService";
 
 const realtimeSlice = createSlice({
   name: "realtime",
@@ -29,6 +37,14 @@ const realtimeSlice = createSlice({
       isLoading: false,
       action: "CREATE",
       filter: "",
+    },
+    realtimeRooms: [],
+    roomActivity: {
+      currentRoom: null,
+      activities: [],
+      currentMessage: null,
+      action: "CREATE",
+      fetchStatus: "",
     },
     isLoading: true,
   },
@@ -137,11 +153,64 @@ const realtimeSlice = createSlice({
       if (index != -1) state.conversation.messageList[index] = updatedMessage;
       // }
     },
+    setRoomAction: (state, action) => {
+      state.roomActivity.action = action.payload;
+    },
+    removeRoom: (state, action) => {
+      state.realtimeRooms = state.realtimeRooms.filter(
+        (item) => item.id != action.payload
+      );
+    },
+    setCurrentRoom: (state, action) => {
+      state.roomActivity.currentRoom = {
+        ...state.roomActivity.currentRoom,
+        ...action.payload,
+      };
+      state.realtimeRooms.forEach((item) => {
+        if (item.id == action.payload.id) {
+          item.hasUnreadMessage = false;
+        }
+      });
+    },
+    setCurrentRoomMessage: (state, action) => {
+      state.roomActivity.currentMessage = action.payload;
+    },
+    addNewRoomActivity: (state, action) => {
+      state.roomActivity.activities.unshift(action.payload);
+    },
+    updateRoomMessage: (state, action) => {
+      const message = action.payload;
+      const index = state.roomActivity.activities.findIndex(
+        (item) => item.id === message.id
+      );
+      if (index != -1) {
+        state.roomActivity.activities[index] = message;
+      }
+    },
+    setRoomReadStatus: (state, action) => {
+      const index = state.realtimeRooms.findIndex(
+        (room) => room.id == action.payload.roomId
+      );
+      if (index != -1) {
+        state.realtimeRooms[index]["hasUnread"] = action.payload.hasUnread;
+      }
+    },
+    newRealtimeRoomMessage: (state, action) => {
+      const { roomId, activity } = action.payload;
+      if (state.roomActivity.currentRoom.id == roomId) {
+        state.roomActivity.activities.unshift(activity);
+      } else {
+        state.realtimeRooms.forEach((item) => {
+          if (item.id == roomId) item.hasUnreadMessage = true;
+        });
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(prepareRealtimeDataThunk.fulfilled, (state, action) => {
-        const [invitationResult, friendResult] = action.payload;
+        const [invitationResult, friendResult, joinedRoomResult] =
+          action.payload;
         state.invitations = invitationResult.data.map((item) => ({
           ...item,
           status: "idle",
@@ -151,6 +220,11 @@ const realtimeSlice = createSlice({
         socket.emit(
           "FILTER STATUS FRIEND",
           friendResult.data.map((item) => item.id)
+        );
+        state.realtimeRooms = joinedRoomResult.data;
+        socket.emit(
+          "JOIN MULTI ROOM",
+          joinedRoomResult.data.map((room) => room.id)
         );
       })
       .addCase(getRealtimeFriendsThunk.fulfilled, (state, action) => {
@@ -224,6 +298,44 @@ const realtimeSlice = createSlice({
         //   state.conversation.messageList[index] = action.payload.data;
         // }
         socket.emit("UPDATE MESSAGE", action.payload.data);
+      })
+      .addCase(getRoomThunk.fulfilled, (state, action) => {
+        if (
+          Array.isArray(action.payload) &&
+          action.payload.every((item) => item.isSuccess)
+        ) {
+          const [roomResult, activityResult] = action.payload;
+          state.roomActivity.currentRoom = roomResult.data;
+          state.roomActivity.activities = activityResult.data;
+        }
+      })
+      .addCase(createRoomThunk.fulfilled, (state, action) => {
+        if (action.payload.isSuccess) {
+          state.realtimeRooms.push(action.payload.data);
+          location.replace("/conversation/room/" + action.payload.data.id);
+        }
+      })
+      .addCase(inviteJoinRoomThunk.fulfilled, (state, action) => {
+        if (action.payload.isSuccess) {
+          action.payload.data.forEach((activity) => {
+            state.roomActivity.currentRoom.members.push(activity.receiver);
+            state.roomActivity.activities.push(activity);
+            socket.emit(
+              "INVITE TO ROOM",
+              state.roomActivity.currentRoom.id,
+              activity
+            );
+          });
+        }
+      })
+      .addCase(updateRoomThunk.pending, (state, action) => {
+        state.roomActivity.fetchStatus = "UPDATING";
+      })
+      .addCase(updateRoomThunk.fulfilled, (state, action) => {
+        state.roomActivity.fetchStatus = "";
+        if (action.payload.isSuccess) {
+          state.roomActivity.currentRoom = action.payload.data;
+        }
       });
   },
 });
@@ -232,7 +344,11 @@ export const prepareRealtimeDataThunk = createAsyncThunk(
   "realtime/prepareRealtimeDataThunk",
   async () => {
     const user = store.getState().auth.user?.user;
-    return await Promise.all([getInvitations(), getFriendList(user.id)]);
+    return await Promise.all([
+      getInvitations(),
+      getFriendList(user.id),
+      getJoinedRoom(),
+    ]);
   }
 );
 
@@ -356,6 +472,94 @@ export const removeConversationThunk = createAsyncThunk(
   }
 );
 
+export const getRoomThunk = createAsyncThunk(
+  "realtime/getRoomThunk",
+  async (id, { dispatch }) => {
+    return await Promise.all([getRoom(id), getActivitiesOfRoom(id)])
+      .then((res) => {
+        const failResponse = res.find((item) => !item.isSuccess);
+        if (failResponse) {
+          switch (failResponse.message) {
+            case "ROOM NOT EXIST":
+              dispatch(
+                showSnackbar({
+                  message: "Phòng chat không tồn tại",
+                  type: "error",
+                })
+              );
+              break;
+            default:
+              dispatch(
+                showSnackbar({
+                  message: "Mở đoạn tin nhắn thất bại",
+                  type: "error",
+                })
+              );
+          }
+        }
+        return res;
+      })
+      .catch((e) => {
+        return e.response.data;
+      });
+  }
+);
+
+export const createRoomThunk = createAsyncThunk(
+  "realtime/createRoomThunk",
+  async ({ name, file }, { dispatch }) => {
+    const res = await createRoom(name, file);
+    if (res.isSuccess) {
+      dispatch(
+        showSnackbar({
+          message: "Tạo nhóm thành công",
+          type: "success",
+        })
+      );
+    } else {
+      dispatch(
+        showSnackbar({
+          message: "Tạo nhóm thất bại",
+          type: "error",
+        })
+      );
+    }
+    return res;
+  }
+);
+
+export const inviteJoinRoomThunk = createAsyncThunk(
+  "realtime/inviteJoinRoomThunk",
+  async ({ roomId, userIdList }, { dispatch }) => {
+    console.log(userIdList);
+    const res = await inviteJoinRoom(roomId, userIdList);
+
+    if (res.isSuccess) {
+      dispatch(showSnackbar({ message: "Mời thành công", type: "success" }));
+    } else {
+      dispatch(showSnackbar({ message: "Mời thất bại", type: "error" }));
+      console.log(res);
+    }
+    return res;
+  }
+);
+
+export const updateRoomThunk = createAsyncThunk(
+  "realtime/updateRoomThunk",
+  async ({ roomId, name, file }, { dispatch }) => {
+    const res = await updateRoom(roomId, name, file);
+    if (res.isSuccess) {
+      dispatch(
+        showSnackbar({ message: "Cập nhật thành công", type: "success" })
+      );
+    } else {
+      dispatch(showSnackbar({ message: "Cập nhật thất bại", type: "error" }));
+      console.log(res);
+    }
+    return res;
+  }
+);
+
 export const {
   setNewInvitationNumber,
   setNewInvitation,
@@ -370,5 +574,13 @@ export const {
   setHasUnreadStatus,
   setUpdateMessage,
   clearConversation,
+  setRoomAction,
+  removeRoom,
+  setCurrentRoom,
+  setCurrentRoomMessage,
+  addNewRoomActivity,
+  updateRoomMessage,
+  newRealtimeRoomMessage,
+  setRoomReadStatus,
 } = realtimeSlice.actions;
 export default realtimeSlice.reducer;

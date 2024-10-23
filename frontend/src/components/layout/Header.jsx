@@ -36,7 +36,7 @@ const Header = () => {
         className="h-full w-fit flex justify-around cursor-pointer gap-1"
         to="/home"
       >
-        <div className="h-full">
+        <div className="h-full hidden sm:inline-block">
           <img
             src="/logo-withoutbg.png"
             alt=""
@@ -56,14 +56,14 @@ const Header = () => {
           setSearching(false);
         }}
       >
-        <div className="rounded-2xl py-2 px-4 w-1/4 bg-slate-500 flex items-center gap-2 relative">
+        <div className="rounded-full sm:rounded-2xl ml-auto mr-3 sm:mr-0 sm:ml-0 p-2 sm:py-2 sm:px-4 sm:w-1/3 bg-slate-500 flex items-center gap-2 relative">
           <i className="bx bx-search"></i>
           <input
             value={searchValue}
             readOnly={true}
             type="text"
             placeholder="Tìm kiếm người dùng"
-            className="bg-transparent outline-none flex-1"
+            className="bg-transparent outline-none flex-1 placeholder:invisible sm:placeholder:visible hidden sm:inline-block overflow-ellipsis"
             onFocus={() => setSearching(true)}
           />
           {isSearching && (
@@ -123,7 +123,7 @@ const Header = () => {
               </div>
             )}
             {showNotify && (
-              <div className="absolute right-0 bg-gray-700 w-[350px] rounded-md p-2 flex flex-col gap-2 z-50">
+              <div className="absolute right-0 bg-gray-700 w-[250px] sm:w-[350px] rounded-md p-2 flex flex-col gap-2 z-50">
                 {invitations.length != 0 ? (
                   invitations.map((invite, index) => (
                     <InvitationItem
@@ -140,8 +140,8 @@ const Header = () => {
             )}
           </div>
         </ClickAwayListener>
-        <div className="flex gap-4 items-center cursor-pointer popup-container">
-          <span className="font-bold">{user.name}</span>
+        <div className="flex gap-3 items-center cursor-pointer popup-container">
+          <span className="font-bold hidden md:inline-block">{user.name}</span>
           <div className="size-8 rounded-full overflow-hidden">
             <img
               src={user.avatarUrl ? user.avatarUrl : "/unknown-avatar.png"}

@@ -62,7 +62,7 @@ const AccountPage = () => {
   }, [manageEmail.progress]);
 
   return (
-    <div className="w-full h-full bg-gray-200 py-4">
+    <div className="w-full h-full py-4">
       <div className="bg-white shadow-md w-3/4 h-full mx-auto text-gray-800 rounded-md px-3 py-4 flex flex-col gap-5 overflow-auto custom-scroll">
         <div
           className="flex justify-between items-center p-4 w-full rounded-md hover:bg-gray-100 cursor-pointer shadow-lg"

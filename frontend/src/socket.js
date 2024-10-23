@@ -8,6 +8,8 @@ import {
   setUpdateMessage,
   updateFriendStatus,
   getRealtimeFriendsThunk,
+  newRealtimeRoomMessage,
+  updateRoomMessage,
 } from "./redux/realtimeSlice";
 import { signout } from "./redux/authSlice";
 import { setFriendStatus } from "./redux/personalSlice";
@@ -90,6 +92,33 @@ const onConnect = () => {
       store.dispatch(setFriendStatus(isAccept ? "FRIEND" : "NO"));
     }
   });
+
+  socket.on("PROVIDE ROOM MEMBER", (roomId) => {
+    const room = store
+      .getState()
+      .realtime.realtimeRooms.find((item) => item.id == roomId);
+    console.log(room);
+
+    if (room) {
+      socket.emit(
+        "REGISTER ROOM",
+        roomId,
+        room.members.map((item) => item.user.id)
+      );
+    }
+  });
+
+  socket.on("NEW ROOM MESSAGE", (roomId, activity) => {
+    store.dispatch(newRealtimeRoomMessage({ roomId, activity }));
+  });
+
+  socket.on("UPDATE ROOM MESSAGE", (roomId, activity) => {
+    store.dispatch(updateRoomMessage(activity));
+  });
+
+  socket.on("NEW MEMBER", (activity) => {});
+
+  socket.on("INVITE TO ROOM");
 
   socket.on("disconnect", () => [removeAllListenersExcept(socket, "connect")]);
 };

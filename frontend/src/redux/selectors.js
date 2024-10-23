@@ -39,6 +39,17 @@ export const realtimeFriendSelector = createSelector(
   }
 );
 
+export const realtimeRoomSelector = createSelector(
+  [realtimeSelector, conversationFilterSelector],
+  (realtime, filter) => {
+    return realtime.realtimeRooms.filter((item) =>
+      item.name.toLowerCase().includes(filter.toLowerCase())
+    );
+  }
+);
+
+export const roomActivitySelector = (state) => state.realtime.roomActivity;
+
 // ADMIN
 export const adminSelector = (state) => state.admin;
 

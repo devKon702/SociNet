@@ -18,7 +18,7 @@ const CommentList = () => {
     });
   }, [dispatch, postId]);
   return (
-    <div className="w-[600px] flex-1 p-3 overflow-auto custom-scroll pr-24">
+    <div className=" w-full sm:w-[600px] flex-1 p-3 overflow-auto custom-scroll pr-24">
       {commentList.map((comment) => (
         <CommentItem key={comment.id} comment={comment}></CommentItem>
       ))}

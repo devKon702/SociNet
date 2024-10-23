@@ -11,12 +11,10 @@ const Layout = () => {
   }, []);
 
   return (
-    <div className="container">
-      <div className="h-full bg-white rounded-md mx-auto overflow-hidden flex flex-col gap-2">
-        <Header></Header>
-        <div className="custom-scroll flex-1 overflow-y-auto overflow-x-hidden">
-          <Outlet></Outlet>
-        </div>
+    <div className="flex flex-col h-screen overflow-hidden">
+      <Header></Header>
+      <div className="md:px-10 pt-4 pb-2 flex-1 overflow-hidden bg-lightGray">
+        <Outlet></Outlet>
       </div>
     </div>
   );

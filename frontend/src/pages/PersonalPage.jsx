@@ -30,24 +30,22 @@ const PersonalPage = () => {
 
   if (!user) return <></>;
   return (
-    <div className="px-4 py-3 bg-gray-300">
-      <div className="flex h-full bg-slate-200">
-        {isShowCreatePostModal ? (
-          <CreatePostDialog
-            handleClose={() => {
-              dispatch(setAction({ create: "", share: "" }));
-              setShowCreatePostModal(false);
-            }}
-          ></CreatePostDialog>
-        ) : null}
+    <div className="h-full overflow-y-scroll custom-scroll">
+      {isShowCreatePostModal ? (
+        <CreatePostDialog
+          handleClose={() => {
+            dispatch(setAction({ create: "", share: "" }));
+            setShowCreatePostModal(false);
+          }}
+        ></CreatePostDialog>
+      ) : null}
 
-        {isShowUpdateInfoModal ? (
-          <UserInfoDIalog
-            user={user}
-            handleClose={() => setShowUpdateInfoModal(false)}
-          ></UserInfoDIalog>
-        ) : null}
-      </div>
+      {isShowUpdateInfoModal ? (
+        <UserInfoDIalog
+          user={user}
+          handleClose={() => setShowUpdateInfoModal(false)}
+        ></UserInfoDIalog>
+      ) : null}
       <section className="bg-white w-full rounded-lg p-4 text-gray-800">
         <div className="flex items-start gap-5 mb-4">
           <div className="rounded-full size-40 overflow-hidden">

@@ -11,7 +11,7 @@ const Dialog = ({ title, handleClose, ...props }) => {
             onClick={handleClose}
           ></div>
 
-          <div className="content w-fit h-5/6 rounded-2xl z-10 bg-white text-gray-700 flex flex-col relative">
+          <div className="content w-11/12 md:w-fit h-5/6 rounded-2xl z-10 bg-white text-gray-700 flex flex-col relative">
             <button
               className="rounded-full absolute top-0 right-0 bg-slate-400 text-white p-3 size-10 translate-x-1/4 -translate-y-1/4 flex items-center justify-center"
               onClick={handleClose}

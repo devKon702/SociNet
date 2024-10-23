@@ -15,7 +15,7 @@ const HomePage = () => {
 
   if (user == null) return null;
   return (
-    <div className="flex h-full bg-slate-200">
+    <div className="flex justify-center h-full gap-2 px-2">
       {isShowCreatePostModal && (
         <CreatePostDialog
           handleClose={() => {
@@ -25,7 +25,7 @@ const HomePage = () => {
         ></CreatePostDialog>
       )}
 
-      <section className="w-3/12 h-full bg-white text py-4 px-2">
+      <section className="lg:w-3/12 h-fit bg-white py-4 px-2 rounded-xl md:block w-fit">
         <ToolItem
           icon="bx bxs-home-circle"
           name="Trang cá nhân"
@@ -53,7 +53,7 @@ const HomePage = () => {
       </section>
       <PostList></PostList>
       {/* Online Friend */}
-      <section className="w-3/12 h-full bg-white py-4 px-3 text-gray-800 flex flex-col">
+      <section className="hidden w-3/12 h-fit bg-white py-4 px-3 rounded-xl text-gray-800 md:flex flex-col">
         <div className="flex items-start flex-col mb-4 gap-2 justify-between">
           <h1 className="font-bold text-xl text-secondary">Trò chuyện ngay</h1>
           <input
@@ -70,12 +70,13 @@ const HomePage = () => {
             .map((friend, index) => (
               <Link
                 to={`/conversation/${friend.id}`}
-                className="rounded-md hover:bg-gray-200 p-2 flex items-center cursor-pointer gap-3"
+                className="rounded-md hover:bg-gray-200 p-2 flex items-center justify-start cursor-pointer gap-3"
                 key={index}
+                title={friend.name}
               >
                 <div className="size-8 rounded-full relative">
                   <img
-                    src={friend.avatarUrl || "unknown-avatar.png"}
+                    src={friend.avatarUrl || "/unknown-avatar.png"}
                     alt=""
                     className="object-cover w-full h-full rounded-full"
                   />
@@ -89,37 +90,26 @@ const HomePage = () => {
                     } absolute bottom-0 right-0`}
                   ></div>
                 </div>
-                <div className="flex flex-1 items-center">
-                  <p
-                    className={`flex-1 ${
-                      friend.hasUnreadMessage && "font-bold"
-                    }`}
-                  >
-                    {friend.name}
-                  </p>
-                  {friend.hasUnreadMessage && (
-                    <div className="size-3 rounded-full bg-secondary"></div>
-                  )}
+                <div
+                  className={`flex flex-1 items-center overflow-hidden ${
+                    friend.hasUnreadMessage ? "font-bold" : ""
+                  }`}
+                >
+                  {friend.name}
                 </div>
+                {friend.hasUnreadMessage && (
+                  <div className="size-3 rounded-full bg-secondary"></div>
+                )}
               </Link>
             ))}
         </div>
       </section>
+      {/* <section className="h-fit w-fit bg-white py-4 px-2 rounded-xl md:hidden">
+        <div className="size-fit p-2 md:hidden grid place-items-center bg-white cursor-pointer hover:bg-slate-100">
+          <i className="bx bxs-conversation text-secondary text-2xl"></i>
+        </div>
+      </section> */}
     </div>
-  );
-};
-
-const UserItem = () => {
-  return (
-    <Link
-      to="/user/1"
-      className="user-item flex gap-2 hover:bg-slate-100 p-2 cursor-pointer items-center rounded-md"
-    >
-      <div className="rounded-full size-10 overflow-hidden relative">
-        <img src="/dev1.png" alt="" className="object-cover w-full h-full" />
-      </div>
-      <span className="text-gray-800">Nguyễn Nhật Kha</span>
-    </Link>
   );
 };
 
@@ -128,9 +118,10 @@ const ToolItem = ({ icon, name, ...props }) => {
     <Link
       className="flex items-center gap-2 text-gray-700 font-bold p-2 hover:bg-slate-100 cursor-pointer"
       {...props}
+      title={name}
     >
       <i className={`${icon} text-[28px]`}></i>
-      {name}
+      <span className="hidden lg:inline-block">{name}</span>
     </Link>
   );
 };

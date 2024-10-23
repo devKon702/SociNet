@@ -5,6 +5,7 @@ import MessageItem from "../components/conversation/MessageItem";
 import { useDispatch, useSelector } from "react-redux";
 import { realtimeSelector } from "../redux/selectors";
 import {
+  clearConversation,
   createConversationThunk,
   editConversationThunk,
   getConversationThunk,
@@ -60,14 +61,20 @@ const ConversationPage = () => {
   }, [action, currentMessage]);
 
   useEffect(() => {
-    dispatch(getConversationThunk(id));
+    if (!isNaN(id)) dispatch(getConversationThunk(id));
+    return () => {
+      dispatch(clearConversation());
+    };
   }, [id]);
 
   if (!currentUser) return <div className=""></div>;
 
   return (
-    <div className="flex flex-col justify-between h-full">
+    <div className="flex flex-col justify-between h-full bg-white">
       <section className="flex px-3 py-1 items-center gap-2 shadow-lg">
+        <div className="md:hidden size-10 rounded-full grid place-items-center cursor-pointer">
+          <i className="bx bx-menu text-2xl"></i>
+        </div>
         <div className="rounded-full overflow-hidden size-10">
           <img
             src={currentUser.avatarUrl || "/unknown-avatar.png"}

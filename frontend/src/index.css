@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-slate-800 font-body text-white;
+    @apply bg-gray-600 font-body text-white;
   }
 }
 
@@ -13,8 +13,7 @@
 } */
 
 .container {
-  width: 100vw;
-  height: 100vh;
+  flex: 1 1 0%;
   padding: 1rem 3rem;
 }
 

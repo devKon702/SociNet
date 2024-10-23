@@ -23,7 +23,7 @@ const SharePostDialog = ({ post, handleClose }) => {
   return (
     <Dialog handleClose={handleClose} title="Chia sẻ bài viết">
       <>
-        <div className="p-4 flex-1 w-[550px] overflow-auto custom-scroll">
+        <div className="p-4 flex-1 w-[350px] sm:w-[550px] overflow-auto custom-scroll">
           <div className="flex items-center gap-3 my-2">
             <div className="rounded-full overflow-hidden size-10">
               <img

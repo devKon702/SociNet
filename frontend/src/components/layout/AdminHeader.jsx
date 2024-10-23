@@ -7,7 +7,7 @@ const AdminHeader = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   return (
-    <div className="w-full h-[50px] flex justify-between items-center bg-slate-700 py-3 px-10">
+    <div className="w-full h-[60px] flex justify-between items-center bg-slate-700 py-3 px-10">
       <div className="h-full w-fit flex justify-around cursor-pointer gap-1">
         <div className="h-full">
           <img

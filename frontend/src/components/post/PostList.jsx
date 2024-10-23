@@ -35,7 +35,7 @@ const PostList = () => {
   return (
     <div
       ref={ref}
-      className="flex-1 max-h-full overflow-y-auto custom-scroll flex flex-col items-center py-4 gap-8"
+      className="h-full overflow-y-scroll custom-scroll flex flex-1 flex-col items-center gap-6 rounded-lg"
       onScroll={(e) => dispatch(setCurrentScroll(e.target.scrollTop))}
     >
       {isLoading ? (

@@ -60,7 +60,7 @@ const SignInForm = () => {
         <h1 className="text-primary text-center text-5xl font-bold mb-10">
           Đăng nhập
         </h1>
-        <div className="rounded-md border-[2px] outline-none p-3 text-gray-800 mb-2 flex items-center gap-3">
+        <div className="rounded-md border-[2px] outline-none p-3 text-gray-800 mb-2 flex items-center gap-3 w-full">
           <i className="bx bx-user text-xl"></i>
           <input
             autoFocus={true}

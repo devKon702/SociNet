@@ -18,7 +18,7 @@
     "@reduxjs/toolkit": "^2.2.6",
     "@souhaildev/reactemojis": "^1.0.5",
     "@uidotdev/usehooks": "^2.4.1",
-    "axios": "^1.7.2",
+    "axios": "^1.7.7",
     "date-fns": "^3.6.0",
     "emoji-picker-react": "^4.11.1",
     "firebase": "^10.12.4",
