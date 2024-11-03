@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/navigation_single"
+        android:title="Trò chuyện"
+        android:icon="@drawable/ic_user"/>
+
+    <item android:id="@+id/navigation_room"
+        android:title="Nhóm"
+        android:icon="@drawable/ic_group"/>
+</menu>

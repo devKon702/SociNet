@@ -84,8 +84,8 @@ const ConversationLayout = () => {
           {/* List */}
           {page === "conversation" && (
             <ul className="overflow-scroll custom-scroll flex-1">
-              {realtimeFriends.map((friend, index) => (
-                <UserItem user={friend} key={index}></UserItem>
+              {realtimeFriends.map((friend) => (
+                <UserItem user={friend} key={friend.id}></UserItem>
               ))}
             </ul>
           )}
@@ -99,8 +99,8 @@ const ConversationLayout = () => {
                 Tạo nhóm
               </div>
               <ul className="overflow-scroll custom-scroll flex-1">
-                {realtimeRooms.map((room, index) => (
-                  <RoomItem room={room} key={index}></RoomItem>
+                {realtimeRooms.map((room) => (
+                  <RoomItem room={room} key={room.id}></RoomItem>
                 ))}
               </ul>
             </>

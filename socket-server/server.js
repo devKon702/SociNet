@@ -4,7 +4,6 @@ const { connect } = require("http2");
 const { Server } = require("socket.io");
 const { connection: mysqlConnection } = require("./database");
 const PORT = 3000;
-let roomResult = {};
 // const app = express();
 // const server = http.createServer(app);
 const io = new Server({
@@ -19,10 +18,9 @@ mysqlConnection.connect((err) => {
     `SELECT * FROM socialnet.room_member`,
     (error, results, fields) => {
       // Hiển thị kết quả của truy vấn
-      console.log(results);
       results.forEach((item) => {
-        if (!roomResult[item.room_id]) roomResult[item.room_id] = {};
-        roomResult[item.room_id][item.user_id] = [];
+        if (!roomManager[item.room_id]) roomManager[item.room_id] = {};
+        roomManager[item.room_id][item.user_id] = [];
       });
       // Đóng kết nối
       // connection.end();
@@ -121,28 +119,39 @@ userIo.on("connection", (socket) => {
   });
 
   socket.on("RESPONSE INVITATION", (senderId, isAccept) => {
-    console.log({ isAccept });
-
     userIo.to(senderId).emit("RESPONSE INVITATION", socketUser.id, isAccept);
+  });
+
+  socket.on("GET ROOM STATUS", () => {
+    const joinedRoomId = Object.keys(roomManager).filter(
+      (roomId) => !!roomManager[roomId][socketUser.id]
+    );
+    const roomStatusList = joinedRoomId.map((roomId) => {
+      const isUnread = roomManager[roomId][socketUser.id].length > 0;
+      return { roomId, isUnread };
+    });
+    const unreadRoomIdList = roomStatusList
+      .filter((item) => item.isUnread)
+      .map((item) => item.roomId);
+    socket.emit("GET ROOM STATUS", unreadRoomIdList);
   });
 
   socket.on("NEW ROOM MESSAGE", (roomId, activity) => {
     // if room info is not exist
-    console.log(roomManager[roomId]);
-    if (!roomManager[roomId] || !roomManager[roomId].tempActivity) {
+    if (!roomManager[roomId]) {
       // Temp save activity data to room prop
-      roomManager[roomId] = { tempActivity: activity }; // Luu tam activityId
-      socket.emit("PROVIDE ROOM MEMBER", roomId);
+      // roomManager[roomId] = { tempActivity: activity }; // Luu tam activityId
+      // socket.emit("PROVIDE ROOM MEMBER", roomId);
+      console.log("Room id " + roomId + " is not exist");
     }
     // have info
     else {
       // push activity to each member of room
       Object.keys(roomManager[roomId]).forEach((userId) => {
-        roomManager[roomId][userId].add(activity);
+        roomManager[roomId][userId].push(activity);
       });
       socket.to(`R${roomId}`).emit("NEW ROOM MESSAGE", roomId, activity);
     }
-    console.log(roomManager[roomId]);
   });
 
   socket.on("REGISTER ROOM", (roomId, userIdList) => {
@@ -155,7 +164,6 @@ userIo.on("connection", (socket) => {
       });
       socket.to(`R${roomId}`).emit("NEW ROOM MESSAGE", roomId, tempActivity);
       delete roomManager[roomId].tempActivity;
-      console.log(roomManager[roomId]);
     }
   });
 
@@ -163,11 +171,18 @@ userIo.on("connection", (socket) => {
     socket.to(`R${roomId}`).emit("UPDATE ROOM MESSAGE", roomId, activity);
   });
 
+  socket.on("READ ROOM MESSAGE", (roomId) => {
+    if (roomManager[roomId]) {
+      roomManager[roomId][socketUser.id] = [];
+    } else {
+      console.log("Room id " + roomId + " is not exist");
+    }
+  });
+
   socket.on("INVITE TO ROOM", (roomId, activity) => {
     socket.to(`R${roomId}`).emit("NEW MEMBER", roomId, activity);
     socket.to(activity.receiver.id).emit("INVITE TO ROOM", roomId);
     roomManager[roomId][activity.receiver.id] = [];
-    console.log(roomManager[roomId]);
   });
 
   socket.on("JOIN ROOM", (roomId) => {
@@ -179,7 +194,7 @@ userIo.on("connection", (socket) => {
   });
 
   socket.on("QUIT ROOM", (roomId, activity) => {
-    socket.to(`R${roomId}`).emit("MEMBER QUIT", activity);
+    socket.to(`R${roomId}`).emit("MEMBER QUIT", roomId, activity);
     socket.leave("R" + roomId);
     delete roomManager[roomId][socketUser.id];
   });

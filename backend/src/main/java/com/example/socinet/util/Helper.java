@@ -2,6 +2,7 @@ package com.example.socinet.util;
 
 import com.example.socinet.response.Response;
 import com.example.socinet.security.AccountDetail;
+import jakarta.servlet.http.Cookie;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -35,6 +36,14 @@ public class Helper {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AccountDetail accountDetail = (AccountDetail) authentication.getPrincipal();
         return accountDetail.getUser().getId();
+    }
+
+    public static Cookie createCookie(String name, String token, int maxAge, String path){
+        Cookie cookie = new Cookie(name, token);
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(maxAge);
+        cookie.setPath(path);
+        return cookie;
     }
 
 }

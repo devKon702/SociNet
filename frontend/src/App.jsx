@@ -26,6 +26,7 @@ import AdminPage from "./pages/AdminPage";
 import { Alert, Slide, Snackbar } from "@mui/material";
 import { hideSnackbar } from "./redux/snackbarSlice";
 import RoomPage from "./pages/RoomPage";
+import { signin, signout } from "./redux/authSlice";
 
 function SlideTransition(props) {
   return <Slide {...props} direction="up" />;
@@ -43,7 +44,24 @@ function App() {
   };
 
   useEffect(() => {
-    refreshToken(dispatch);
+    const token = localStorage.getItem("socinet");
+    if (!token) dispatch(signout());
+    else {
+      refreshToken(localStorage.getItem("socinet"))
+        .then((res) => {
+          if (res.isSuccess) {
+            const { accessToken, refreshToken, account } = res.data;
+            dispatch(signin({ token: accessToken, user: account }));
+            localStorage.setItem("socinet", refreshToken);
+          } else {
+            dispatch(signout());
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+          dispatch(signout());
+        });
+    }
   }, []);
 
   if (isLoading) {

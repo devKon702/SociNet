@@ -1,8 +1,6 @@
 import axios from "axios";
-import { refreshTokenThunk, signout } from "./redux/authSlice";
-import { useDispatch } from "react-redux";
 import { refreshToken } from "./api/AuthService";
-import { useNavigate } from "react-router-dom";
+import { signin, signout } from "./redux/authSlice";
 
 axios.defaults.baseURL = "http://localhost:8080";
 axios.defaults.withCredentials = true;
@@ -28,21 +26,26 @@ export const setupInterceptors = (store) => {
     async (error) => {
       const originalRequest = error.config;
       const message = error.response?.data?.message;
-      console.log(error);
 
       if (message === "TOKEN EXPIRED" && !originalRequest._retry) {
         originalRequest._retry = true;
         try {
-          const dispatch = useDispatch();
-          const navigate = useNavigate();
           const auth = store.getState().auth;
-          await dispatch(refreshTokenThunk(dispatch, navigate));
+          await refreshToken(localStorage.getItem("socinet")).then((res) => {
+            if (res.isSuccess) {
+              const { accessToken, refreshToken, account } = res.data;
+              store.dispatch(signin({ token: accessToken, user: account }));
+              localStorage.setItem("socinet", refreshToken);
+            }
+          });
           axios.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${auth.token}`;
+
           originalRequest.headers["Authorization"] = `Bearer ${auth.token}`;
           return axios(originalRequest);
         } catch (refreshError) {
+          console.log(JSON.stringify(refreshError));
           store.dispatch(signout());
           // window.location.href = "/auth/signin";
           return Promise.reject(refreshError);

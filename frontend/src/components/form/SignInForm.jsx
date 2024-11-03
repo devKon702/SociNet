@@ -81,7 +81,6 @@ const SignInForm = () => {
             {...register("password")}
           />
         </div>
-
         {errors?.password && (
           <p className="text-red-400 text-sm">{errors.password.message}</p>
         )}

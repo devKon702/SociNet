@@ -10,11 +10,17 @@ import {
   getRealtimeFriendsThunk,
   newRealtimeRoomMessage,
   updateRoomMessage,
+  newRealtimeRoomMember,
+  newRealtimeJoinedRoom,
+  newRealtimeMemberQuitActivity,
+  disableRoom,
+  setUnreadRoom,
 } from "./redux/realtimeSlice";
 import { signout } from "./redux/authSlice";
 import { setFriendStatus } from "./redux/personalSlice";
 import { removeAllListenersExcept } from "./helper";
 import { getUserInfo } from "./api/UserService";
+import { getRoom } from "./api/RoomService";
 
 const USER_URL = "http://localhost:3000";
 const ADMIN_URL = "http://localhost:3000/admin";
@@ -93,19 +99,8 @@ const onConnect = () => {
     }
   });
 
-  socket.on("PROVIDE ROOM MEMBER", (roomId) => {
-    const room = store
-      .getState()
-      .realtime.realtimeRooms.find((item) => item.id == roomId);
-    console.log(room);
-
-    if (room) {
-      socket.emit(
-        "REGISTER ROOM",
-        roomId,
-        room.members.map((item) => item.user.id)
-      );
-    }
+  socket.on("GET ROOM STATUS", (unreadRoomIdList) => {
+    store.dispatch(setUnreadRoom(unreadRoomIdList));
   });
 
   socket.on("NEW ROOM MESSAGE", (roomId, activity) => {
@@ -116,9 +111,28 @@ const onConnect = () => {
     store.dispatch(updateRoomMessage(activity));
   });
 
-  socket.on("NEW MEMBER", (activity) => {});
+  socket.on("NEW MEMBER", (roomId, activity) => {
+    store.dispatch(newRealtimeRoomMember({ roomId, activity }));
+  });
 
-  socket.on("INVITE TO ROOM");
+  socket.on("INVITE TO ROOM", (roomId) => {
+    getRoom(roomId).then((res) => {
+      if (res.isSuccess) {
+        store.dispatch(newRealtimeJoinedRoom(res.data));
+      } else {
+        console.log(res);
+      }
+    });
+    socket.emit("JOIN ROOM", roomId);
+  });
+
+  socket.on("MEMBER QUIT", (roomId, activity) => {
+    store.dispatch(newRealtimeMemberQuitActivity({ roomId, activity }));
+  });
+
+  socket.on("DISABLE ROOM", (roomId) => {
+    store.dispatch(disableRoom(roomId));
+  });
 
   socket.on("disconnect", () => [removeAllListenersExcept(socket, "connect")]);
 };

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragment.AccountFragment"
+    android:background="@color/lightGray">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="100dp"
+        android:paddingTop="20dp"
+        android:paddingHorizontal="20dp"
+        android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/layout_btnProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_rounded_white"
+            android:paddingHorizontal="15dp"
+            android:paddingVertical="10dp"
+            android:gravity="start|center">
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="1000dp">
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/img_ex1"
+                    android:scaleType="centerCrop"/>
+            </androidx.cardview.widget.CardView>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="Trang cá nhân"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical"
+            android:background="@drawable/shape_rounded_white">
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:paddingStart="25dp"
+                app:icon="@drawable/ic_color_mail"
+                app:iconTint="@color/darkGray"
+                app:iconGravity="start"
+                app:iconPadding="20dp"
+                android:text="Đổi email"
+                android:textAlignment="textStart"
+                android:textColor="@color/black"
+                android:textAllCaps="false"/>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="2dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:paddingStart="25dp"
+                app:icon="@drawable/ic_color_password"
+                app:iconTint="@color/darkGray"
+                app:iconGravity="start"
+                app:iconPadding="20dp"
+                android:text="Đổi mật khẩu"
+                android:textAlignment="textStart"
+                android:textColor="@color/black"
+                android:textAllCaps="false"/>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="2dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:paddingStart="25dp"
+                app:icon="@drawable/ic_laptop"
+                app:iconTint="@color/darkGray"
+                app:iconGravity="start"
+                app:iconPadding="20dp"
+                android:text="Quản lý đăng nhập"
+                android:textAlignment="textStart"
+                android:textColor="@color/black"
+                android:textAllCaps="false"/>
+        </LinearLayout>
+
+<!--        <View-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0dp"-->
+<!--            android:layout_weight="1" />-->
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLogout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/orange"
+            android:layout_marginTop="20dp"
+            app:icon="@drawable/ic_logout"
+            app:iconGravity="textStart"
+            app:iconTint="@color/white"
+            app:cornerRadius="6dp"
+            android:text="Đăng xuất"
+            android:textColor="@color/white"
+            android:textAllCaps="false"/>
+    </LinearLayout>
+
+</FrameLayout>

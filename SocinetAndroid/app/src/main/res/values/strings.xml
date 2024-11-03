@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Socinet Android</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="login_title">Đăng nhập</string>
+</resources>

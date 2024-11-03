@@ -16,10 +16,16 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RefreshToken extends AbstractEntity{
-    @OneToOne
-    @JoinColumn(name = "username", referencedColumnName = "username")
+    @ManyToOne
+    @JoinColumn(name = "username")
     Account account;
 
     @Column
     String token;
+
+    @Column(name = "user_agent")
+    String userAgent;
+
+    @Column
+    String ip;
 }

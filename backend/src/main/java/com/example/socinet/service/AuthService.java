@@ -83,7 +83,7 @@ public class AuthService {
                 .build();
     }
 
-    public AuthDto signIn(SignInRequest signInRequest) throws Exception{
+    public AuthDto signIn(SignInRequest signInRequest, String userAgent, String ip) throws Exception{
         // Xác thực
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -99,7 +99,7 @@ public class AuthService {
             String accessToken = jwtProvider.generateAccessToken(accountDto.getUsername());
             String refreshToken = jwtProvider.generateRefreshToken(accountDto.getUsername());
             // Kiểm tra đã có thiết bị đăng nhập chưa = tài khoản đã lưu một refresh token chưa
-            Optional<RefreshToken> refreshTokenOpt = refreshTokenRepo.findByAccount_Username(accountDto.getUsername());
+            Optional<RefreshToken> refreshTokenOpt = refreshTokenRepo.findByAccount_UsernameAndIp(accountDto.getUsername(), ip);
             if(refreshTokenOpt.isPresent()){
                 // Cập nhật
                 refreshTokenOpt.get().setToken(refreshToken);
@@ -109,6 +109,8 @@ public class AuthService {
                 RefreshToken newRefreshToken = RefreshToken.builder()
                         .account(account.get())
                         .token(refreshToken)
+                        .ip(ip)
+                        .userAgent(userAgent)
                         .build();
                 refreshTokenRepo.save(newRefreshToken);
             }
@@ -124,7 +126,7 @@ public class AuthService {
         }
     }
 
-    public AuthDto signInWithGoogle(String email, String name, String avatarUrl, String googleId) throws Exception {
+    public AuthDto signInWithGoogle(String email, String name, String avatarUrl, String googleId, String userAgent, String ip) throws Exception {
         Account account = accountRepo.findByEmail(email).orElseGet(() -> {
             // Build user
             User newUser = User.builder()
@@ -150,7 +152,7 @@ public class AuthService {
         String accessToken = jwtProvider.generateAccessToken(account.getUsername());
         String refreshToken = jwtProvider.generateRefreshToken(account.getUsername());
         // Kiểm tra đã có thiết bị đăng nhập chưa = tài khoản đã lưu một refresh token chưa
-        Optional<RefreshToken> refreshTokenOpt = refreshTokenRepo.findByAccount_Username(account.getUsername());
+        Optional<RefreshToken> refreshTokenOpt = refreshTokenRepo.findByAccount_UsernameAndIp(account.getUsername(), ip);
         if(refreshTokenOpt.isPresent()){
             // Cập nhật
             refreshTokenOpt.get().setToken(refreshToken);
@@ -160,11 +162,12 @@ public class AuthService {
             RefreshToken newRefreshToken = RefreshToken.builder()
                     .account(account)
                     .token(refreshToken)
+                    .ip(ip)
+                    .userAgent(userAgent)
                     .build();
             refreshTokenRepo.save(newRefreshToken);
         }
 
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
         return AuthDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -181,7 +184,6 @@ public class AuthService {
 
             // Kiểm tra token có lưu dưới db
             Optional<RefreshToken> savedTokenOpt = refreshTokenRepo.findByAccount_UsernameAndToken(username, refreshToken);
-
             // Nếu không -> throw lỗi
             if(savedTokenOpt.isEmpty()) throw new Exception("Unauthenticated");
             // Nếu có -> generate token mới và cập nhật
@@ -195,7 +197,7 @@ public class AuthService {
                     .account(new AccountDto(accountOpt.get()))
                     .build();
         } else{
-            throw new Exception("Refresh token is null or invalid");
+            throw new Exception("INVALID TOKEN");
         }
     }
 

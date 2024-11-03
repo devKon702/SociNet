@@ -7,7 +7,6 @@ import {
   makeInvitation,
 } from "../api/FriendService";
 import { socket } from "../socket";
-import { showSnackbar } from "./snackbarSlice";
 
 const personalSlice = createSlice({
   name: "personal",
@@ -55,16 +54,23 @@ const personalSlice = createSlice({
         state.friendList = action.payload.data;
       })
       .addCase(preparePersonalInfoThunk.fulfilled, (state, action) => {
-        const [
-          personalInfoResult,
-          postResult,
-          friendResult,
-          friendStatusResult,
-        ] = action.payload;
-        state.user = personalInfoResult.data;
-        state.postList = postResult.data;
-        state.friendList = friendResult.data;
-        state.friendStatus = friendStatusResult.data;
+        if (
+          Array.isArray(action.payload) &&
+          action.payload.every((result) => result.isSuccess)
+        ) {
+          const [
+            personalInfoResult,
+            postResult,
+            friendResult,
+            friendStatusResult,
+          ] = action.payload;
+          state.user = personalInfoResult.data;
+          state.postList = postResult.data;
+          state.friendList = friendResult.data;
+          state.friendStatus = friendStatusResult.data;
+        } else {
+          console.log(action.payload);
+        }
       })
       .addCase(preparePersonalInfoThunk.rejected, (state, action) => {
         console.log(action.error);
@@ -114,12 +120,13 @@ export const getFriendListThunk = createAsyncThunk(
 export const preparePersonalInfoThunk = createAsyncThunk(
   "personal, preparePersonalInfoThunk",
   async (userId) => {
-    return await Promise.all([
+    const res = await Promise.all([
       getUserInfo(userId),
       getPostByUserId(userId),
       getFriendList(userId),
       checkIsFriend(userId),
     ]);
+    return res;
   }
 );
 

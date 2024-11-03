@@ -1,4 +1,5 @@
 import axios from "../axiosConfig";
+import { getIpInformation } from "../helper";
 import {
   setError,
   setPending,
@@ -31,20 +32,24 @@ const AuthService = {
   //     dispatch(setError(res.message));
   //   }
   // },
-  signIn: async (username, password) =>
-    axios
-      .post(BASE + "/sign-in", { username, password })
+  signIn: async (username, password) => {
+    const ipInformation = await getIpInformation();
+    return axios
+      .post(BASE + "/sign-in?ip=" + ipInformation.query, { username, password })
       .then((res) => res.data)
-      .catch((e) => e.response.data),
-  signInWithGoogle: async (email, googleId, name, avatarUrl) =>
-    axios
+      .catch((e) => e.response.data);
+  },
+  signInWithGoogle: async (email, googleId, name, avatarUrl) => {
+    const ipInformation = await getIpInformation();
+    return axios
       .post(
         "api/v1/auth/google",
-        { email, googleId, name, avatarUrl },
+        { email, googleId, name, avatarUrl, ip: ipInformation.query },
         { headers: { "Content-Type": "multipart/form-data" } }
       )
       .then((res) => res.data)
-      .catch((e) => e.response.data),
+      .catch((e) => e.response.data);
+  },
   signOut: async (dispatch, navigate) => {
     dispatch(signout());
     navigate("/auth/signin");
@@ -55,21 +60,32 @@ const AuthService = {
       .post("api/v1/auth/sign-up", { username, password, email, name, otp })
       .then((res) => res.data)
       .catch((e) => e.response.data),
-  refreshToken: async (dispatch) => {
-    const token = localStorage.getItem("socinet");
-    if (!token) dispatch(signout());
-    else {
-      axios
-        .get(`api/v1/auth/refresh-token/${token}`)
-        .then((res) => {
-          const { accessToken, refreshToken, account } = res.data.data;
-          dispatch(signin({ token: accessToken, user: account }));
-          localStorage.setItem("socinet", refreshToken);
-        })
-        .catch(() => {
-          dispatch(signout());
-        });
-    }
+  // refreshToken: async (dispatch) => {
+  //   const token = localStorage.getItem("socinet");
+  //   if (!token) dispatch(signout());
+  //   else {
+  //     // const ipInfo = await getIpInformation();
+  //     // const userAgent = navigator.userAgent;
+  //     return axios
+  //       .get(`api/v1/auth/refresh-token?token=${token}`)
+  //       .then((res) => {
+  //         const { accessToken, refreshToken, account } = res.data.data;
+  //         dispatch(signin({ token: accessToken, user: account }));
+  //         localStorage.setItem("socinet", refreshToken);
+  //       })
+  //       .catch((e) => {
+  //         dispatch(signout());
+  //         console.log(e);
+  //       });
+  //   }
+  // },
+  refreshToken: async (token) => {
+    // const ipInfo = await getIpInformation();
+    // const userAgent = navigator.userAgent;
+    return axios
+      .get(`api/v1/auth/refresh-token`)
+      .then((res) => res.data)
+      .catch((e) => e.response.data);
   },
   getOtp: async (email) =>
     axios

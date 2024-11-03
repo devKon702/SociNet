@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addNewRoomActivity,
+  clearRoomActivity,
   getRoomThunk,
   removeRoom,
   setCurrentRoom,
@@ -23,7 +24,6 @@ import {
   updateChat,
 } from "../api/RoomService";
 import { showSnackbar } from "../redux/snackbarSlice";
-import { setCurrentAccount } from "../redux/adminSlice";
 import useImageSelect from "../hooks/useImageSelect";
 import { socket } from "../socket";
 
@@ -124,6 +124,9 @@ const RoomPage = () => {
 
   useEffect(() => {
     if (!isNaN(id)) dispatch(getRoomThunk(id));
+    return () => {
+      dispatch(clearRoomActivity());
+    };
   }, [id]);
 
   useEffect(() => {
@@ -224,6 +227,14 @@ const RoomPage = () => {
                       className="opacity-50 text-center"
                       title={dateDetailFormated(item.createdAt)}
                     >{`${item.sender.name} đã xóa ${item.receiver.name}`}</p>
+                  );
+                case "QUIT":
+                  return (
+                    <p
+                      key={item.id}
+                      className="opacity-50 text-center"
+                      title={dateDetailFormated(item.createdAt)}
+                    >{`${item.sender.name} đã rời nhóm`}</p>
                   );
                 default:
                   <p
@@ -415,7 +426,7 @@ const MemberItem = ({ member }) => {
     <div className="p-2 rounded-lg hover:bg-lightGray cursor-pointer flex gap-2">
       <div className="size-10 rounded-full overflow-hidden">
         <img
-          src={member.user.avatarUrl || "/unknown-avatar.png"}
+          src={member?.user?.avatarUrl || "/unknown-avatar.png"}
           alt=""
           className="object-cover size-full"
         />

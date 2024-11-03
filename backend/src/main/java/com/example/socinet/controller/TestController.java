@@ -16,7 +16,8 @@ public class TestController {
     private final EmailOtpService emailOtpService;
     @GetMapping("")
     public String test(HttpServletRequest request){
-        return "Test response from API";
+        String text = request.getHeader("X-FORWARED-FOR");
+        return "Test response from API" + text;
     }
 
     @GetMapping("test-mail")

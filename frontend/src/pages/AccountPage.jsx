@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { accountSelector } from "../redux/selectors";
+import { accountSelector, authSelector } from "../redux/selectors";
 import { signOut } from "../api/AuthService";
 import * as Yup from "yup";
 import {
@@ -19,6 +19,9 @@ import {
   setProgress,
 } from "../redux/accountSlice";
 import { Collapse } from "@mui/material";
+import { dateFormated, getDeviceType, getIpInformation } from "../helper";
+import { getLoginSessionList, removeLoginSession } from "../api/AccountService";
+import { showSnackbar } from "../redux/snackbarSlice";
 
 const emailSchema = Yup.object({
   email: Yup.string()
@@ -31,9 +34,11 @@ const AccountPage = () => {
   const { manageEmail, managePassword } = useSelector(accountSelector);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [loginSessionList, setLoginSessionList] = useState([]);
 
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [showLoginSession, setShowLoginSession] = useState(false);
 
   const handleSignOut = () => {
     const check = confirm("Bạn chắc chắn muốn đăng xuất?");
@@ -57,13 +62,37 @@ const AccountPage = () => {
     }
   };
 
+  const handleRemoveLoginSession = (id) => {
+    removeLoginSession(id).then((res) => {
+      if (res.isSuccess) {
+        setLoginSessionList(loginSessionList.filter((item) => item.id != id));
+      } else {
+        console.log(res);
+        dispatch(
+          showSnackbar({
+            message: "Xóa thiết bị đăng nhập thất bại",
+            type: "error",
+          })
+        );
+      }
+    });
+  };
+
   useEffect(() => {
     dispatch(setEmailError({ errorMessage: "" }));
   }, [manageEmail.progress]);
 
+  useEffect(() => {
+    getLoginSessionList().then((res) => {
+      if (res.isSuccess) {
+        setLoginSessionList(res.data);
+      }
+    });
+  }, []);
+
   return (
     <div className="w-full h-full py-4">
-      <div className="bg-white shadow-md w-3/4 h-full mx-auto text-gray-800 rounded-md px-3 py-4 flex flex-col gap-5 overflow-auto custom-scroll">
+      <div className="bg-white shadow-md lg:w-3/4 h-full mx-auto text-gray-800 rounded-md px-3 py-4 flex flex-col gap-5 overflow-auto custom-scroll">
         <div
           className="flex justify-between items-center p-4 w-full rounded-md hover:bg-gray-100 cursor-pointer shadow-lg"
           onClick={() => setShowEmailForm(!showEmailForm)}
@@ -285,6 +314,36 @@ const AccountPage = () => {
         </div>
 
         <div
+          className="flex justify-between items-center p-4 w-full rounded-md hover:bg-gray-100 cursor-pointer shadow-lg"
+          onClick={() => {
+            setShowLoginSession(!showLoginSession);
+          }}
+        >
+          <p>
+            <span className="font-bold">Các phiên đăng nhập</span>
+          </p>
+          <i
+            className={`bx bxs-chevron-${showLoginSession ? "down" : "right"}`}
+          ></i>
+        </div>
+        <div className="md:px-10">
+          <Collapse in={showLoginSession}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {loginSessionList.map((item) => (
+                <LoginSessionItem
+                  loginSession={item}
+                  key={item.id}
+                  handleRemove={() => {
+                    const check = confirm("Bạn muốn xóa phiên đăng nhập này?");
+                    if (check) handleRemoveLoginSession(item.id);
+                  }}
+                ></LoginSessionItem>
+              ))}
+            </div>
+          </Collapse>
+        </div>
+
+        <div
           className="flex justify-between items-center p-4 w-full rounded-md hover:bg-gray-100 cursor-pointer shadow-lg mt-auto"
           onClick={handleSignOut}
         >
@@ -293,6 +352,60 @@ const AccountPage = () => {
           </p>
           <i className="bx bxs-exit"></i>
         </div>
+      </div>
+    </div>
+  );
+};
+
+const LoginSessionItem = ({ loginSession, handleRemove }) => {
+  const deviceType = getDeviceType(loginSession.userAgent);
+  const [ipInfo, setIpInfo] = useState({});
+  const { ip } = useSelector(authSelector);
+  useEffect(() => {
+    getIpInformation(loginSession.ip).then((res) => {
+      setIpInfo(res);
+    });
+  }, [loginSession.ip]);
+
+  return (
+    <div className="flex justify-between items-center p-4 w-full rounded-md shadow-lg">
+      <div className="flex items-center gap-4">
+        <i
+          className={`bx bx-${
+            deviceType == "Mobile"
+              ? "mobile"
+              : deviceType == "PC"
+              ? "laptop"
+              : "devices"
+          } text-4xl`}
+        ></i>
+        <div>
+          <p className="font-bold">
+            {deviceType == "Tablet"
+              ? "Tablet"
+              : deviceType == "Mobile"
+              ? "Di động"
+              : "Máy tính"}
+          </p>
+          <p className="opacity-50 ms-auto">{ipInfo?.regionName}</p>
+        </div>
+      </div>
+      <div className="flex items-center gap-4">
+        {loginSession.ip == ip ? (
+          <span className="text-bold text-green-500">Hiện tại</span>
+        ) : (
+          <>
+            <span className="opacity-50 text-xs">
+              {dateFormated(loginSession.updatedAt)}
+            </span>
+            <div
+              className="size-10 rounded-full hover:bg-lightGray grid place-items-center cursor-pointer"
+              onClick={handleRemove}
+            >
+              <i className="bx bx-trash text-red-400 text-xl"></i>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

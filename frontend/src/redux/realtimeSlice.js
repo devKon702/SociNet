@@ -172,6 +172,15 @@ const realtimeSlice = createSlice({
         }
       });
     },
+    clearRoomActivity: (state) => {
+      state.roomActivity = {
+        currentRoom: null,
+        activities: [],
+        currentMessage: null,
+        action: "CREATE",
+        fetchStatus: "",
+      };
+    },
     setCurrentRoomMessage: (state, action) => {
       state.roomActivity.currentMessage = action.payload;
     },
@@ -197,13 +206,54 @@ const realtimeSlice = createSlice({
     },
     newRealtimeRoomMessage: (state, action) => {
       const { roomId, activity } = action.payload;
-      if (state.roomActivity.currentRoom.id == roomId) {
+      if (state.roomActivity.currentRoom?.id == roomId) {
         state.roomActivity.activities.unshift(activity);
       } else {
         state.realtimeRooms.forEach((item) => {
           if (item.id == roomId) item.hasUnreadMessage = true;
         });
       }
+    },
+    newRealtimeRoomMember: (state, action) => {
+      const { roomId, activity } = action.payload;
+      if (state.roomActivity.currentRoom?.id == roomId) {
+        state.roomActivity.activities.unshift(activity);
+        state.roomActivity.currentRoom.members.push(activity.receiver);
+      }
+    },
+    newRealtimeJoinedRoom: (state, action) => {
+      const room = action.payload;
+      // if room have not been in the realtimeRooms yet
+      if (!state.realtimeRooms.some((item) => item.id == room.id)) {
+        state.realtimeRooms.unshift(room);
+      }
+    },
+    newRealtimeMemberQuitActivity: (state, action) => {
+      const { roomId, activity } = action.payload;
+      // if room is now currentRoom
+      if (state.roomActivity.currentRoom?.id == roomId) {
+        state.roomActivity.currentRoom.members =
+          state.roomActivity.currentRoom.members.filter(
+            (member) => member.user.id != activity.sender.id
+          );
+
+        state.roomActivity.activities.unshift(activity);
+      }
+    },
+    disableRoom: (state, action) => {
+      const roomId = action.payload;
+      if (state.roomActivity.currentRoom?.id == roomId) {
+        state.roomActivity.currentRoom.isActive = false;
+      }
+    },
+    setUnreadRoom: (state, action) => {
+      const unreadRoomIdList = action.payload;
+      // if each room exist in the unread array -> hasUnreadMessage = true
+      state.realtimeRooms.forEach((item) => {
+        if (unreadRoomIdList.some((roomId) => roomId == item.id)) {
+          item.hasUnreadMessage = true;
+        }
+      });
     },
   },
   extraReducers: (builder) => {
@@ -221,11 +271,13 @@ const realtimeSlice = createSlice({
           "FILTER STATUS FRIEND",
           friendResult.data.map((item) => item.id)
         );
+        socket.emit("GET ROOM STATUS");
         state.realtimeRooms = joinedRoomResult.data;
         socket.emit(
           "JOIN MULTI ROOM",
           joinedRoomResult.data.map((room) => room.id)
         );
+        state.isLoading = false;
       })
       .addCase(getRealtimeFriendsThunk.fulfilled, (state, action) => {
         if (action.payload.isSuccess) {
@@ -307,6 +359,10 @@ const realtimeSlice = createSlice({
           const [roomResult, activityResult] = action.payload;
           state.roomActivity.currentRoom = roomResult.data;
           state.roomActivity.activities = activityResult.data;
+          socket.emit("READ ROOM MESSAGE", roomResult.data.id);
+          state.realtimeRooms.forEach((item, index, arr) => {
+            if (item.id == roomResult.data.id) arr[index] = roomResult.data;
+          });
         }
       })
       .addCase(createRoomThunk.fulfilled, (state, action) => {
@@ -318,8 +374,11 @@ const realtimeSlice = createSlice({
       .addCase(inviteJoinRoomThunk.fulfilled, (state, action) => {
         if (action.payload.isSuccess) {
           action.payload.data.forEach((activity) => {
-            state.roomActivity.currentRoom.members.push(activity.receiver);
-            state.roomActivity.activities.push(activity);
+            state.roomActivity.currentRoom.members.push({
+              user: activity.receiver,
+              isAdmin: false,
+            });
+            state.roomActivity.activities.unshift(activity);
             socket.emit(
               "INVITE TO ROOM",
               state.roomActivity.currentRoom.id,
@@ -577,10 +636,16 @@ export const {
   setRoomAction,
   removeRoom,
   setCurrentRoom,
+  clearRoomActivity,
   setCurrentRoomMessage,
   addNewRoomActivity,
   updateRoomMessage,
   newRealtimeRoomMessage,
   setRoomReadStatus,
+  newRealtimeRoomMember,
+  newRealtimeJoinedRoom,
+  newRealtimeMemberQuitActivity,
+  disableRoom,
+  setUnreadRoom,
 } = realtimeSlice.actions;
 export default realtimeSlice.reducer;

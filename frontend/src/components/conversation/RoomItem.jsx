@@ -19,9 +19,9 @@ const RoomItem = ({ room }) => {
       </div>
       <div>
         <p className="font-bold">{room.name}</p>
-        {/* <p className="opacity-50 font-bold">
-          {user.hasUnreadMessage && "Tin nhắn mới"}
-        </p> */}
+        <p className="opacity-50 font-bold">
+          {room.hasUnreadMessage && "Tin nhắn mới"}
+        </p>
       </div>
     </NavLink>
   );

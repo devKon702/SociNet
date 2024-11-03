@@ -5,7 +5,9 @@ const UserService = {
     axios
       .get("api/v1/users/" + userId)
       .then((res) => res.data)
-      .catch((e) => e.response.data),
+      .catch((e) => {
+        return e;
+      }),
 
   getUsersByName: async (name, page, size) =>
     axios

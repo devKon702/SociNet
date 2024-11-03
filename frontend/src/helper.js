@@ -87,3 +87,28 @@ export const removeAllListenersExcept = (socket, eventNameToKeep) => {
     socket.on(eventNameToKeep, listener);
   });
 };
+
+export const getDeviceType = (userAgent) => {
+  if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(userAgent)) {
+    return "Tablet";
+  }
+  if (
+    /Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(
+      userAgent
+    )
+  ) {
+    return "Mobile";
+  }
+  return "PC";
+};
+
+export const getIpInformation = async (ip) => {
+  let url = "";
+  if (ip) url = "http://ip-api.com/json/" + ip;
+  else url = "http://ip-api.com/json/?fields=61439";
+
+  const ipResult = await fetch(url)
+    .then((res) => res.json())
+    .catch((error) => console.log(error));
+  return ipResult;
+};

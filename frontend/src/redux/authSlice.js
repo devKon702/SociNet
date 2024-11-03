@@ -1,8 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
 import { refreshToken, signIn, signInWithGoogle } from "../api/AuthService";
 import { socket } from "../socket";
-import store from "./store";
 import { showSnackbar } from "./snackbarSlice";
 
 const authSlice = createSlice({
@@ -10,6 +8,7 @@ const authSlice = createSlice({
   initialState: {
     token: null,
     user: null,
+    ip: null,
     isLoading: true,
     error: null,
     isAuthenticated: false,
@@ -50,6 +49,9 @@ const authSlice = createSlice({
     setAccountEmail: (state, action) => {
       state.user.email = action.payload;
     },
+    setIP: (state, action) => {
+      state.ip = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -82,6 +84,7 @@ export const signInThunk = createAsyncThunk(
   "auth/signInThunk",
   async ({ username, password }, { dispatch }) => {
     const res = await signIn(username, password);
+
     if (res.isSuccess) {
       dispatch(
         showSnackbar({ message: "Đăng nhập thành công", type: "success" })
@@ -109,8 +112,8 @@ export const signInThunk = createAsyncThunk(
 
 export const refreshTokenThunk = createAsyncThunk(
   "auth/refreshTokenThunk",
-  async ({ dispatch, navigate }) => {
-    await refreshToken(dispatch, navigate);
+  async (token) => {
+    return await refreshToken(token);
   }
 );
 
@@ -136,5 +139,6 @@ export const {
   setUser,
   setUserInfo,
   setAccountEmail,
+  setIP,
 } = authSlice.actions;
 export default authSlice.reducer;

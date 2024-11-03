@@ -16,7 +16,23 @@ const AccountService = {
       )
       .then((res) => res.data)
       .catch((e) => e.response.data),
+
+  getLoginSessionList: async () =>
+    axios
+      .get("api/v1/account/login-session")
+      .then((res) => res.data)
+      .catch((e) => e.response.data),
+  removeLoginSession: async (id) =>
+    axios
+      .delete("api/v1/account/login-session?id=" + id)
+      .then((res) => res.data)
+      .catch((e) => e.response.data),
 };
 
-export const { changeEmail, changePassword } = AccountService;
+export const {
+  changeEmail,
+  changePassword,
+  getLoginSessionList,
+  removeLoginSession,
+} = AccountService;
 export default AccountService;
