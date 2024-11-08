@@ -1,22 +1,18 @@
 package com.example.socinetandroid.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.socinetandroid.databinding.ActivityLoginBinding;
-import com.example.socinetandroid.databinding.ActivityMainBinding;
 import com.example.socinetandroid.interfaces.IRetrofitResponseHandler;
 import com.example.socinetandroid.model.ApiResponse;
 import com.example.socinetandroid.model.Auth;
-import com.example.socinetandroid.service.AuthService;
-import com.example.socinetandroid.service.PostService;
-import com.example.socinetandroid.service.UserService;
-import com.example.socinetandroid.service.config.RetrofitClient;
+import com.example.socinetandroid.repository.AuthRepository;
+import com.example.socinetandroid.repository.UserRepository;
+import com.example.socinetandroid.repository.config.RetrofitClient;
 import com.example.socinetandroid.utils.Helper;
 import com.example.socinetandroid.utils.TokenManager;
 
@@ -31,7 +27,7 @@ import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
     private ActivityLoginBinding bd;
-    private AuthService authService;
+    private AuthRepository authRepository;
     private TokenManager tokenManager;
 
     @Override
@@ -44,7 +40,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void initial(){
         bd = ActivityLoginBinding.inflate(getLayoutInflater());
-        authService = RetrofitClient.createInstance(this).create(AuthService.class);
+        authRepository = RetrofitClient.createInstance(this).create(AuthRepository.class);
         tokenManager = new TokenManager(this);
 
     }
@@ -57,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
             Map<String, String> requestBody = new HashMap<>();
             requestBody.put("username", username);
             requestBody.put("password", password);
-            authService.signIn(requestBody).enqueue(new Callback<ApiResponse>() {
+            authRepository.signIn(requestBody).enqueue(new Callback<ApiResponse>() {
                 @Override
                 public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                     Helper.handleRetrofitResponse(response, new IRetrofitResponseHandler(){
@@ -91,8 +87,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void checkLogged() throws GeneralSecurityException, IOException {
-        UserService userService = RetrofitClient.createInstance(this).create(UserService.class);
-        userService.getMyInfo().enqueue(new Callback<ApiResponse>() {
+        UserRepository userRepository = RetrofitClient.createInstance(this).create(UserRepository.class);
+        userRepository.getMyInfo().enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                 Helper.handleRetrofitResponse(response, new IRetrofitResponseHandler() {

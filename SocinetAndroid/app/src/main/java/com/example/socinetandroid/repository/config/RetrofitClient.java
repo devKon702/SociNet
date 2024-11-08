@@ -1,8 +1,8 @@
-package com.example.socinetandroid.service.config;
+package com.example.socinetandroid.repository.config;
 
 import android.content.Context;
 
-import com.example.socinetandroid.utils.TokenManager;
+import com.example.socinetandroid.utils.Constant;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -17,9 +17,6 @@ public class RetrofitClient {
     private static Retrofit retrofit = null;
 
     private static Retrofit getClient(Context context) throws GeneralSecurityException, IOException {
-
-        TokenManager tokenManger = new TokenManager(context);
-
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(new RetrofitInterceptor(context))
                 .cookieJar(new PersistentCookieJar(context))
@@ -30,7 +27,7 @@ public class RetrofitClient {
                 .create();
 
         retrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.0.101:8080/api/v1/")
+                .baseUrl(Constant.BASE_API_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(okHttpClient)
                 .build();

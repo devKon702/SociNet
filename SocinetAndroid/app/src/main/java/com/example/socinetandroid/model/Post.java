@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.Map;
 
 public class Post {
-    Long id;
+    long id;
     User user;
     String caption;
     String imageUrl;
@@ -17,7 +17,7 @@ public class Post {
     Date updatedAt;
     String selfReaction;
 
-    public Post(Long id, User user, String caption, String imageUrl, String videoUrl, Post sharedPost, int numberOfComments, Map<String, Integer> numberOfReactions, boolean isActive, Date createdAt, Date updatedAt, String selfReaction) {
+    public Post(long id, User user, String caption, String imageUrl, String videoUrl, Post sharedPost, int numberOfComments, Map<String, Integer> numberOfReactions, boolean isActive, Date createdAt, Date updatedAt, String selfReaction) {
         this.id = id;
         this.user = user;
         this.caption = caption;
@@ -50,11 +50,11 @@ public class Post {
                 '}';
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 

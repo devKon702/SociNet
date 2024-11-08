@@ -1,7 +1,7 @@
 package com.example.socinetandroid.model;
 
 public class User {
-    private Long id;
+    private long id;
     private String name;
     private String phone;
     private String school;
@@ -9,7 +9,7 @@ public class User {
     private String avatarUrl;
     private boolean isMale;
 
-    public User(Long id, String name, String phone, String school, String address, String avatarUrl, boolean isMale) {
+    public User(long id, String name, String phone, String school, String address, String avatarUrl, boolean isMale) {
         this.id = id;
         this.name = name;
         this.phone = phone;
@@ -32,11 +32,11 @@ public class User {
                 '}';
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 

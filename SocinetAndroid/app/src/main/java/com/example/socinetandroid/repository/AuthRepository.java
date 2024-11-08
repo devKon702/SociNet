@@ -1,4 +1,4 @@
-package com.example.socinetandroid.service;
+package com.example.socinetandroid.repository;
 
 import com.example.socinetandroid.model.ApiResponse;
 
@@ -9,7 +9,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 
-public interface AuthService {
+public interface AuthRepository {
     @POST("auth/sign-in")
     Call<ApiResponse> signIn(@Body Map<String, String> body);
 

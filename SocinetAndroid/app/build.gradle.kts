@@ -32,8 +32,10 @@ android {
 
     buildFeatures{
         viewBinding = true
+        dataBinding = true
     }
 }
+
 
 dependencies {
 
@@ -46,6 +48,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation(libs.lifecycle.livedata)
+    implementation (libs.lifecycle.viewmodel)
 
     implementation(libs.annotation)
     implementation(libs.retrofit)
@@ -55,4 +59,11 @@ dependencies {
     implementation(libs.okhttp.logging.interceptor)
     implementation(libs.security.crypto)
     implementation(libs.picasso)
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.exoplayer.dash)
+    implementation(libs.media3.ui)
+    implementation(libs.tedpermission.normal)
+//    implementation("io.github.ParkSangGwon:tedbottompicker:2.0.1")
+//    implementation("gun0912.ted:tedbottompicker:1.2.6")
+
 }

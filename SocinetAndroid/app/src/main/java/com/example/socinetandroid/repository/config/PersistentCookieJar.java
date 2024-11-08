@@ -1,4 +1,4 @@
-package com.example.socinetandroid.service.config;
+package com.example.socinetandroid.repository.config;
 
 import android.content.Context;
 
@@ -6,8 +6,6 @@ import androidx.annotation.NonNull;
 
 import com.example.socinetandroid.utils.TokenManager;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

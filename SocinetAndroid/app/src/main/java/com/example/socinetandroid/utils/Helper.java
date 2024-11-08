@@ -4,13 +4,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.util.Log;
-import android.view.LayoutInflater;
+
 import android.view.View;
 import android.widget.LinearLayout;
 
-import androidx.activity.Api19Impl;
-
-import com.example.socinetandroid.R;
 import com.example.socinetandroid.interfaces.IRetrofitResponseHandler;
 import com.example.socinetandroid.model.ApiResponse;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -40,10 +37,7 @@ public class Helper {
     public static <T> Type getListType(Class<T> clazz) {
         return TypeToken.getParameterized(List.class, clazz).getType();
     }
-    public static BottomSheetDialog setupBottomSheetDialog(BottomSheetDialog bottomSheetDialog, Context context, int bottomSheetLayoutId, boolean isFullScreen, int topParentId){
-        View viewDialog = LayoutInflater.from(context).inflate(bottomSheetLayoutId, null);
-        bottomSheetDialog.setContentView(viewDialog);
-
+    public static void setupBottomSheetDialog(BottomSheetDialog bottomSheetDialog, View viewDialog, boolean isFullScreen, int topParentId){
         BottomSheetBehavior<View> behavior = BottomSheetBehavior.from((View) viewDialog.getParent());
         behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         behavior.setSkipCollapsed(true);
@@ -54,7 +48,6 @@ public class Helper {
             layout.setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
         }
 
-        return bottomSheetDialog;
     }
 
     public static void saveSharedPrefs(Context context, String key, String value){
@@ -63,12 +56,10 @@ public class Helper {
         editor.putString(key, value);
         editor.apply();
     }
-
     public static void clearSharedPrefs(Context context){
         context.getSharedPreferences("Socinet", Context.MODE_PRIVATE)
                 .edit().clear().apply();
     }
-
     public static String getSharedPrefsValue(Context context, String key){
         return context.getSharedPreferences("Socinet", Context.MODE_PRIVATE)
                 .getString(key, null);
@@ -87,9 +78,5 @@ public class Helper {
             handler.onFail(convertDataToType(response.errorBody(), ApiResponse.class));
             Log.e("API ERROR", response.toString());
         }
-    }
-
-    public static void refreshToken(){
-
     }
 }

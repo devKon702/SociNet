@@ -3,7 +3,9 @@ package com.example.socinetandroid.fragment;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,118 +13,139 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.example.socinetandroid.R;
 import com.example.socinetandroid.adapter.PostAdapter;
 import com.example.socinetandroid.databinding.FragmentHomeBinding;
+import com.example.socinetandroid.dialog.CommentBottomSheet;
+import com.example.socinetandroid.dialog.PostActionBottomSheet;
+import com.example.socinetandroid.dialog.SharePostBottomSheet;
 import com.example.socinetandroid.interfaces.IPostListener;
 import com.example.socinetandroid.interfaces.IRetrofitResponseHandler;
 import com.example.socinetandroid.model.ApiResponse;
 import com.example.socinetandroid.model.Post;
-import com.example.socinetandroid.service.AuthService;
-import com.example.socinetandroid.service.PostService;
-import com.example.socinetandroid.service.config.RetrofitClient;
+import com.example.socinetandroid.repository.PostRepository;
+import com.example.socinetandroid.repository.config.RetrofitClient;
 import com.example.socinetandroid.utils.Helper;
+import com.example.socinetandroid.viewmodel.PostViewModel;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class HomeFragment extends Fragment{
+public class HomeFragment extends Fragment implements IPostListener{
     public static final String TAG = "HOME";
     private FragmentHomeBinding bd;
+    private PostViewModel postViewModel;
+    private PostRepository postRepository;
+    private PostAdapter postAdapter;
 
     public HomeFragment() {
         // Required empty public constructor
     }
     public static HomeFragment newInstance(String param1, String param2) {
         HomeFragment fragment = new HomeFragment();
-//        Bundle args = new Bundle();
-//        args.putString(ARG_PARAM1, param1);
-//        args.putString(ARG_PARAM2, param2);
-//        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        if (getArguments() != null) {
-//            mParam1 = getArguments().getString(ARG_PARAM1);
-//            mParam2 = getArguments().getString(ARG_PARAM2);
-//        }
-        init();
-        setEvent();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-//        return inflater.inflate(R.layout.fragment_home, container, false);
+        init();
+        setEvent();
         return bd.getRoot();
     }
 
 
     private void init(){
         bd = FragmentHomeBinding.inflate(getLayoutInflater());
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        bd.rcvPost.setLayoutManager(linearLayoutManager);
+        bd.rcvPost.setLayoutManager(new LinearLayoutManager(getContext()));
+        postViewModel = new ViewModelProvider(requireActivity()).get(PostViewModel.class);
+        postAdapter = new PostAdapter(getContext(), new ArrayList<>(), this);
+        bd.rcvPost.setAdapter(postAdapter);
+        postRepository = RetrofitClient.createInstance(getContext()).create(PostRepository.class);
     }
 
     private void setEvent(){
-        PostService postService = null;
-        postService = RetrofitClient.createInstance(getContext()).create(PostService.class);
+        postViewModel.getState().observe(getViewLifecycleOwner(), value -> {
+            switch(value){
+                case PostViewModel.NORMAL: break;
+                case PostViewModel.EDITED:
+                    postAdapter.updateItem(postViewModel.getNewPost());
+                    postViewModel.setNewPost(null);
+                    postViewModel.setState(PostViewModel.NORMAL);
+                    break;
+                case PostViewModel.DELETED:
+                    postAdapter.deleteItem(postViewModel.getNewPost());
+                    postViewModel.setNewPost(null);
+                    postViewModel.setState(PostViewModel.NORMAL);
+                    break;
+                case PostViewModel.CREATED:
+                    postAdapter.addItem(0, postViewModel.getNewPost());
+                    postViewModel.setNewPost(null);
+                    postViewModel.setState(PostViewModel.NORMAL);
+                    break;
+            }
+        });
 
-        postService.getPosts().enqueue(new Callback<ApiResponse>() {
+        postRepository.getPosts().enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                 Helper.handleRetrofitResponse(response, new IRetrofitResponseHandler() {
                     @Override
                     public void onSuccess(ApiResponse result) {
                         List<Post> postList = Helper.convertDataToType(result.getData(), Helper.getListType(Post.class));
-                        setAdapterData(postList);
+                        postAdapter.setList(postList);
                     }
 
                     @Override
                     public void onFail(ApiResponse result) {
-
+                        Toast.makeText(getContext(), "Lấy danh sách bài viết thất bại\n"+result.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
             }
 
             @Override
             public void onFailure(Call<ApiResponse> call, Throwable throwable) {
-
+                Log.e("API", throwable.getMessage());
             }
         });
     }
 
-    private void setAdapterData(List<Post> list){
-        PostAdapter adapter = new PostAdapter(list, new IPostListener() {
-            @Override
-            public void onItemClick() {
-                Toast.makeText(getContext(), "Item click", Toast.LENGTH_SHORT).show();
-            }
+    @Override
+    public void onActionClick(RecyclerView.ViewHolder holder, Post post) {
+        postViewModel.setCurrentPost(post);
+        PostActionBottomSheet dialog = new PostActionBottomSheet();
+        dialog.show(getParentFragmentManager(), dialog.getTag());
+    }
 
-            @Override
-            public void onReactClick() {
-                Toast.makeText(getContext(), "React click", Toast.LENGTH_SHORT).show();
-            }
+    @Override
+    public void onReactClick(RecyclerView.ViewHolder holder, Post post) {
+        if(post.getSelfReaction() != null){
 
-            @Override
-            public void onCommentClick() {
-                Toast.makeText(getContext(), "Comment click", Toast.LENGTH_SHORT).show();
-            }
+        }
+    }
 
-            @Override
-            public void onShareClick() {
-                Toast.makeText(getContext(), "Share click", Toast.LENGTH_SHORT).show();
-            }
-        });
-        bd.rcvPost.setAdapter(adapter);
+    @Override
+    public void onReactLongClick(RecyclerView.ViewHolder holder, Post post) {
+
+    }
+
+    @Override
+    public void onCommentClick(RecyclerView.ViewHolder holder, Post post) {
+        CommentBottomSheet dialog = CommentBottomSheet.newInstance(post.getId());
+        dialog.show(requireActivity().getSupportFragmentManager(), dialog.getTag());
+    }
+
+    @Override
+    public void onShareClick(RecyclerView.ViewHolder holder, Post post) {
+        SharePostBottomSheet dialog = new SharePostBottomSheet();
+        dialog.show(requireActivity().getSupportFragmentManager(), dialog.getTag());
     }
 }

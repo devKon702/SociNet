@@ -1,4 +1,4 @@
-package com.example.socinetandroid.service.config;
+package com.example.socinetandroid.repository.config;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,13 +8,12 @@ import androidx.annotation.NonNull;
 import com.example.socinetandroid.activity.LoginActivity;
 import com.example.socinetandroid.model.ApiResponse;
 import com.example.socinetandroid.model.Auth;
-import com.example.socinetandroid.service.AuthService;
+import com.example.socinetandroid.repository.AuthRepository;
 import com.example.socinetandroid.utils.Constant;
 import com.example.socinetandroid.utils.Helper;
 import com.example.socinetandroid.utils.TokenManager;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -24,7 +23,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitInterceptor implements Interceptor {
-    private Context context;
+    private final Context context;
 
     public RetrofitInterceptor(Context context) {
         this.context = context;
@@ -33,10 +32,9 @@ public class RetrofitInterceptor implements Interceptor {
     @NonNull
     @Override
     public Response intercept(Interceptor.Chain chain) throws IOException {
-
         Request request = chain.request();
-        TokenManager tokenManager = new TokenManager(context);
 
+        TokenManager tokenManager = new TokenManager(context);
         String accessToken = tokenManager.getAccessToken();
         if(accessToken != null){
             request = request
@@ -53,14 +51,14 @@ public class RetrofitInterceptor implements Interceptor {
                         .cookieJar(new PersistentCookieJar(context))
                         .build();
 
-            AuthService authService = new Retrofit
+            AuthRepository authRepository = new Retrofit
                     .Builder()
                     .baseUrl(Constant.BASE_API_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(okHttpClient)
                     .build()
-                    .create(AuthService.class);
-            ApiResponse result = authService.refreshToken().execute().body();
+                    .create(AuthRepository.class);
+            ApiResponse result = authRepository.refreshToken().execute().body();
             if(result != null){
                 Auth auth = Helper.convertDataToType(result.getData(), Helper.getType(Auth.class));
 
@@ -78,9 +76,9 @@ public class RetrofitInterceptor implements Interceptor {
     }
 
     private void logout(){
-        Helper.clearSharedPrefs(context);
+        new TokenManager(context).clearSharedPref();
         Intent intent = new Intent(context, LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
         context.startActivity(intent);
     }
 }

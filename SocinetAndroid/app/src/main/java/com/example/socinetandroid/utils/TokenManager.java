@@ -9,8 +9,8 @@ import androidx.security.crypto.MasterKeys;
 import com.example.socinetandroid.interfaces.IRefreshTokenHandler;
 import com.example.socinetandroid.model.ApiResponse;
 import com.example.socinetandroid.model.Auth;
-import com.example.socinetandroid.service.AuthService;
-import com.example.socinetandroid.service.config.PersistentCookieJar;
+import com.example.socinetandroid.repository.AuthRepository;
+import com.example.socinetandroid.repository.config.PersistentCookieJar;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -68,19 +68,22 @@ public class TokenManager {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .cookieJar(new PersistentCookieJar(context))
                 .build();
-        AuthService authService = new Retrofit.Builder()
+        AuthRepository authRepository = new Retrofit.Builder()
                 .baseUrl(Constant.BASE_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient)
                 .build()
-                .create(AuthService.class);
-        authService.refreshToken().enqueue(new Callback<ApiResponse>() {
+                .create(AuthRepository.class);
+        authRepository.refreshToken().enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                 ApiResponse result = response.body();
                 if(result != null){
                     Auth auth = Helper.convertDataToType(result.getData(), Helper.getType(Auth.class));
+                    // Save access token
                     saveAccessToken(auth.getAccessToken());
+                    // Save user info
+                    GlobalData.user = auth.getAccount().getUser();
                     iRefreshTokenHandler.handleSuccess();
                 } else {
                     iRefreshTokenHandler.handleFail();
