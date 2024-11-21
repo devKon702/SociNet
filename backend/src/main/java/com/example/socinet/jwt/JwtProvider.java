@@ -14,7 +14,7 @@ public class JwtProvider {
     private String ACCESS_KEY;
     @Value("${jwt.refresh.secret}")
     private String REFRESH_KEY;
-    private final long accessExpired = 10 * 1000;
+    private final long accessExpired = 5 * 1000;
     private final long refreshExpired = 30L * 24 * 60 * 60 * 1000;
 
     public String generateAccessToken(String username){
@@ -52,7 +52,7 @@ public class JwtProvider {
         } catch(MalformedJwtException e){
             log.error("Token is invalid");
         } catch(ExpiredJwtException e){
-            log.error("Token is expired");
+//            log.error("Token is expired");
             throw e;
         } catch(Exception e) {
             log.error(e.getMessage());

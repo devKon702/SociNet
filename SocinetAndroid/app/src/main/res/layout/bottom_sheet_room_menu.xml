@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:id="@+id/layoutRoomMenu"
+    tools:context=".dialog.RoomMenuBottomSheet"
+    android:paddingTop="20dp">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+            <androidx.cardview.widget.CardView
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                app:cardCornerRadius="1000dp">
+                <ImageView
+                    android:id="@+id/ivAvatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"/>
+            </androidx.cardview.widget.CardView>
+            
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="32sp"
+                android:textColor="@color/black"
+                android:gravity="center"
+                android:layout_marginBottom="20dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnUpdate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_pencil"
+                app:iconTint="@color/darkGray"
+                app:iconPadding="30dp"
+                android:backgroundTint="@color/white"
+                android:text="Chỉnh sửa thông tin nhóm"
+                android:textColor="@color/darkGray"
+                android:textAllCaps="false"
+                android:textAlignment="textStart"/>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMember"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_group"
+                app:iconTint="@color/darkGray"
+                app:iconPadding="30dp"
+                android:backgroundTint="@color/white"
+                android:text="Thành viên"
+                android:textColor="@color/darkGray"
+                android:textAllCaps="false"
+                android:textAlignment="textStart"/>
+            <LinearLayout
+                android:id="@+id/layoutMemberList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcvMember"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddMember"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_plus"
+                    app:iconTint="@color/darkGray"
+                    app:iconPadding="30dp"
+                    app:iconGravity="textStart"
+                    android:backgroundTint="@color/white"
+                    android:text="Thêm thành viên"
+                    android:textColor="@color/darkGray"
+                    android:textAllCaps="false"
+                    android:textAlignment="center"/>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+    
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnQuit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        app:icon="@drawable/ic_logout"
+        app:iconTint="@color/orange"
+        android:textAlignment="textStart"
+        android:text=""
+        android:textColor="@color/orange"
+        android:background="@android:color/transparent"
+        android:padding="10dp"/>
+</LinearLayout>

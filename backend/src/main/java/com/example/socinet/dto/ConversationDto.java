@@ -13,7 +13,9 @@ import java.util.Date;
 public class ConversationDto {
     Long id;
     Long senderId;
+    UserDto sender;
     Long receiverId;
+    UserDto receiver;
     String content;
     String fileUrl;
     Date createdAt;
@@ -25,7 +27,9 @@ public class ConversationDto {
     public ConversationDto(Conversation conversation){
         this.id = conversation.getId();
         this.senderId = conversation.getSender().getId();
+        this.sender = new UserDto(conversation.getSender());
         this.receiverId = conversation.getReceiver().getId();
+        this.receiver = new UserDto(conversation.getReceiver());
         this.content = conversation.getContent();
         this.fileUrl = conversation.getFileUrl();
         this.createdAt = conversation.getCreatedAt();

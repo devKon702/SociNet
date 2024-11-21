@@ -6,16 +6,40 @@
     android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        app:title="Trang cá nhân"
-        app:titleCentered="true"
-        android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"/>
-    <ScrollView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scrollbars="none">
+        android:paddingVertical="10dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Trang cá nhân"
+            android:textSize="20sp"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+        <ImageView
+            android:id="@+id/ivBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_arrow_left"
+            android:layout_marginStart="10dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="2dp"/>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:fillViewport="true">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -33,42 +57,61 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent">
                     <ImageView
+                        android:id="@+id/ivAvatar"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/img_ex1"
+                        android:src="@drawable/unknown_avatar"
                         android:scaleType="centerCrop"/>
                 </androidx.cardview.widget.CardView>
                 <TextView
                     android:id="@+id/tvName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Devas"
+                    android:text=""
                     android:textStyle="bold"
                     android:textSize="32sp"
                     android:layout_marginLeft="20dp"
                     app:layout_constraintLeft_toRightOf="@+id/cvAvatar"
                     app:layout_constraintTop_toTopOf="parent"/>
                 <TextView
+                    android:id="@+id/tvFriendNumber"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="20 bạn bè"
+                    android:text=""
                     android:textSize="20sp"
                     android:textColor="@color/darkGray"
                     android:layout_marginLeft="20dp"
                     app:layout_constraintLeft_toRightOf="@+id/cvAvatar"
                     app:layout_constraintTop_toBottomOf="@+id/tvName"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
+
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFriend"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cornerRadius="6dp"
-                android:text="Đăng bài"
+                android:text="Kết bạn"
+                android:textColor="@color/white"
                 android:layout_marginTop="20dp"
-                app:icon="@drawable/ic_plus"
+                app:icon="@drawable/ic_check_friend"
                 app:iconGravity="textStart"
-                android:backgroundTint="@color/green"/>
+                app:iconTint="@color/white"
+                android:backgroundTint="@color/blue"
+                android:visibility="gone"/>
+
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:id="@+id/btnCreatePost"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                app:cornerRadius="6dp"-->
+<!--                android:text="Đăng bài"-->
+<!--                android:layout_marginTop="20dp"-->
+<!--                app:icon="@drawable/ic_plus"-->
+<!--                app:iconGravity="textStart"-->
+<!--                android:backgroundTint="@color/green"/>-->
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnUpdateProfile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cornerRadius="6dp"
@@ -78,7 +121,9 @@
                 app:icon="@drawable/ic_pencil"
                 app:iconTint="@color/black"
                 app:iconGravity="textStart"
-                android:backgroundTint="@color/lightGray"/>
+                app:iconSize="18dp"
+                android:backgroundTint="@color/lightGray"
+                android:visibility="gone"/>
 
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
@@ -96,6 +141,7 @@
                     android:textStyle="bold"
                     android:textSize="16sp"/>
                 <TextView
+                    android:id="@+id/tvFrom"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -104,8 +150,9 @@
                     android:drawablePadding="10dp"
                     android:drawableTint="@color/darkGray"
                     android:textSize="16sp"
-                    android:text="Đến từ An Giang"/>
+                    android:text="Đến từ"/>
                 <TextView
+                    android:id="@+id/tvSchool"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -114,8 +161,9 @@
                     android:drawablePadding="10dp"
                     android:drawableTint="@color/darkGray"
                     android:textSize="16sp"
-                    android:text="Học tại THPT Châu Giang"/>
+                    android:text="Học tại"/>
                 <TextView
+                    android:id="@+id/tvGenre"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -124,8 +172,9 @@
                     android:drawablePadding="10dp"
                     android:drawableTint="@color/darkGray"
                     android:textSize="16sp"
-                    android:text="Giới tính nam"/>
+                    android:text="Giới tính"/>
                 <TextView
+                    android:id="@+id/tvPhone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -134,7 +183,7 @@
                     android:drawablePadding="10dp"
                     android:drawableTint="@color/darkGray"
                     android:textSize="16sp"
-                    android:text="0333888777"/>
+                    android:text=""/>
             </LinearLayout>
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
@@ -146,24 +195,30 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
                 android:orientation="vertical">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Bạn bè"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:layout_marginBottom="10dp"/>
-                <GridLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:columnCount="3"
-                    >
-                    <include layout="@layout/layout_friend_item_review"/>
-                    <include layout="@layout/layout_friend_item_review"/>
-                    <include layout="@layout/layout_friend_item_review"/>
-                </GridLayout>
+                    android:layout_marginBottom="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Bạn bè"
+                        android:textStyle="bold"
+                        android:textSize="16sp" />
+                    <TextView
+                        android:id="@+id/tvFriendBottomNumber"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"/>
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcvFriend"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnShowAllFriend"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Xem danh sách bạn bè"
@@ -174,8 +229,11 @@
 
             </LinearLayout>
 
-            <include layout="@layout/layout_post_item"/>
-            <include layout="@layout/layout_post_item"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcvPost"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"/>
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>

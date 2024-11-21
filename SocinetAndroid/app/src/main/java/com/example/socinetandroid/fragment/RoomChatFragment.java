@@ -1,66 +1,87 @@
 package com.example.socinetandroid.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-import com.example.socinetandroid.R;
+import com.example.socinetandroid.MyApplication;
+import com.example.socinetandroid.activity.RoomActivity;
+import com.example.socinetandroid.adapter.RealtimeChatAdapter;
+import com.example.socinetandroid.databinding.FragmentRoomChatBinding;
+import com.example.socinetandroid.interfaces.IRealtimeChatListener;
+import com.example.socinetandroid.interfaces.IRetrofitResponseHandler;
+import com.example.socinetandroid.model.ApiResponse;
+import com.example.socinetandroid.model.RealtimeChat;
+import com.example.socinetandroid.model.RealtimeRoom;
+import com.example.socinetandroid.model.Room;
+import com.example.socinetandroid.repository.RoomRepository;
+import com.example.socinetandroid.repository.config.RetrofitClient;
+import com.example.socinetandroid.utils.Helper;
+import com.example.socinetandroid.viewmodel.AppViewModel;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link RoomChatFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+
 public class RoomChatFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public RoomChatFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment RoomChatFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static RoomChatFragment newInstance(String param1, String param2) {
-        RoomChatFragment fragment = new RoomChatFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    public static final String TAG = "ROOM_CHAT";
+    private FragmentRoomChatBinding bd;
+    private RealtimeChatAdapter realtimeChatAdapter;
+    private AppViewModel appViewModel;
+    public RoomChatFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_room_chat, container, false);
+        bd = FragmentRoomChatBinding.inflate(getLayoutInflater());
+        initialize();
+        setEvent();
+        return bd.getRoot();
+    }
+
+    private void initialize() {
+        appViewModel = ((MyApplication) requireActivity().getApplication()).getAppViewModel();
+//        roomRepository = RetrofitClient.createInstance(getContext()).create(RoomRepository.class);
+        realtimeChatAdapter = new RealtimeChatAdapter(new ArrayList<>(), new IRealtimeChatListener() {
+            @Override
+            public void onItemClick(RealtimeChat realtimeChat) {
+                Intent intent = new Intent(getActivity(), com.example.socinetandroid.activity.RoomActivity.class);
+                intent.putExtra(RoomActivity.EXTRA_KEY, realtimeChat.getId());
+                startActivity(intent);
+            }
+        });
+        bd.rcvRoomList.setLayoutManager(new LinearLayoutManager(getContext()));
+        bd.rcvRoomList.setAdapter(realtimeChatAdapter);
+        realtimeChatAdapter.setList(appViewModel.getLiveRealtimeRoomList().getValue()
+                .stream()
+                .map(item -> new RealtimeChat(item.getRoom(), item.getNewMessage(), item.isHasUnread()))
+                .collect(Collectors.toList()));
+    }
+
+    private void setEvent() {
+        appViewModel.getLiveRealtimeRoomList().observe(getViewLifecycleOwner(), value -> {
+            realtimeChatAdapter.updateList(value
+                    .stream()
+                    .map(item -> new RealtimeChat(item.getRoom(), item.getNewMessage(), item.isHasUnread()))
+                     .collect(Collectors.toList()));
+        });
     }
 }

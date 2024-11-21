@@ -23,6 +23,8 @@ import {
   inviteJoinRoom,
   updateRoom,
 } from "../api/RoomService";
+import { refreshToken } from "../api/AuthService";
+import { signin } from "./authSlice";
 
 const realtimeSlice = createSlice({
   name: "realtime",
@@ -369,6 +371,7 @@ const realtimeSlice = createSlice({
         if (action.payload.isSuccess) {
           state.realtimeRooms.push(action.payload.data);
           location.replace("/conversation/room/" + action.payload.data.id);
+          socket.emit("NEW ROOM", action.payload.data.id);
         }
       })
       .addCase(inviteJoinRoomThunk.fulfilled, (state, action) => {
@@ -534,6 +537,13 @@ export const removeConversationThunk = createAsyncThunk(
 export const getRoomThunk = createAsyncThunk(
   "realtime/getRoomThunk",
   async (id, { dispatch }) => {
+    await refreshToken(localStorage.getItem("socinet")).then((res) => {
+      if (res.isSuccess) {
+        const { accessToken, refreshToken, account } = res.data;
+        dispatch(signin({ token: accessToken, user: account }));
+        localStorage.setItem("socinet", refreshToken);
+      }
+    });
     return await Promise.all([getRoom(id), getActivitiesOfRoom(id)])
       .then((res) => {
         const failResponse = res.find((item) => !item.isSuccess);
@@ -590,7 +600,6 @@ export const createRoomThunk = createAsyncThunk(
 export const inviteJoinRoomThunk = createAsyncThunk(
   "realtime/inviteJoinRoomThunk",
   async ({ roomId, userIdList }, { dispatch }) => {
-    console.log(userIdList);
     const res = await inviteJoinRoom(roomId, userIdList);
 
     if (res.isSuccess) {

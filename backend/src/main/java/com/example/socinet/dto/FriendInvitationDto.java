@@ -11,15 +11,17 @@ import java.util.Date;
 
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class FriendDto {
+public class FriendInvitationDto {
     Long id;
     UserDto user;
+    UserDto sender;
+    UserDto receiver;
     Date createdAt;
     Date updatedAt;
     @JsonProperty("isAccepted")
     boolean isAccepted;
 
-    public FriendDto(Friend friend){
+    public FriendInvitationDto(Friend friend){
         this.id = friend.getId();
         this.createdAt = friend.getCreatedAt();
         this.updatedAt = friend.getUpdatedAt();
@@ -28,5 +30,7 @@ public class FriendDto {
         if(friend.getSender().getId() != currentUserId){
             this.user = new UserDto(friend.getSender());
         } else this.user = new UserDto(friend.getReceiver());
+        this.sender = new UserDto(friend.getSender());
+        this.receiver = new UserDto(friend.getReceiver());
     }
 }

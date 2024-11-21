@@ -21,7 +21,7 @@ public interface PostRepository {
     Call<ApiResponse> getPosts();
 
     @GET("posts/user/{id}")
-    Call<ApiResponse> getPostOfUser(@Path("id") long id);
+    Call<ApiResponse> getPostOfUser(@Path("id") long userId);
 
     @Multipart
     @POST("posts")

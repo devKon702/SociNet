@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".dialog.ActivityActionBottomSheet">
+
+    <TextView
+        android:id="@+id/tvUpdate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="Chỉnh sửa"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:drawablePadding="20dp"
+        app:drawableStartCompat="@drawable/ic_pencil"
+        app:drawableTint="@color/black" />
+
+    <TextView
+        android:id="@+id/tvRemove"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="Thu hồi"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:drawablePadding="20dp"
+        app:drawableStartCompat="@drawable/ic_trash"
+        app:drawableTint="@color/black" />
+</LinearLayout>

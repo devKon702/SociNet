@@ -1,5 +1,10 @@
 package com.example.socinetandroid.model;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Objects;
+
 public class User {
     private long id;
     private String name;

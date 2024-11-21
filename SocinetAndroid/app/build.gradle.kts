@@ -65,5 +65,9 @@ dependencies {
     implementation(libs.tedpermission.normal)
 //    implementation("io.github.ParkSangGwon:tedbottompicker:2.0.1")
 //    implementation("gun0912.ted:tedbottompicker:1.2.6")
+    implementation (libs.socket.io.client){
+        exclude(group = "org.json", module = "json")
+    }
+    implementation ("com.fasterxml.jackson.core:jackson-databind:2.13.0")
 
 }

@@ -46,7 +46,7 @@ public class PostActionBottomSheet extends BottomSheetDialogFragment {
     }
 
     private void init(){
-        PostViewModel postViewModel = new ViewModelProvider(requireActivity()).get(PostViewModel.class);
+        postViewModel = new ViewModelProvider(requireActivity()).get(PostViewModel.class);
     }
 
     private void setEvent(View view){
@@ -86,7 +86,6 @@ public class PostActionBottomSheet extends BottomSheetDialogFragment {
                 });
             }
             confirmCount++;
-
         });
     }
 

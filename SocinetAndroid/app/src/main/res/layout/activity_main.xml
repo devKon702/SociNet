@@ -39,9 +39,15 @@
                     android:id="@+id/tvTest"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:text=""
+                    android:textColor="@color/white"
                     app:layout_constraintEnd_toEndOf="parent"
-                    android:text="faskldjflkeads"
-                    android:textColor="@color/white"/>
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:maxWidth="200dp"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -53,6 +59,7 @@
         app:layout_anchor="@id/appBar"
         app:layout_anchorGravity="bottom"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
         <FrameLayout
             android:id="@+id/frameLayout"
             android:layout_width="match_parent"
@@ -91,6 +98,21 @@
         app:maxImageSize="35dp"
         app:layout_anchor="@id/bottomAppBar"
         android:backgroundTint="@color/orange"
-        app:tint="@color/white"/>
+        app:tint="@color/white"
+        android:contentDescription="CHAT" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <TextView
+        android:id="@+id/tvBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="20sp"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:padding="4dp"
+        app:layout_anchor="@id/fab"
+        app:layout_anchorGravity="end"
+        android:background="@drawable/shape_message"
+        android:backgroundTint="@color/red"
+        android:elevation="10dp"
+        android:visibility="gone"/>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,9 +1,10 @@
 package com.example.socinet.service;
 
-import com.example.socinet.dto.FriendDto;
+import com.example.socinet.dto.FriendInvitationDto;
 import com.example.socinet.dto.UserDto;
 import com.example.socinet.entity.Friend;
 import com.example.socinet.entity.User;
+import com.example.socinet.enums.FriendStatus;
 import com.example.socinet.repository.FriendRepository;
 import com.example.socinet.repository.UserRepository;
 import com.example.socinet.util.Helper;
@@ -34,15 +35,15 @@ public class FriendService {
         return result;
     }
 
-    public List<FriendDto> getInvitations() {
+    public List<FriendInvitationDto> getInvitations() {
         Long userId = Helper.getUserId();
         List<Friend> invitationList = friendRepository.findInvitations(userId);
-        List<FriendDto> result = new ArrayList<>();
-        invitationList.forEach(invitation -> result.add(0, new FriendDto(invitation)));
+        List<FriendInvitationDto> result = new ArrayList<>();
+        invitationList.forEach(invitation -> result.add(0, new FriendInvitationDto(invitation)));
         return result;
     }
 
-    public FriendDto makeFriendInvitation(Long id) throws Exception{
+    public FriendInvitationDto makeFriendInvitation(Long id) throws Exception{
         Long currentUserId = Helper.getUserId();
         if(id == currentUserId) throw new Exception("CANNOT CREATE INVITATION");
 
@@ -58,13 +59,13 @@ public class FriendService {
                     .receiver(receiverOpt.get())
                     .isAccepted(false)
                     .build();
-            return new FriendDto(friendRepository.save(invitation));
+            return new FriendInvitationDto(friendRepository.save(invitation));
         } else{
             throw new Exception("INVITATION EXISTED");
         }
     }
 
-    public FriendDto responseFriendInvitation(Long invitationId, boolean isAccept) throws Exception{
+    public FriendInvitationDto responseFriendInvitation(Long invitationId, boolean isAccept) throws Exception{
         Optional<Friend> friendOpt = friendRepository.findById(invitationId);
         if(friendOpt.isPresent()){
             // Kiểm tra có phải người gửi lời mời
@@ -75,7 +76,7 @@ public class FriendService {
             // Chấp nhận
             if(isAccept){
                 friendOpt.get().setAccepted(true);
-                return new FriendDto(friendRepository.save(friendOpt.get()));
+                return new FriendInvitationDto(friendRepository.save(friendOpt.get()));
             }
             // Từ chối
             else{
@@ -91,9 +92,8 @@ public class FriendService {
     public String checkIsFriend(Long userId){
         Optional<Friend> invitationOpt = friendRepository.findInvitation(Helper.getUserId(), userId);
         if(invitationOpt.isPresent()){
-            if(invitationOpt.get().isAccepted()) return "FRIEND";
-            else return "INVITED";
-        } else return "NO";
+            if(invitationOpt.get().isAccepted()) return FriendStatus.FRIEND.getType();
+            else return FriendStatus.INVITED.getType();
+        } else return FriendStatus.NO.getType();
     }
-
 }

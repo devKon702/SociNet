@@ -4,19 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragment.SingleChatFragment">
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <LinearLayout
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcvConversationList"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <include layout="@layout/layout_chat_item"/>
-            <include layout="@layout/layout_chat_item"/>
-            <include layout="@layout/layout_chat_item"/>
-            <include layout="@layout/layout_chat_item"/>
-        </LinearLayout>
-    </ScrollView>
-
+            android:layout_height="match_parent"/>
 </FrameLayout>

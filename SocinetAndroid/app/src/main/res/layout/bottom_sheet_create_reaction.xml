@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:paddingVertical="20dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".dialog.CreateReactionBottomSheet">
+    <ImageView
+        android:id="@+id/ivLike"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_like_react"
+        android:padding="10dp" />
+
+    <ImageView
+        android:id="@+id/ivLove"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_love_react"
+        android:padding="10dp"/>
+
+    <ImageView
+        android:id="@+id/ivHaha"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_haha_react"
+        android:padding="10dp"/>
+
+    <ImageView
+        android:id="@+id/ivSad"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_sad_react"
+        android:padding="10dp"/>
+</LinearLayout>

@@ -6,7 +6,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".activity.ChatActivity">
+    tools:context=".activity.ConversationActivity">
+
+    <LinearLayout
+        android:id="@+id/layoutInactive"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/lightGray"
+        android:gravity="center"
+        android:visibility="gone">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nhóm đã giải tán"
+            android:textColor="@color/red"
+            android:textSize="20sp"/>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,9 +41,10 @@
             android:layout_height="40dp"
             app:cardCornerRadius="1000dp">
             <ImageView
+                android:id="@+id/ivAvatar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/img_ex1"
+                android:src="@drawable/unknown_avatar"
                 android:scaleType="centerCrop"/>
         </androidx.cardview.widget.CardView>
 
@@ -39,22 +55,17 @@
             android:layout_weight="1"
             android:layout_marginStart="8dp">
             <TextView
+                android:id="@+id/tvName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hội đam mê zzz"
+                android:text=""
                 android:textColor="@color/black"
                 android:textStyle="bold"
                 android:textSize="16sp"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Online"
-                android:textColor="@color/green"
-                android:textStyle="bold"/>
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/ivInfo"
+            android:id="@+id/ivMenu"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/ic_menu"
@@ -64,26 +75,63 @@
         android:layout_width="match_parent"
         android:layout_height="2dp"/>
 
-    <LinearLayout
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcvActivity"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="10dp">
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <LinearLayout
+        android:layout_weight="1"/>
+
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="2dp"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutState"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:visibility="gone">
+        <TextView
+            android:id="@+id/tvState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+        <TextView
+            android:id="@+id/tvCurrentContent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/tvState"
+            app:layout_constraintStart_toStartOf="@+id/tvState"/>
+        <ImageView
+            android:id="@+id/ivImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="100dp"
+            android:maxHeight="100dp"
+            android:background="@drawable/shape_rounded_white"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvClose"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:cardCornerRadius="1000dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+            <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <include layout="@layout/layout_other_message_item"/>
-                <include layout="@layout/layout_self_message_item"/>
-                <include layout="@layout/layout_other_message_item"/>
-                <include layout="@layout/layout_other_message_item"/>
-                <include layout="@layout/layout_self_message_item"/>
-            </LinearLayout>
-        </ScrollView>
-    </LinearLayout>
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_x"
+                app:tint="@color/darkGray"
+                android:scaleType="centerCrop"
+                android:padding="12dp"/>
+        </androidx.cardview.widget.CardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -91,17 +139,22 @@
         android:padding="10dp"
         android:gravity="start|center">
         <ImageView
+            android:id="@+id/ivChooseFile"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/ic_image"/>
         <EditText
+            android:id="@+id/edtContent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@drawable/input_shape"
             android:layout_weight="1"
             android:layout_marginHorizontal="12dp"
+            android:maxLines="6"
+            android:scrollbars="none"
             android:hint="Tin nhắn"/>
         <ImageView
+            android:id="@+id/ivSend"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/ic_send"/>

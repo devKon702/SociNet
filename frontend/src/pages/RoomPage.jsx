@@ -44,6 +44,7 @@ const RoomPage = () => {
     maxSize: 5 * 1024 * 1024,
   });
   function handleButtonSendClick() {
+    console.log(action);
     switch (action) {
       case "CREATE":
         console.log("Gửi chat");
@@ -152,12 +153,12 @@ const RoomPage = () => {
     <>
       {action === "INVITE" && (
         <InviteMemberDialog
-          handleClose={() => dispatch(setRoomAction(""))}
+          handleClose={() => dispatch(setRoomAction("CREATE"))}
         ></InviteMemberDialog>
       )}
       {action === "UPDATE" && (
         <UpdateRoomDialog
-          handleClose={() => dispatch(setRoomAction(""))}
+          handleClose={() => dispatch(setRoomAction("CREATE"))}
           room={currentRoom}
         ></UpdateRoomDialog>
       )}
@@ -290,6 +291,7 @@ const RoomPage = () => {
                 accept="image/*"
                 hidden
                 onChange={handleFileChange}
+                value={!file ? "" : ""}
               />
               <div className="flex-1 bg-gray-300 rounded-3xl flex items-center relative">
                 <TextareaAutosize

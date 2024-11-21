@@ -3,12 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginVertical="6dp"
+    android:paddingHorizontal="10dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cvAvatar"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         app:cardCornerRadius="1000dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -16,7 +17,8 @@
             android:id="@+id/ivUserAvatar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/img_ex1"/>
+            android:src="@drawable/unknown_avatar"
+            android:scaleType="centerCrop"/>
     </androidx.cardview.widget.CardView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -25,7 +27,7 @@
         app:layout_constraintLeft_toRightOf="@+id/cvAvatar"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:paddingHorizontal="10dp">
+        android:layout_marginLeft="10dp">
         <LinearLayout
             android:id="@+id/messageContent"
             android:layout_width="wrap_content"
@@ -41,7 +43,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Đỗ Trí Hà"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/black"/>
             <TextView
@@ -60,5 +62,28 @@
             android:text="10 giờ trước"
             android:textColor="@color/black"
             android:layout_marginStart="10dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcvChildComment"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/tvTime"
+            app:layout_constraintLeft_toLeftOf="@+id/messageContent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:visibility="visible"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/decorateLine"
+        android:layout_width="2dp"
+        android:layout_height="0dp"
+        android:background="@color/darkGray"
+        app:layout_constraintTop_toBottomOf="@id/cvAvatar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/cvAvatar"
+        app:layout_constraintRight_toRightOf="@id/cvAvatar"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:visibility="visible"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

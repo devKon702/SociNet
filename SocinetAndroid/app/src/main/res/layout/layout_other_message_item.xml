@@ -3,21 +3,41 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:gravity="start"
-    android:layout_marginTop="4dp">
+    android:layout_marginBottom="4dp"
+    android:paddingHorizontal="8dp">
     <androidx.cardview.widget.CardView
         android:id="@+id/cvAvatar"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         app:cardCornerRadius="1000dp"
+        android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toBottomOf="@+id/tvContent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="gone">
         <ImageView
             android:id="@+id/ivAvatar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/img_ex1"
             android:scaleType="centerCrop"/>
+    </androidx.cardview.widget.CardView>
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="6dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/tvContent"
+        android:visibility="gone">
+        <ImageView
+            android:id="@+id/ivImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="200dp"
+            android:maxHeight="200dp"
+            android:src="@drawable/img_ex3"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"/>
     </androidx.cardview.widget.CardView>
     <TextView
         android:id="@+id/tvContent"
@@ -28,13 +48,14 @@
         android:breakStrategy="high_quality"
         android:text="Hôm nay như thế nào?"
         android:textColor="@color/black"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="4dp"
+        app:layout_constraintTop_toBottomOf="@id/cvImage"
         app:layout_constraintStart_toEndOf="@+id/cvAvatar"/>
     <TextView
         android:id="@+id/tvTime"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:visibility="visible"
+        android:visibility="gone"
         android:text="18:21"
         android:textSize="12sp"
         android:layout_marginStart="10dp"

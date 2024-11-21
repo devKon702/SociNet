@@ -22,7 +22,7 @@ public interface CommentRepository {
 
     @FormUrlEncoded
     @PUT("comments/{id}")
-    Call<ApiResponse> updateComment(@Path("id") Long id, @Field("content") String content);
+    Call<ApiResponse> updateComment(@Path("id") long id, @Field("content") String content);
 
     @DELETE("comments/{id}")
     Call<ApiResponse> deleteComment(@Path("id") Long id);

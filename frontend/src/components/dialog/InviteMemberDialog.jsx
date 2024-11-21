@@ -26,7 +26,7 @@ const InviteMemberDialog = ({ handleClose }) => {
         userIdList: Object.keys(checkUsers),
       })
     );
-    dispatch(setRoomAction(""));
+    dispatch(setRoomAction("CREATE"));
   }
 
   const checkUsers = {};

@@ -6,11 +6,13 @@ import android.util.Log;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
 
+import com.example.socinetandroid.MyApplication;
 import com.example.socinetandroid.interfaces.IRefreshTokenHandler;
 import com.example.socinetandroid.model.ApiResponse;
 import com.example.socinetandroid.model.Auth;
 import com.example.socinetandroid.repository.AuthRepository;
 import com.example.socinetandroid.repository.config.PersistentCookieJar;
+import com.example.socinetandroid.viewmodel.AppViewModel;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -83,7 +85,9 @@ public class TokenManager {
                     // Save access token
                     saveAccessToken(auth.getAccessToken());
                     // Save user info
-                    GlobalData.user = auth.getAccount().getUser();
+//                    GlobalData.user = auth.getAccount().getUser();
+                    AppViewModel appViewModel = ((MyApplication) context.getApplicationContext()).getAppViewModel();
+                    appViewModel.getLiveUser().setValue(auth.getAccount().getUser());
                     iRefreshTokenHandler.handleSuccess();
                 } else {
                     iRefreshTokenHandler.handleFail();

@@ -18,6 +18,7 @@ security-crypto = "1.1.0-alpha06"
 annotation = "1.9.0"
 legacySupportV4 = "1.0.0"
 latestPicasso = "latest.release"
+socketIoClient = "2.0.0"
 tedimagepicker = "1.1.10"
 tedpermissionNormal = "3.4.2"
 
@@ -45,6 +46,7 @@ security-crypto = { group = "androidx.security", name = "security-crypto", versi
 picasso = { module = "com.squareup.picasso:picasso", version.ref = "latestPicasso" }
 legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "legacySupportV4" }
 annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
+socket-io-client = { module = "io.socket:socket.io-client", version.ref = "socketIoClient" }
 tedimagepicker = { module = "gun0912.ted:tedimagepicker", version.ref = "tedimagepicker" }
 tedpermission-normal = { module = "io.github.ParkSangGwon:tedpermission-normal", version.ref = "tedpermissionNormal" }
 [plugins]

@@ -12,4 +12,7 @@ public class Constant {
     public static final String UNAUTHENTICATED_MESSAGE = "Unauthenticated";
     public static final String INVALID_TOKEN_MESSAGE = "INVALID TOKEN";
     public static final String EXPIRED_TOKEN_MESSAGE = "TOKEN EXPIRED";
+
+    // SOCKET
+    public static final String SOCKET_URL = "http://192.168.0.101:3000";
 }

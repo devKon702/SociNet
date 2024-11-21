@@ -6,7 +6,9 @@ import android.content.res.Resources;
 import android.util.Log;
 
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
+
 
 import com.example.socinetandroid.interfaces.IRetrofitResponseHandler;
 import com.example.socinetandroid.model.ApiResponse;
@@ -15,7 +17,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.Date;
 import java.util.List;
 
 import retrofit2.Response;
@@ -42,12 +50,18 @@ public class Helper {
         behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         behavior.setSkipCollapsed(true);
 
+        bottomSheetDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         if(isFullScreen){
-            LinearLayout layout = bottomSheetDialog.findViewById(topParentId);
+            View layout = bottomSheetDialog.findViewById(topParentId);
             assert  layout != null;
-            layout.setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
+            if(layout instanceof LinearLayout){
+                ((LinearLayout)layout).setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
+            }
+            // Constraint ko áp dụng được
+//            else if(layout instanceof ConstraintLayout){
+//                ((ConstraintLayout)layout).setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
+//            }
         }
-
     }
 
     public static void saveSharedPrefs(Context context, String key, String value){
@@ -77,6 +91,48 @@ public class Helper {
         else {
             handler.onFail(convertDataToType(response.errorBody(), ApiResponse.class));
             Log.e("API ERROR", response.toString());
+        }
+    }
+
+    public static <T> T clone(Object object, Type type){
+        return gson.fromJson(gson.toJson(object), type);
+    }
+    public static JSONObject toJsonObject(Object object) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            // Lấy tất cả các field (thuộc tính) của lớp
+            Field[] fields = object.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                field.setAccessible(true); // Cho phép truy cập vào các field private
+
+                Object value = field.get(object);
+
+                // Nếu field là một đối tượng lớp khác, đệ quy gọi toJsonObject
+                if (value != null && !isPrimitiveOrString(value)) {
+                    jsonObject.put(field.getName(), toJsonObject(value));
+                } else {
+                    jsonObject.put(field.getName(), value); // Thêm giá trị của field vào jsonObject
+                }
+            }
+        } catch (IllegalAccessException | JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+    // Kiểm tra xem một đối tượng có phải là kiểu nguyên thủy (primitive) hoặc String không
+    private static boolean isPrimitiveOrString(Object value) {
+        return value instanceof Date || value instanceof String || value instanceof Number || value instanceof Boolean || value.getClass().isPrimitive();
+    }
+
+    public static <T> JSONArray toJsonArray(List<T> list) {
+        String jsonString = gson.toJson(list);
+        try {
+            // Chuyển chuỗi JSON thành JSONArray
+            return new JSONArray(jsonString);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;  // Trả về null nếu có lỗi
         }
     }
 }

@@ -10,6 +10,7 @@ public class PostViewModel extends ViewModel {
     public final static int EDITED = 1;
     public final static int DELETED = 2;
     public final static int CREATED = 3;
+    public final static int REACTED = 4;
 
     private final MutableLiveData<Post> currentPost = new MutableLiveData<>();
     private final MutableLiveData<Post> newPost = new MutableLiveData<>();
@@ -54,5 +55,10 @@ public class PostViewModel extends ViewModel {
     public void addPost(Post post){
         newPost.setValue(post);
         state.setValue(CREATED);
+    }
+
+    public void reactPost(Post post){
+        newPost.setValue(post);
+        state.setValue(REACTED);
     }
 }

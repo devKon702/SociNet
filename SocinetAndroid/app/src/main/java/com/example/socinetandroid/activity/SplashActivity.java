@@ -6,9 +6,11 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.socinetandroid.MyApplication;
 import com.example.socinetandroid.R;
 import com.example.socinetandroid.interfaces.IRefreshTokenHandler;
 import com.example.socinetandroid.utils.TokenManager;
+import com.example.socinetandroid.viewmodel.AppViewModel;
 
 
 @SuppressLint("CustomSplashScreen")

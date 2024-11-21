@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:paddingTop="10dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".dialog.UpdateRoomBottomSheet">
+<!--    <com.google.android.material.bottomsheet.BottomSheetDragHandleView-->
+<!--        android:layout_width="100dp"-->
+<!--        android:layout_height="8dp"-->
+<!--        android:layout_gravity="center"-->
+<!--        android:background="@color/darkGray"/>-->
+
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Thông tin nhóm"-->
+<!--        android:textSize="30sp"-->
+<!--        android:gravity="center"-->
+<!--        android:paddingVertical="6dp"/>-->
+
+<!--    <com.google.android.material.divider.MaterialDivider-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="2dp"-->
+<!--        android:layout_marginBottom="6dp"/>-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingHorizontal="20dp">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableStart="@drawable/ic_image"
+            android:drawableTint="@color/darkGray"
+            android:drawablePadding="10dp"
+            android:text="Hình đại diện nhóm"
+            android:textSize="20sp"
+            android:paddingVertical="5dp"/>
+<!--        <ImageView-->
+<!--            android:layout_width="30dp"-->
+<!--            android:layout_height="30dp"-->
+<!--            android:src="@drawable/ic_pencil"-->
+<!--            app:tint="@color/darkGray"-->
+<!--            android:padding="4dp"/>-->
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="15dp">
+        <androidx.cardview.widget.CardView
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            app:cardCornerRadius="1000dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent">
+            <ImageView
+                android:id="@+id/ivImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"/>
+        </androidx.cardview.widget.CardView>
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvClose"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            app:cardCornerRadius="1000dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:clickable="true"
+            android:visibility="gone">
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/ic_x"
+                android:elevation="10dp"
+                app:tint="@color/white"
+                android:background="@color/darkGray"
+                android:padding="5dp"/>
+        </androidx.cardview.widget.CardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="5dp"
+        android:drawableStart="@drawable/ic_group"
+        android:drawableTint="@color/darkGray"
+        android:drawablePadding="10dp"
+        android:text="Tên nhóm"
+        android:textSize="20sp"/>
+
+    <EditText
+        android:id="@+id/edtName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/input_shape"
+        android:text="Wibu Club"
+        android:hint="Nhập tên nhóm..."
+        android:paddingVertical="6dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnUpdate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:text="Cập nhật"
+        android:textAllCaps="false"
+        android:layout_marginVertical="10dp"/>
+</LinearLayout>

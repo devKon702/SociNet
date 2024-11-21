@@ -16,6 +16,7 @@ public class RoomActivityDto {
     String fileUrl;
     UserDto sender;
     UserDto receiver;
+    Long roomId;
     String type;
     @JsonProperty("isActive")
     boolean isActive;
@@ -30,6 +31,7 @@ public class RoomActivityDto {
         if(activity.getReceiver() != null) {
             this.receiver = new UserDto(activity.getReceiver());
         }
+        this.roomId = activity.getRoom().getId();
         this.type = activity.getType();
         this.isActive = activity.isActive();
         this.createdAt = activity.getCreatedAt();

@@ -112,15 +112,15 @@ public class CreatePostBottomSheet extends BottomSheetDialogFragment {
                             Toast.makeText(getContext(), "Đăng bài thành công", Toast.LENGTH_SHORT).show();
                             Post post = Helper.convertDataToType(result.getData(), Helper.getType(Post.class));
                             postViewModel.addPost(post);
+                            dismiss();
                         }
 
                         @Override
                         public void onFail(ApiResponse result) {
                             Toast.makeText(getContext(), "Tạo bài viết thất bại\n" + result.getMessage(), Toast.LENGTH_SHORT).show();
+                            dismiss();
                         }
                     });
-
-                    dismiss();
                 }
 
                 @Override
@@ -128,6 +128,19 @@ public class CreatePostBottomSheet extends BottomSheetDialogFragment {
                     Log.e("API", throwable.getMessage());
                 }
             });
+        });
+        bd.tvChooseFile.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/* video/*");
+//                intent.setAction(Intent.ACTION_GET_CONTENT);
+            mActivityResultLauncher.launch(Intent.createChooser(intent, "Select Image"));
+        });
+        bd.cvRemoveFile.setOnClickListener(v -> {
+            fileUri = null;
+            bd.ivImage.setImageURI(null);
+            bd.ivImage.setVisibility(View.GONE);
+            bd.playerView.setVisibility(View.GONE);
+            bd.cvRemoveFile.setVisibility(View.GONE);
         });
     }
 

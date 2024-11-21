@@ -6,6 +6,7 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.socinetandroid.MyApplication;
 import com.example.socinetandroid.databinding.ActivityLoginBinding;
 import com.example.socinetandroid.interfaces.IRetrofitResponseHandler;
 import com.example.socinetandroid.model.ApiResponse;
@@ -14,7 +15,9 @@ import com.example.socinetandroid.repository.AuthRepository;
 import com.example.socinetandroid.repository.UserRepository;
 import com.example.socinetandroid.repository.config.RetrofitClient;
 import com.example.socinetandroid.utils.Helper;
+import com.example.socinetandroid.utils.SocketManager;
 import com.example.socinetandroid.utils.TokenManager;
+import com.example.socinetandroid.viewmodel.AppViewModel;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -29,6 +32,8 @@ public class LoginActivity extends AppCompatActivity {
     private ActivityLoginBinding bd;
     private AuthRepository authRepository;
     private TokenManager tokenManager;
+    private SocketManager socketManager;
+    private AppViewModel appViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,10 +44,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void initial(){
+        appViewModel = ((MyApplication) getApplication()).getAppViewModel();
+        socketManager = SocketManager.getInstance(getApplication());
+        socketManager.disconnect();
         bd = ActivityLoginBinding.inflate(getLayoutInflater());
         authRepository = RetrofitClient.createInstance(this).create(AuthRepository.class);
         tokenManager = new TokenManager(this);
-
     }
 
     private void setEvent() {
@@ -60,6 +67,7 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(ApiResponse result) {
                             Auth auth = Helper.convertDataToType(result.getData(), Helper.getType(Auth.class));
+                            appViewModel.setUser(auth.getAccount().getUser());
                             tokenManager.saveAccessToken(auth.getAccessToken());
 
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);

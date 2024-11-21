@@ -1,6 +1,6 @@
 package com.example.socinet.controller;
 
-import com.example.socinet.dto.FriendDto;
+import com.example.socinet.dto.FriendInvitationDto;
 import com.example.socinet.dto.UserDto;
 import com.example.socinet.service.FriendService;
 import com.example.socinet.util.Helper;
@@ -18,7 +18,7 @@ public class FriendController {
 
     @GetMapping("invitation")
     ResponseEntity<?> getInvitationList(){
-        List<FriendDto> invitations = friendService.getInvitations();
+        List<FriendInvitationDto> invitations = friendService.getInvitations();
         return Helper.returnSuccessResponse("Get invitations success", invitations);
     }
 
@@ -32,14 +32,14 @@ public class FriendController {
 
     @PostMapping("{userId}")
     ResponseEntity<?> makeFriendInvitation(@PathVariable Long userId) throws Exception{
-        FriendDto friendDto = friendService.makeFriendInvitation(userId);
-        return Helper.returnSuccessResponse("Create invitation success", friendDto);
+        FriendInvitationDto friendInvitationDto = friendService.makeFriendInvitation(userId);
+        return Helper.returnSuccessResponse("Create invitation success", friendInvitationDto);
     }
 
     @PutMapping("{id}")
     ResponseEntity<?> responseInvitation(@PathVariable Long id, @RequestParam boolean isAccept) throws Exception{
-        FriendDto friendDto = friendService.responseFriendInvitation(id, isAccept);
-        return Helper.returnSuccessResponse("Response invitation success", friendDto);
+        FriendInvitationDto friendInvitationDto = friendService.responseFriendInvitation(id, isAccept);
+        return Helper.returnSuccessResponse("Response invitation success", friendInvitationDto);
     }
 
     @GetMapping("check/{userId}")

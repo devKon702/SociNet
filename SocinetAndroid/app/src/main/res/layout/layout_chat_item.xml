@@ -3,48 +3,70 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="10dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layoutChatItem"
+    android:background="@color/white"
+    android:clickable="true"
+    android:focusable="true">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cvAvatar"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        app:cardCornerRadius="1000dp"
+    <RelativeLayout
+        android:id="@+id/layoutAvatar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvAvatar"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            app:cardCornerRadius="1000dp">
+            <ImageView
+                android:id="@+id/ivAvatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/unknown_avatar" />
+        </androidx.cardview.widget.CardView>
+        <LinearLayout
+            android:id="@+id/circleStatus"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/circle_shape"
+            android:backgroundTint="@color/green"
+            android:layout_alignRight="@id/cvAvatar"
+            android:layout_alignBottom="@id/cvAvatar"
+            android:elevation="10dp"
+            android:visibility="gone"
+            android:orientation="horizontal" />
+    </RelativeLayout>
 
-        <ImageView
-            android:id="@+id/ivAvatar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/img_ex1" />
-    </androidx.cardview.widget.CardView>
+
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingStart="20dp"
-        app:layout_constraintStart_toEndOf="@+id/cvAvatar"
+        app:layout_constraintStart_toEndOf="@+id/layoutAvatar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
         <TextView
+            android:id="@+id/tvName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Nguyễn Nhật Kha"
+            android:text=""
             android:textColor="@color/black"
             android:textSize="24sp"
-            android:textStyle="bold"
             android:ellipsize="end"/>
         <TextView
+            android:id="@+id/tvNewMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tin nhắn mới"
+            android:text=""
             android:textColor="@color/darkGray"
-            android:textSize="20sp"
-            android:ellipsize="end"/>
+            android:textSize="18sp"
+            android:ellipsize="end" />
     </LinearLayout>
 
 

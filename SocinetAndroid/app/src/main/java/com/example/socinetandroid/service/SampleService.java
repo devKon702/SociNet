@@ -13,8 +13,17 @@ import androidx.core.app.NotificationCompat;
 import com.example.socinetandroid.MyApplication;
 import com.example.socinetandroid.R;
 import com.example.socinetandroid.activity.MainActivity;
+import com.example.socinetandroid.utils.Constant;
+import com.example.socinetandroid.viewmodel.AppViewModel;
+
+import java.net.URISyntaxException;
+
+import io.socket.client.IO;
+import io.socket.client.Socket;
 
 public class SampleService extends Service {
+    private Socket mSocket;
+    private AppViewModel appViewModel;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -49,5 +58,17 @@ public class SampleService extends Service {
                 .build();
 
         startForeground(1, notification);
+    }
+
+    private void setupSocket(){
+        try {
+            mSocket = IO.socket(Constant.SOCKET_URL);
+            setupSocketEventListening();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void setupSocketEventListening(){
     }
 }

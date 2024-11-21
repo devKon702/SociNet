@@ -109,6 +109,7 @@ public class FileSupporter {
     }
 
     public static void loadImage(ImageView view, String url){
+        if(url == null || url.isEmpty()) return;
         Picasso.get()
                 .load(url)
                 .placeholder(R.drawable.unknown_avatar)
@@ -116,6 +117,7 @@ public class FileSupporter {
     }
 
     public static void loadVideo(Context context, PlayerView view, String url){
+        if(url == null || url.isEmpty()) return;
         ExoPlayer exoPlayer = new ExoPlayer.Builder(context).build();
         view.setPlayer(exoPlayer);
         MediaItem mediaItem = MediaItem.fromUri(url);

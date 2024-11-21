@@ -136,6 +136,14 @@ userIo.on("connection", (socket) => {
     socket.emit("GET ROOM STATUS", unreadRoomIdList);
   });
 
+  socket.on("NEW ROOM", (roomId) => {
+    if (roomManager[roomId] == null) {
+      roomManager[roomId] = {};
+      roomManager[roomId][socketUser.id] = [];
+      socket.join("R" + roomId);
+    }
+  });
+
   socket.on("NEW ROOM MESSAGE", (roomId, activity) => {
     // if room info is not exist
     if (!roomManager[roomId]) {
