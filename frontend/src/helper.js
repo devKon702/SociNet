@@ -93,7 +93,7 @@ export const getDeviceType = (userAgent) => {
     return "Tablet";
   }
   if (
-    /Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(
+    /Mobile|iP(hone|od)|Android|okhttp|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(
       userAgent
     )
   ) {

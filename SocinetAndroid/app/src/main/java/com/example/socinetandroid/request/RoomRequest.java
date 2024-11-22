@@ -21,7 +21,7 @@ public class RoomRequest {
             String mimeType = activity.getContentResolver().getType(avatarUri);
             assert mimeType != null;
             RequestBody requestFile = RequestBody.create(MediaType.parse(mimeType), file);
-            this.avatarPart = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+            this.avatarPart = MultipartBody.Part.createFormData("avatarFile", file.getName(), requestFile);
         }
         this.namePart = RequestBody.create(MediaType.parse("multipart/form-data"), name);
     }

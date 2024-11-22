@@ -16,6 +16,7 @@ import com.example.socinetandroid.MyApplication;
 import com.example.socinetandroid.activity.RoomActivity;
 import com.example.socinetandroid.adapter.RealtimeChatAdapter;
 import com.example.socinetandroid.databinding.FragmentRoomChatBinding;
+import com.example.socinetandroid.dialog.CreateRoomBottomSheet;
 import com.example.socinetandroid.interfaces.IRealtimeChatListener;
 import com.example.socinetandroid.interfaces.IRetrofitResponseHandler;
 import com.example.socinetandroid.model.ApiResponse;
@@ -82,6 +83,10 @@ public class RoomChatFragment extends Fragment {
                     .stream()
                     .map(item -> new RealtimeChat(item.getRoom(), item.getNewMessage(), item.isHasUnread()))
                      .collect(Collectors.toList()));
+        });
+        bd.btnCreate.setOnClickListener(v -> {
+            CreateRoomBottomSheet dialog = new CreateRoomBottomSheet();
+            dialog.show(getParentFragmentManager(), dialog.getTag());
         });
     }
 }

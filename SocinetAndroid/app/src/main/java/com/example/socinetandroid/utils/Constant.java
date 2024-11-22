@@ -15,4 +15,6 @@ public class Constant {
 
     // SOCKET
     public static final String SOCKET_URL = "http://192.168.0.101:3000";
+    // GOOGLE
+    public static final String GOOGLE_CLIENT_ID = "1054565960382-t46uo0jlq7alsn1kb3k3f19guq2hbpvv.apps.googleusercontent.com";
 }

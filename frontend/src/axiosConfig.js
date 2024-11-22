@@ -2,7 +2,7 @@ import axios from "axios";
 import { refreshToken } from "./api/AuthService";
 import { signin, signout } from "./redux/authSlice";
 
-axios.defaults.baseURL = "http://localhost:8080";
+axios.defaults.baseURL = "http://localhost:8888";
 axios.defaults.withCredentials = true;
 
 export const setupInterceptors = (store) => {

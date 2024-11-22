@@ -69,5 +69,6 @@ dependencies {
         exclude(group = "org.json", module = "json")
     }
     implementation ("com.fasterxml.jackson.core:jackson-databind:2.13.0")
+    implementation ("com.google.android.gms:play-services-auth:21.2.0")
 
 }

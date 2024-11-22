@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.socinetandroid.MyApplication;
 import com.example.socinetandroid.databinding.BottomSheetUpdateRoomBinding;
 import com.example.socinetandroid.interfaces.IRetrofitResponseHandler;
 import com.example.socinetandroid.model.ApiResponse;
@@ -25,6 +26,7 @@ import com.example.socinetandroid.repository.config.RetrofitClient;
 import com.example.socinetandroid.request.RoomRequest;
 import com.example.socinetandroid.utils.FileSupporter;
 import com.example.socinetandroid.utils.Helper;
+import com.example.socinetandroid.viewmodel.AppViewModel;
 import com.example.socinetandroid.viewmodel.RoomViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
@@ -35,6 +37,7 @@ import retrofit2.Response;
 public class UpdateRoomBottomSheet extends BottomSheetDialogFragment {
     private BottomSheetUpdateRoomBinding bd;
     private RoomViewModel roomViewModel;
+    private AppViewModel appViewModel;
     private RoomRepository roomRepository;
     private Uri fileUri;
     private final ActivityResultLauncher<Intent> mActivityResultLauncher = registerForActivityResult(
@@ -70,6 +73,7 @@ public class UpdateRoomBottomSheet extends BottomSheetDialogFragment {
     }
 
     public void initialize(){
+        appViewModel = ((MyApplication) requireActivity().getApplication()).getAppViewModel();
         roomViewModel = new ViewModelProvider(requireActivity()).get(RoomViewModel.class);
         roomRepository = RetrofitClient.createInstance(getContext()).create(RoomRepository.class);
         Room currentRoom = roomViewModel.getLiveRoom().getValue();
@@ -90,6 +94,7 @@ public class UpdateRoomBottomSheet extends BottomSheetDialogFragment {
                         public void onSuccess(ApiResponse result) {
                             Room room = Helper.convertDataToType(result.getData(), Helper.getType(Room.class));
                             roomViewModel.setRoom(room);
+                            appViewModel.updateRoom(room);
                             dismiss();
                         }
 

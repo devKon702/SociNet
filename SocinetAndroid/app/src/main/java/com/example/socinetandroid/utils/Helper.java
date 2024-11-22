@@ -21,6 +21,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Date;
@@ -79,7 +80,7 @@ public class Helper {
                 .getString(key, null);
     }
 
-    public static void handleRetrofitResponse(Response<ApiResponse> response, IRetrofitResponseHandler handler){
+    public static void handleRetrofitResponse(Response<ApiResponse> response, IRetrofitResponseHandler handler) {
         if(response.body() != null){
             ApiResponse result = response.body();
             if(result.isSuccess()){
@@ -88,9 +89,13 @@ public class Helper {
                 handler.onFail(result);
             }
         }
-        else {
-            handler.onFail(convertDataToType(response.errorBody(), ApiResponse.class));
-            Log.e("API ERROR", response.toString());
+        else if(response.errorBody() != null){
+            try {
+                handler.onFail(gson.fromJson(response.errorBody().string(), ApiResponse.class));
+                Log.e("API ERROR", response.toString());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

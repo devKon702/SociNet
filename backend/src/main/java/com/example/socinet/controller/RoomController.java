@@ -50,7 +50,6 @@ public class RoomController {
                                         @RequestParam(required = false) MultipartFile avatarFile) throws Exception{
         RoomDto result = roomService.createRoom(name, null, avatarFile);
         return Helper.returnSuccessResponse("Create room success", result);
-
     }
 
     @PutMapping("{id}")

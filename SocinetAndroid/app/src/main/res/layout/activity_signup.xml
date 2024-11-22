@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.SignUpActivity">
-
+    tools:context=".activity.SignupActivity">
 
     <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="none">
@@ -17,18 +17,30 @@
             android:layout_height="wrap_content"
             android:paddingHorizontal="30dp"
             android:gravity="center_horizontal">
-            <ImageButton
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@drawable/circle_shape"
-                android:backgroundTint="@color/lightGray"
-                android:src="@drawable/ic_arrow_left"
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:layout_marginTop="20dp"/>
+                android:gravity="center"
+                android:layout_marginTop="20dp">
+                <ImageButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/circle_shape"
+                    android:backgroundTint="@color/lightGray"
+                    android:src="@drawable/ic_arrow_left"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Đã có tài khoản?"
+                    android:layout_marginLeft="10dp"/>
+            </LinearLayout>
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginBottom="50dp"
                 android:textSize="40sp"
                 android:textStyle="bold"
@@ -37,6 +49,7 @@
                 android:text="Đăng ký"/>
 
             <EditText
+                android:id="@+id/edtUsername"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="Tên đăng nhập"
@@ -44,6 +57,7 @@
                 android:gravity="center_vertical"/>
 
             <EditText
+                android:id="@+id/edtPassword"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="Mật khẩu"
@@ -53,6 +67,7 @@
                 android:inputType="textPassword"/>
 
             <EditText
+                android:id="@+id/edtConfirm"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="Xác nhận mật khẩu"
@@ -62,31 +77,33 @@
                 android:inputType="textPassword"/>
 
             <EditText
+                android:id="@+id/edtName"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="Tên hiển thị"
                 android:background="@drawable/input_shape"
                 android:layout_marginTop="20dp"
-                android:gravity="center_vertical"
-                android:inputType="textPassword"/>
+                android:gravity="center_vertical"/>
 
             <EditText
+                android:id="@+id/edtEmail"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="Email"
                 android:background="@drawable/input_shape"
                 android:layout_marginTop="20dp"
                 android:gravity="center_vertical"
-                android:inputType="textPassword"/>
+                android:inputType="textEmailAddress"/>
 
             <EditText
+                android:id="@+id/edtOtp"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="OTP"
                 android:background="@drawable/input_shape"
                 android:layout_marginTop="20dp"
                 android:gravity="center_vertical"
-                android:inputType="textPassword"/>
+                android:inputType="number"/>
 
 
 
@@ -95,16 +112,18 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical">
                 <TextView
+                    android:id="@+id/tvOtp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Chưa nhận được OTP?"/>
+                    android:text=""/>
                 <TextView
+                    android:id="@+id/tvGetOtp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="10dp"
                     android:textStyle="bold"
                     android:textColor="@color/green"
-                    android:text="Gửi lại"/>
+                    android:text="Nhận mã OTP"/>
             </LinearLayout>
 
             <com.google.android.material.button.MaterialButton
@@ -116,26 +135,8 @@
                 app:cornerRadius="10dp"
                 android:paddingVertical="10dp"
                 android:layout_marginTop="10dp"
-                android:textSize="20sp" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="40dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Đã có tài khoản?"/>
-                <TextView
-                    android:id="@+id/tvLogin"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="10dp"
-                    android:textStyle="bold"
-                    android:textColor="@color/orange"
-                    android:text="@string/login_title"/>
-            </LinearLayout>
+                android:textSize="20sp"
+                android:layout_marginBottom="40dp"/>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

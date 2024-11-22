@@ -33,7 +33,7 @@ public interface RoomRepository {
                                  @Part("name")RequestBody name,
                                  @Part MultipartBody.Part avatarFile);
 
-    @DELETE("room/{id}")
+    @DELETE("rooms/{id}")
     Call<ApiResponse> deleteRoom(@Path("id") long roomId);
     @POST("rooms/{id}/invite")
     Call<ApiResponse> invite(@Path("id") long roomId, @Query("usersId") List<Long> usersId);

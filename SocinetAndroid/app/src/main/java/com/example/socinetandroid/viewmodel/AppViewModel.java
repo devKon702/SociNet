@@ -234,6 +234,15 @@ public class AppViewModel extends ViewModel {
             liveNewestRoomsActivity.postValue(activity);
         }
     }
+    public void updateRoom(Room room){
+        for(RealtimeRoom item : liveRealtimeRoomList.getValue()){
+            if(item.getRoom().getId() == room.getId()){
+                item = new RealtimeRoom(room, "", false);
+                liveRealtimeRoomList.postValue(new ArrayList<>(liveRealtimeRoomList.getValue()));
+                return;
+            }
+        }
+    }
     public void quitRoom(long roomId){
         for(int i=0; i<liveRealtimeRoomList.getValue().size(); i++){
             if(liveRealtimeRoomList.getValue().get(i).getRoom().getId() == roomId){

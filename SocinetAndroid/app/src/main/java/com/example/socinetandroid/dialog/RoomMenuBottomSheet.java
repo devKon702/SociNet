@@ -77,6 +77,7 @@ public class RoomMenuBottomSheet extends BottomSheetDialogFragment {
         if(currentRoom.isAdmin()){
             bd.btnQuit.setText("Giải tán");
         } else{
+            bd.btnUpdate.setVisibility(View.GONE);
             bd.btnQuit.setText("Rời nhóm");
             bd.btnAddMember.setVisibility(View.GONE);
         }
