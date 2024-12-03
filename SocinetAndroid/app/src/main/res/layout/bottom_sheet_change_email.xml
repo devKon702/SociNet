@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingHorizontal="20dp"
+    android:orientation="vertical"
+    android:paddingBottom="20dp"
+    tools:context=".dialog.ChangeEmailBottomSheet">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đổi email"
+        android:textSize="32sp"
+        android:gravity="center"/>
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginBottom="20dp"/>
+    <EditText
+        android:id="@+id/edtEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/input_shape"
+        android:hint="Nhập địa chỉ email"
+        android:text=""
+        android:paddingVertical="10dp"
+        android:layout_marginBottom="20dp"/>
+    <EditText
+        android:id="@+id/edtOtp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/input_shape"
+        android:hint="Nhập mã OTP"
+        android:text=""
+        android:paddingVertical="10dp"
+        android:inputType="number"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_gravity="start">
+        <TextView
+            android:id="@+id/tvOtp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:paddingVertical="8dp"/>
+        <TextView
+            android:id="@+id/tvGetOtp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textStyle="bold"
+            android:textColor="@color/green"
+            android:text="Nhận mã OTP"
+            android:visibility="visible"/>
+    </LinearLayout>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnChange"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Thay đổi"
+        android:textColor="@color/white"
+        android:backgroundTint="@color/green"
+        android:layout_gravity="end"/>
+</LinearLayout>

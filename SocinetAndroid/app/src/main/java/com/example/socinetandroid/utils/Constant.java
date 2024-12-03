@@ -2,7 +2,7 @@ package com.example.socinetandroid.utils;
 
 public class Constant {
     // API
-    public static final String BASE_API_URL = "http://192.168.0.101:8080/api/v1/";
+    public static final String BASE_API_URL = "http://192.168.0.101:8888/api/v1/";
     // Token
     public static final String TOKEN_SHARED_PREFS_FILE = "private_prefs";
     public static final String ACCESS_TOKEN_KEY = "access_token";

@@ -10,8 +10,11 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 
 
+import com.example.socinetandroid.interfaces.IGetIpInfoHandler;
 import com.example.socinetandroid.interfaces.IRetrofitResponseHandler;
 import com.example.socinetandroid.model.ApiResponse;
+import com.example.socinetandroid.model.IPResponse;
+import com.example.socinetandroid.repository.IpRepository;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.gson.Gson;
@@ -26,8 +29,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Helper {
     private static final Gson gson = new Gson();
@@ -139,5 +147,58 @@ public class Helper {
             e.printStackTrace();
             return null;  // Trả về null nếu có lỗi
         }
+    }
+
+    public static void getIpInfo(String ip, IGetIpInfoHandler handler){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://ip-api.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        IpRepository service = retrofit.create(IpRepository.class);
+        Call<IPResponse> call;
+
+        if (ip != null && !ip.isEmpty()) {
+            call = service.getIpInfo(ip);
+        } else {
+            call = service.getCurrentIpInfo("61439");
+        }
+
+        call.enqueue(new Callback<IPResponse>() {
+            @Override
+            public void onResponse(Call<IPResponse> call, Response<IPResponse> response) {
+                if (response.isSuccessful()) {
+                    IPResponse result = response.body();
+                    handler.onSuccess(result);
+                } else {
+                    handler.onFail();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<IPResponse> call, Throwable t) {
+                Log.e("IP", t.getMessage());
+            }
+        });
+    }
+    public static String getDeviceType(String userAgent) {
+        if (userAgent == null || userAgent.isEmpty()) {
+            return "Unknown";
+        }
+
+        // Kiểm tra Tablet
+        String tabletRegex = ".*(tablet|ipad|playbook|silk)|(android(?!.*mobi)).*";
+        if (Pattern.compile(tabletRegex, Pattern.CASE_INSENSITIVE).matcher(userAgent).matches()) {
+            return "Tablet";
+        }
+
+        // Kiểm tra Mobile
+        String mobileRegex = ".*(Mobile|iP(hone|od)|Android|okhttp|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)).*";
+        if (Pattern.compile(mobileRegex, Pattern.CASE_INSENSITIVE).matcher(userAgent).matches()) {
+            return "Mobile";
+        }
+
+        // Mặc định là PC
+        return "PC";
     }
 }

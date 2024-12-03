@@ -48,6 +48,7 @@
             android:orientation="vertical"
             android:background="@drawable/shape_rounded_white">
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnChangeEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
@@ -66,6 +67,7 @@
                 android:layout_height="2dp"/>
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnChangePassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
@@ -84,6 +86,7 @@
                 android:layout_height="2dp"/>
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLoginSession"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"

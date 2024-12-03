@@ -16,13 +16,17 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.socinetandroid.MyApplication;
 import com.example.socinetandroid.R;
 import com.example.socinetandroid.databinding.ActivityMainBinding;
+import com.example.socinetandroid.databinding.BottomSheetSearchUserBinding;
+import com.example.socinetandroid.dialog.SearchUserBottomSheet;
 import com.example.socinetandroid.enums.RealtimeStatus;
 import com.example.socinetandroid.fragment.AccountFragment;
 import com.example.socinetandroid.fragment.HomeFragment;
 import com.example.socinetandroid.fragment.InvitationFragment;
+import com.example.socinetandroid.interfaces.IGetIpInfoHandler;
 import com.example.socinetandroid.interfaces.IRefreshTokenHandler;
 import com.example.socinetandroid.interfaces.IRetrofitResponseHandler;
 import com.example.socinetandroid.model.ApiResponse;
+import com.example.socinetandroid.model.IPResponse;
 import com.example.socinetandroid.model.RealtimeChat;
 import com.example.socinetandroid.model.RealtimeRoom;
 import com.example.socinetandroid.model.RealtimeUser;
@@ -147,9 +151,23 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("API", throwable.getMessage());
             }
         });
+        Helper.getIpInfo(null, new IGetIpInfoHandler() {
+            @Override
+            public void onSuccess(IPResponse response) {
+                appViewModel.getLiveIp().setValue(response.getQuery());
+            }
+
+            @Override
+            public void onFail() {
+            }
+        });
     }
 
     private void setEvent(){
+        binding.ivSearch.setOnClickListener(v -> {
+            SearchUserBottomSheet dialog = new SearchUserBottomSheet();
+            dialog.show(getSupportFragmentManager(), dialog.getTag());
+        });
         binding.bottomNavigation.setOnItemSelectedListener(item -> {
             if(item.getItemId() == R.id.navigation_home){
                 switchFragment(new HomeFragment(), HomeFragment.TAG);

@@ -56,7 +56,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ProfileActivity extends AppCompatActivity implements IPostListener {
+public class ProfileActivity extends AppCompatActivity implements IPostListener  {
     public static final String USER_ID = "UserId";
 
     private ActivityProfileBinding bd;
@@ -433,5 +433,12 @@ public class ProfileActivity extends AppCompatActivity implements IPostListener 
     public void onShareClick(RecyclerView.ViewHolder holder, Post post) {
         SharePostBottomSheet dialog = new SharePostBottomSheet(post);
         dialog.show(getSupportFragmentManager(), dialog.getTag());
+    }
+
+    @Override
+    public void onUserClick(Post post) {
+        Intent intent = new Intent(this, ProfileActivity.class);
+        intent.putExtra(USER_ID, post.getUser().getId());
+        startActivity(intent);
     }
 }

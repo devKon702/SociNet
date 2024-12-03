@@ -1,5 +1,6 @@
 package com.example.socinetandroid.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.socinetandroid.MyApplication;
+import com.example.socinetandroid.activity.ProfileActivity;
 import com.example.socinetandroid.adapter.PostAdapter;
 import com.example.socinetandroid.databinding.FragmentHomeBinding;
 import com.example.socinetandroid.dialog.CommentBottomSheet;
@@ -218,5 +220,12 @@ public class HomeFragment extends Fragment implements IPostListener{
     public void onShareClick(RecyclerView.ViewHolder holder, Post post) {
         SharePostBottomSheet dialog = new SharePostBottomSheet(post);
         dialog.show(requireActivity().getSupportFragmentManager(), dialog.getTag());
+    }
+
+    @Override
+    public void onUserClick(Post post) {
+        Intent intent = new Intent(getContext(), ProfileActivity.class);
+        intent.putExtra(ProfileActivity.USER_ID, post.getUser().getId());
+        startActivity(intent);
     }
 }

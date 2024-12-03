@@ -22,8 +22,8 @@ import { removeAllListenersExcept } from "./helper";
 import { getUserInfo } from "./api/UserService";
 import { getRoom } from "./api/RoomService";
 
-const USER_URL = "http://localhost:3000";
-const ADMIN_URL = "http://localhost:3000/admin";
+const USER_URL = import.meta.env.VITE_SOCKET_BASE;
+const ADMIN_URL = `${import.meta.env.VITE_SOCKET_BASE}/admin`;
 
 export const socket = io(USER_URL, {
   autoConnect: false,

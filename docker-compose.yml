@@ -1,0 +1,192 @@
+services:
+  frontend:
+    image: frontend
+    container_name: frontend
+    build:
+      context: ./frontend
+    ports:
+      - "80:5173"
+    networks:
+      - socinet-network
+    environment:
+      # - VITE_API_BASE=http://localhost:8888
+      - VITE_API_BASE=http://localhost:88
+      - VITE_SOCKET_BASE=http://localhost:3000
+    depends_on:
+      - api-gateway
+      - socket-server
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    networks:
+      - socinet-network
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "88:80"  # Truy cập từ bên ngoài qua port 80
+    depends_on:
+      - frontend
+      - api-gateway
+    
+
+  api-gateway:
+    container_name: api-gateway
+    image: api-gateway
+    build:
+      context: ./microservice/ApiGateway
+    ports:
+      - "8888:8888"
+    networks:
+      - socinet-network
+    environment:
+      - ALLOWED_ORIGIN=http://nginx
+      # - ALLOWED_ORIGIN=http://localhost:5173
+      - AUTH_SERVICE=http://auth-service:8081
+      - USER_SERVICE=http://user-service:8082
+      - POST_SERVICE=http://post-service:8083
+      - CHAT_SERVICE=http://chat-service:8084
+      - ADMIN_SERVICE=http://admin-service:8085
+    depends_on:
+      - auth-service
+      - user-service
+      - post-service
+      - chat-service
+      - admin-service
+
+  auth-service:
+    image: auth-service
+    container_name: auth-service
+    build:
+      context: ./microservice/AuthService
+    ports:
+      - "8081:8081"
+    networks:
+      - socinet-network
+    environment:
+      - DB_CONNECTION=jdbc:mysql://mysql:3306/socialnet
+      - DB_USERNAME=root
+      - DB_PASSWORD=123456
+      - MAIL_USERNAME=nnk070dev@gmail.com
+      - MAIL_PASSWORD=mexdvjhalbdcywoj
+    depends_on:
+      - mysql
+
+  user-service:
+    image: user-service
+    container_name: user-service
+    build:
+      context: ./microservice/UserService
+    ports:
+      - "8082:8082"
+    networks:
+      - socinet-network
+    environment:
+      - DB_CONNECTION=jdbc:mysql://mysql:3306/socialnet
+      - DB_USERNAME=root
+      - DB_PASSWORD=123456
+      - MAIL_USERNAME=nnk070dev@gmail.com
+      - MAIL_PASSWORD=mexdvjhalbdcywoj
+    depends_on:
+      - mysql
+    
+  post-service:
+    image: post-service
+    container_name: post-service
+    build:
+      context: ./microservice/PostService
+    ports:
+      - "8083:8083"
+    networks:
+      - socinet-network
+    environment:
+      - DB_CONNECTION=jdbc:mysql://mysql:3306/socialnet
+      - DB_USERNAME=root
+      - DB_PASSWORD=123456
+      - MAIL_USERNAME=nnk070dev@gmail.com
+      - MAIL_PASSWORD=mexdvjhalbdcywoj
+      - FIREBASE_KEY_PATH=/app/firebase-secret.json
+    depends_on:
+      - mysql
+
+  chat-service:
+    image: chat-service
+    container_name: chat-service
+    build:
+      context: ./microservice/ChatService
+    ports:
+      - "8084:8084"
+    networks:
+      - socinet-network
+    environment:
+      - DB_CONNECTION=jdbc:mysql://mysql:3306/socialnet
+      - DB_USERNAME=root
+      - DB_PASSWORD=123456
+      - MAIL_USERNAME=nnk070dev@gmail.com
+      - MAIL_PASSWORD=mexdvjhalbdcywoj
+    depends_on:
+      - mysql
+
+  admin-service:
+    image: admin-service
+    container_name: admin-service
+    build:
+      context: ./microservice/AdminService
+    ports:
+      - "8085:8085"
+    networks:
+      - socinet-network
+    environment:
+      - DB_CONNECTION=jdbc:mysql://mysql:3306/socialnet
+      - DB_USERNAME=root
+      - DB_PASSWORD=123456
+      - MAIL_USERNAME=nnk070dev@gmail.com
+      - MAIL_PASSWORD=mexdvjhalbdcywoj
+    depends_on:
+      - mysql
+
+  socket-server:
+    image: socket-server
+    container_name: socket-server
+    build:
+      context: ./socket-server
+    ports:
+      - "3000:3000"
+    networks:
+      - socinet-network
+    environment:
+      - FRONTEND_ORIGIN=http://localhost
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASS=123456
+      - DB_DATABASE=socialnet
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:9.1.0
+    container_name: mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s      # Kiểm tra mỗi 10 giây
+      timeout: 5s        # Thời gian chờ mỗi lần kiểm tra
+      retries: 5         # Thử lại tối đa 5 lần
+    ports:
+      - "3307:3306"
+    networks:
+      - socinet-network
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=socialnet
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:
+    driver: local
+
+networks:
+  socinet-network:
+    driver: bridge

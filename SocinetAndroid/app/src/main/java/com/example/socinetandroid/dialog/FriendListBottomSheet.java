@@ -50,9 +50,10 @@ public class FriendListBottomSheet extends BottomSheetDialogFragment {
         userAdapter = new UserAdapter(mUserList, UserAdapter.HORIZONTAL_ITEM, new IUserListener() {
             @Override
             public void onItemClick(User user) {
-                dismiss();
                 Intent intent = new Intent(getContext(), ProfileActivity.class);
+                intent.putExtra(ProfileActivity.USER_ID, user.getId());
                 startActivity(intent);
+                dismiss();
             }
         });
         bd.rcvUser.setLayoutManager(new GridLayoutManager(getContext(), 1, GridLayoutManager.VERTICAL, false));

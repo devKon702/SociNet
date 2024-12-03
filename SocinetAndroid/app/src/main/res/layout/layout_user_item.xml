@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layoutItem"
+    android:gravity="center"
+    android:paddingVertical="10dp"
+    android:paddingHorizontal="20dp">
+    <androidx.cardview.widget.CardView
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        app:cardCornerRadius="1000dp">
+        <ImageView
+            android:id="@+id/ivAvatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/unknown_avatar"
+            android:scaleType="centerCrop"/>
+    </androidx.cardview.widget.CardView>
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="24sp"
+        android:text="Nguyễn Nhật Kha"
+        android:textColor="@color/black"
+        android:layout_marginStart="10dp"/>
+</LinearLayout>

@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.socinetandroid.enums.RealtimeStatus;
+import com.example.socinetandroid.model.Account;
 import com.example.socinetandroid.model.Conversation;
 import com.example.socinetandroid.model.Invitation;
 import com.example.socinetandroid.model.RealtimeChat;
@@ -19,7 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AppViewModel extends ViewModel {
-    private final MutableLiveData<User> liveUser = new MutableLiveData<>();
+    private final MutableLiveData<Account> liveAccount = new MutableLiveData<>();
+    private final MutableLiveData<String> liveIp = new MutableLiveData<>();
     private final MutableLiveData<List<Long>> liveFriendByUserIdList = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<Integer> liveNewMessageNumber = new MutableLiveData<>(0);
     private final MutableLiveData<List<Conversation>> liveNewConversationList = new MutableLiveData<>(new ArrayList<>());
@@ -33,14 +35,26 @@ public class AppViewModel extends ViewModel {
     private final MutableLiveData<RoomsActivity> liveNewestRoomsActivity = new MutableLiveData<>();
     private final MutableLiveData<Invitation> liveNewestFriendInvitation = new MutableLiveData<>();
 
-    public MutableLiveData<User> getLiveUser() {
-        return liveUser;
+    public MutableLiveData<String> getLiveIp() {
+        return liveIp;
+    }
+
+    public MutableLiveData<Account> getLiveAccount() {
+        return liveAccount;
     }
     public User getUser(){
-        return liveUser.getValue();
+        return liveAccount.getValue() == null ? null : liveAccount.getValue().getUser();
+    }
+    public Account getAccount(){
+        return liveAccount.getValue();
     }
     public void setUser(@NonNull User user){
-        liveUser.postValue(user);
+        if(liveAccount.getValue() == null) return;
+        liveAccount.getValue().setUser(user);
+        liveAccount.postValue(liveAccount.getValue());
+    }
+    public void setAccount(@NonNull Account account){
+        this.liveAccount.postValue(account);
     }
 
     public MutableLiveData<Integer> getLiveNewMessageNumber() {
@@ -161,7 +175,7 @@ public class AppViewModel extends ViewModel {
 
     public void newConversation(@NonNull Conversation conversation){
         liveNewestConversation.postValue(conversation);
-        if(conversation.getSenderId() == liveUser.getValue().getId()){
+        if(conversation.getSenderId() == liveAccount.getValue().getUser().getId()){
             return;
         } else {
             // neu sender có trong list user nhắn tin

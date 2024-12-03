@@ -1,6 +1,7 @@
 package com.example.socinetandroid.repository;
 
 import com.example.socinetandroid.model.ApiResponse;
+import com.example.socinetandroid.model.IPResponse;
 import com.example.socinetandroid.request.SignUpRequest;
 
 import java.util.Map;
@@ -17,7 +18,7 @@ import retrofit2.http.Query;
 
 public interface AuthRepository {
     @POST("auth/sign-in")
-    Call<ApiResponse> signIn(@Body Map<String, String> body);
+    Call<ApiResponse> signIn(@Body Map<String, String> body, @Query("ip")String ip);
     @GET("auth/refresh-token")
     Call<ApiResponse> refreshToken();
     @POST("auth/sign-up")
@@ -36,5 +37,6 @@ public interface AuthRepository {
     Call<ApiResponse> loginWithGoogle(@Field("email") String email,
                                       @Field("googleId") String googleId,
                                       @Field("name") String name,
-                                      @Field("avatarUrl") String avatarUrl);
+                                      @Field("avatarUrl") String avatarUrl,
+                                      @Field("ip") String ip);
 }

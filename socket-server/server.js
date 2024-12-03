@@ -1,4 +1,5 @@
 const express = require("express");
+require("dotenv").config();
 const http = require("http");
 const { connect } = require("http2");
 const { Server } = require("socket.io");
@@ -8,7 +9,7 @@ const PORT = 3000;
 // const server = http.createServer(app);
 const io = new Server({
   cors: {
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_ORIGIN,
   },
 });
 

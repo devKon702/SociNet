@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingVertical="20dp"
+    android:paddingHorizontal="10dp"
+    android:id="@+id/layoutSearchUser"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".dialog.SearchUserBottomSheet">
+
+    <EditText
+        android:id="@+id/edtSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/input_shape"
+        android:hint="Nhập tên người dùng..."
+        android:textSize="30sp"
+        android:paddingVertical="10dp"/>
+
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginVertical="10dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcvUser"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+</LinearLayout>

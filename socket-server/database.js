@@ -1,15 +1,16 @@
 const mysql = require("mysql2");
-
-const HOST = "localhost";
-const USER = "root";
-const PASS = "123456";
-const DATABASE = "socialnet";
+require("dotenv").config();
+const HOST = process.env.DB_HOST;
+const PORT = process.env.DB_PORT;
+const USER = process.env.DB_USER;
+const PASS = process.env.DB_PASS;
+const DATABASE = process.env.DB_DATABASE;
 const connection = mysql.createConnection({
   host: HOST,
   user: USER,
   password: PASS,
   database: DATABASE,
-  port: 3306,
+  port: PORT,
 });
 connection.connect((err) => {
   if (err) {

@@ -87,7 +87,7 @@ public class TokenManager {
                     // Save user info
 //                    GlobalData.user = auth.getAccount().getUser();
                     AppViewModel appViewModel = ((MyApplication) context.getApplicationContext()).getAppViewModel();
-                    appViewModel.getLiveUser().setValue(auth.getAccount().getUser());
+                    appViewModel.getLiveAccount().setValue(auth.getAccount());
                     iRefreshTokenHandler.handleSuccess();
                 } else {
                     iRefreshTokenHandler.handleFail();

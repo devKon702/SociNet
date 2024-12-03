@@ -267,7 +267,7 @@ public class SocketManager {
     }
 
     public void newInvitation(Invitation invitation){
-        socket.emit(SocketEvent.NEW_INVITATION.getString(), invitation, Helper.toJsonObject(invitation.getSender()), invitation.getReceiver().getId());
+        socket.emit(SocketEvent.NEW_INVITATION.getString(), Helper.toJsonObject(invitation), Helper.toJsonObject(invitation.getSender()), invitation.getReceiver().getId());
     }
 
     public void responseInvitation(long senderId, boolean isAccept){

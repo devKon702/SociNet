@@ -10,11 +10,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.socinetandroid.MyApplication;
 import com.example.socinetandroid.databinding.ActivityLoginBinding;
 import com.example.socinetandroid.dialog.ForgotPasswordBottomSheet;
+import com.example.socinetandroid.interfaces.IGetIpInfoHandler;
 import com.example.socinetandroid.interfaces.IRetrofitResponseHandler;
 import com.example.socinetandroid.model.ApiResponse;
 import com.example.socinetandroid.model.Auth;
+import com.example.socinetandroid.model.IPResponse;
 import com.example.socinetandroid.repository.AuthRepository;
-import com.example.socinetandroid.repository.UserRepository;
 import com.example.socinetandroid.repository.config.RetrofitClient;
 import com.example.socinetandroid.utils.Helper;
 import com.example.socinetandroid.utils.SocketManager;
@@ -27,8 +28,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,6 +44,7 @@ public class LoginActivity extends AppCompatActivity {
     private AppViewModel appViewModel;
     private GoogleSignInOptions gso;
     private GoogleSignInClient gsc;
+    private String currentIp;
 
 
     @Override
@@ -67,6 +67,18 @@ public class LoginActivity extends AppCompatActivity {
                 .build();
         gsc = GoogleSignIn.getClient(this, gso);
         gsc.signOut().addOnCompleteListener(task -> {});
+        Helper.getIpInfo(null, new IGetIpInfoHandler() {
+            @Override
+            public void onSuccess(IPResponse response) {
+                currentIp = response.getQuery();
+                appViewModel.getLiveIp().setValue(currentIp);
+            }
+
+            @Override
+            public void onFail() {
+                Toast.makeText(LoginActivity.this, "Lấy địa chỉ ip thất bại", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setEvent() {
@@ -77,14 +89,14 @@ public class LoginActivity extends AppCompatActivity {
             Map<String, String> requestBody = new HashMap<>();
             requestBody.put("username", username);
             requestBody.put("password", password);
-            authRepository.signIn(requestBody).enqueue(new Callback<ApiResponse>() {
+            authRepository.signIn(requestBody, currentIp).enqueue(new Callback<ApiResponse>() {
                 @Override
                 public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                     Helper.handleRetrofitResponse(response, new IRetrofitResponseHandler(){
                         @Override
                         public void onSuccess(ApiResponse result) {
                             Auth auth = Helper.convertDataToType(result.getData(), Helper.getType(Auth.class));
-                            appViewModel.setUser(auth.getAccount().getUser());
+                            appViewModel.setAccount(auth.getAccount());
                             tokenManager.saveAccessToken(auth.getAccessToken());
 
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
@@ -150,14 +162,14 @@ public class LoginActivity extends AppCompatActivity {
             String name = account.getDisplayName();
             String email = account.getEmail();
             String avatarUrl = account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : null;
-            authRepository.loginWithGoogle(email,googleId,name, avatarUrl).enqueue(new Callback<ApiResponse>() {
+            authRepository.loginWithGoogle(email,googleId,name, avatarUrl, currentIp).enqueue(new Callback<ApiResponse>() {
                 @Override
                 public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                     Helper.handleRetrofitResponse(response, new IRetrofitResponseHandler() {
                         @Override
                         public void onSuccess(ApiResponse result) {
                             Auth auth = Helper.convertDataToType(result.getData(), Helper.getType(Auth.class));
-                            appViewModel.setUser(auth.getAccount().getUser());
+                            appViewModel.setAccount(auth.getAccount());
                             tokenManager.saveAccessToken(auth.getAccessToken());
 
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);

@@ -10,4 +10,5 @@ public interface IPostListener {
     boolean onReactLongClick(RecyclerView.ViewHolder holder, Post post);
     void onCommentClick(RecyclerView.ViewHolder holder, Post post);
     void onShareClick(RecyclerView.ViewHolder holder, Post post);
+    void onUserClick(Post post);
 }

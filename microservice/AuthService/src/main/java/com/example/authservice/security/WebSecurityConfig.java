@@ -5,6 +5,7 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -75,29 +76,15 @@ public class WebSecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-
 //    @Bean
 //    public CorsFilter corsFilter() {
 //        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 //        CorsConfiguration config = new CorsConfiguration();
 //        config.setAllowCredentials(true);
-//        config.addAllowedOrigin("*");
+//        config.addAllowedOrigin(*);
 //        config.addAllowedHeader("*");
 //        config.addAllowedMethod("*");
 //        source.registerCorsConfiguration("/**", config);
 //        return new CorsFilter(source);
 //    }
-
-    @Bean
-    public FirebaseApp initializeFirebaseApp() throws Exception{
-        Resource resource = new ClassPathResource("firebase-secret.json");
-        InputStream serviceAccount = resource.getInputStream();
-
-        FirebaseOptions options = FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .setStorageBucket("socinet-6cfdd.appspot.com")
-                .build();
-
-        return FirebaseApp.initializeApp(options);
-    }
 }

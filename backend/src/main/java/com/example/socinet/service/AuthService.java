@@ -103,6 +103,7 @@ public class AuthService {
             if(refreshTokenOpt.isPresent()){
                 // Cập nhật
                 refreshTokenOpt.get().setToken(refreshToken);
+                refreshTokenOpt.get().setUserAgent(userAgent);
                 refreshTokenRepo.save(refreshTokenOpt.get());
             } else{
                 // Tạo mới
