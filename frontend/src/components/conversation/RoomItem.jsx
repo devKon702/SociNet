@@ -18,7 +18,9 @@ const RoomItem = ({ room }) => {
         />
       </div>
       <div>
-        <p className="font-bold">{room.name}</p>
+        <p className="font-bold text-nowrap text-ellipsis" title={room.name}>
+          {room.name}
+        </p>
         <p className="opacity-50 font-bold">
           {room.hasUnreadMessage && "Tin nhắn mới"}
         </p>

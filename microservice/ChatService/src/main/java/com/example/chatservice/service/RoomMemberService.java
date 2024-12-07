@@ -79,8 +79,8 @@ public class RoomMemberService {
         return activityDtoList;
     }
 
-    public RoomActivityDto kickMember(Long memberId) throws Exception{
-        RoomMember member = roomMemberRepository.findById(memberId).orElseThrow(() -> new Exception("MEMBER NOT EXIST"));
+    public RoomActivityDto kickMember(Long userId, Long roomId) throws Exception{
+        RoomMember member = roomMemberRepository.findByUser_IdAndRoom_Id(userId, roomId).orElseThrow(() -> new Exception("MEMBER NOT EXIST"));
         if(roomMemberRepository.existsByUser_IdAndRoom_IdAndIsAdminTrue(Helper.getUserId(), member.getRoom().getId())){
             if(member.getUser().getId() == Helper.getUserId()) throw new Exception("CANNOT KICK YOURSELF");
             roomMemberRepository.delete(member);

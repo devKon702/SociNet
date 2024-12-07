@@ -46,7 +46,7 @@ const UpdatePostDialog = ({ handleClose, post }) => {
   return (
     <Dialog handleClose={handleClose} title="Chỉnh sửa bài viết">
       <>
-        <div className="p-4 flex-1 w-[550px] overflow-auto custom-scroll">
+        <div className="p-4 flex-1 w-full md:w-[550px] overflow-auto custom-scroll">
           <div className="flex items-center gap-3 my-2">
             <div className="rounded-full overflow-hidden size-10">
               <img
@@ -66,7 +66,7 @@ const UpdatePostDialog = ({ handleClose, post }) => {
           />
           <div>
             {fileSrc && (
-              <div className="w-full h-[200px] relative">
+              <div className="relative w-fit mx-auto">
                 {(isImage(fileSrc) ||
                   fileInputRef.current?.files[0]?.type.startsWith(
                     "image/"
@@ -74,14 +74,14 @@ const UpdatePostDialog = ({ handleClose, post }) => {
                   <img
                     src={fileSrc}
                     alt=""
-                    className="object-cover w-full h-full"
+                    className="object-cover w-full h-full max-h-[400px] rounded-lg"
                   />
                 )}
                 {(isVideo(fileSrc) ||
                   fileInputRef.current?.files[0]?.type.startsWith(
                     "video/"
                   )) && (
-                  <video controls className="w-full h-full">
+                  <video controls className="max-w-full max-h-full">
                     <source src={fileSrc} />
                   </video>
                 )}

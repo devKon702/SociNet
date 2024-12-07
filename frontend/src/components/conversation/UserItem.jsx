@@ -28,7 +28,9 @@ const UserItem = ({ user }) => {
         ></div>
       </div>
       <div>
-        <p className="font-bold">{user.name}</p>
+        <p className="font-bold text-nowrap text-ellipsis" title={user.name}>
+          {user.name}
+        </p>
         <p className="opacity-50 font-bold">
           {user.hasUnreadMessage && "Tin nhắn mới"}
         </p>

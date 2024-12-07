@@ -9,11 +9,13 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoomMemberDto {
+    Long id;
     UserDto user;
     @JsonProperty("isAdmin")
     boolean isAdmin;
 
     public RoomMemberDto(RoomMember member){
+        this.id = member.getId();
         this.user = new UserDto(member.getUser());
         this.isAdmin = member.isAdmin();
     }

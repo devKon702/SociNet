@@ -6,9 +6,11 @@ import {
   realtimeRoomSelector,
 } from "../../redux/selectors";
 import { setConversationFilter } from "../../redux/realtimeSlice";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import RoomItem from "../conversation/RoomItem";
 import CreateRoomDialog from "../dialog/CreateRoomDialog";
+import { ClickAwayListener, Collapse } from "@mui/material";
+import { useWindowSize } from "@uidotdev/usehooks";
 
 const ConversationLayout = () => {
   const realtimeFriends = useSelector(realtimeFriendSelector);
@@ -17,7 +19,13 @@ const ConversationLayout = () => {
   const [page, setPage] = useState(
     location.pathname.includes("room") ? "room" : "conversation"
   );
+  const [showMenu, setShowMenu] = useState(true);
+  const windowSize = useWindowSize();
   const dispatch = useDispatch();
+  useEffect(() => {
+    // if (windowSize.width >= 768) setShowMenu(true);
+    // else setShowMenu(false);
+  }, [windowSize]);
 
   return (
     <>
@@ -27,7 +35,19 @@ const ConversationLayout = () => {
         ></CreateRoomDialog>
       )}
       <div className="flex h-screen md:py-6 md:px-8 justify-center items-center gap-6 text-gray-800 bg-lightGray">
-        <section className="flex flex-col rounded-xl md:w-3/12 h-full bg-white overflow-hidden p-2 gap-2 fixed md:relative left-0 w-[250px] z-10">
+        <section
+          className={`md:w-3/12 md:flex md:flex-col md:p-2 rounded-xl h-full bg-white gap-2 fixed md:relative left-0 z-10 transition-all duration-500 ${
+            showMenu ? "flex flex-col w-[300px] p-2" : "w-0 overflow-hidden"
+          }`}
+        >
+          {windowSize.width <= 768 && (
+            <div
+              className="h-14 rounded-tr-xl rounded-br-xl absolute top-1/2 left-full bg-gray-500 flex items-center justify-end hover:w-6 hover:duration-500 duration-500 cursor-pointer"
+              onClick={() => setShowMenu(false)}
+            >
+              <i className="bx bx-chevron-left text-white"></i>
+            </div>
+          )}
           {/* Header */}
           <Link
             to={"/home"}
@@ -93,7 +113,7 @@ const ConversationLayout = () => {
           {page === "room" && (
             <>
               <div
-                className="p-2 bg-green-400 text-white font-bold rounded-lg flex justify-center mx-auto cursor-pointer w-full"
+                className="p-2 bg-green-400 text-white font-bold rounded-lg flex justify-center mx-auto cursor-pointer w-full text-nowrap"
                 onClick={() => setAction("create room")}
               >
                 Tạo nhóm
@@ -107,7 +127,13 @@ const ConversationLayout = () => {
           )}
         </section>
         <section className="rounded-xl flex-1 h-full overflow-hidden">
-          <Outlet></Outlet>
+          <Outlet
+            context={{
+              toggleMenu: () => {
+                setShowMenu(!showMenu);
+              },
+            }}
+          ></Outlet>
         </section>
       </div>
     </>

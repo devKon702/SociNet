@@ -38,7 +38,7 @@ const InviteMemberDialog = ({ handleClose }) => {
   return (
     <Dialog handleClose={handleClose} title="Mời tham gia">
       <>
-        <div className="w-full md:w-[550px] grid grid-cols-2 p-3 gap-3">
+        <div className="w-full md:w-[550px] grid md:grid-cols-2 p-3 gap-3">
           {joinableFriends.map((item, index) => (
             <FriendItem
               handleCheck={() => handleCheck(item.id)}

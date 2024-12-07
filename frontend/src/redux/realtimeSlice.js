@@ -25,6 +25,7 @@ import {
 } from "../api/RoomService";
 import { refreshToken } from "../api/AuthService";
 import { signin } from "./authSlice";
+import { navigateTo } from "../navigator";
 
 const realtimeSlice = createSlice({
   name: "realtime",
@@ -241,6 +242,26 @@ const realtimeSlice = createSlice({
 
         state.roomActivity.activities.unshift(activity);
       }
+    },
+    newRealtimeMemberKicked: (state, action) => {
+      const { roomId, activity } = action.payload;
+      if (state.roomActivity.currentRoom?.id == roomId) {
+        state.roomActivity.currentRoom.members =
+          state.roomActivity.currentRoom.members.filter(
+            (member) => member.user.id != activity.receiver.id
+          );
+
+        state.roomActivity.activities.unshift(activity);
+      }
+    },
+    kickedOutOfRoom: (state, action) => {
+      const { roomId } = action.payload;
+      if (state.roomActivity.currentRoom?.id == roomId) {
+        navigateTo("/conversation/room");
+      }
+      state.realtimeRooms = state.realtimeRooms.filter(
+        (room) => room.id != roomId
+      );
     },
     disableRoom: (state, action) => {
       const roomId = action.payload;
@@ -654,6 +675,8 @@ export const {
   newRealtimeRoomMember,
   newRealtimeJoinedRoom,
   newRealtimeMemberQuitActivity,
+  newRealtimeMemberKicked,
+  kickedOutOfRoom,
   disableRoom,
   setUnreadRoom,
 } = realtimeSlice.actions;

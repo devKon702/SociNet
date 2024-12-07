@@ -4,10 +4,14 @@ const friendSlice = createSlice({
   name: "friend",
   initialState: {
     friendList: [],
+    suggestionList: [], // list of User
   },
-
-  reducers: {},
+  reducers: {
+    setSuggestionList: (state, action) => {
+      state.suggestionList = action.payload;
+    },
+  },
 });
 
-export const {} = friendSlice.actions;
+export const { setSuggestionList } = friendSlice.actions;
 export default friendSlice.reducer;

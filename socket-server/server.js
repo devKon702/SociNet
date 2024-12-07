@@ -212,7 +212,14 @@ userIo.on("connection", (socket) => {
     socket.to(`R${roomId}`).emit("DISABLE ROOM", roomId);
   });
 
-  socket.on("KICK MEMBER", (roomId, activity) => {});
+  socket.on("KICK MEMBER", (roomId, activity) => {
+    socket.to(activity.receiver.id).emit("KICKED", roomId, activity);
+    socket.to(`R${roomId}`).emit("MEMBER KICKED", roomId, activity);
+    delete roomManager[roomId][activity.receiver.id];
+  });
+  socket.on("LEAVE ROOM", (roomId) => {
+    socket.leave("R" + roomId);
+  });
 });
 
 adminIo.on("connection", (socket) => {

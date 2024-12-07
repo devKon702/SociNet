@@ -34,7 +34,7 @@ const SignupPage = () => {
 
   return (
     <div className="w-screen h-screen grid place-items-center">
-      <div className="w-full h-full sm:w-8/12 sm:h-[500px] bg-white m-auto rounded-xl flex">
+      <div className="w-full h-full sm:w-8/12 sm:h-[500px] bg-white m-auto rounded-xl flex overflow-hidden">
         <div className="w-full md:w-1/2 h-full overflow-hidden overflow-y-auto custom-scroll">
           <SignUpForm></SignUpForm>
         </div>

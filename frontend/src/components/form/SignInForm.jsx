@@ -105,7 +105,8 @@ const SignInForm = () => {
             console.log("Login Failed");
           }}
           text="Đăng nhập với Google"
-          type="icon"
+          type="standard"
+          theme="outline"
         />
       </div>
       <p className="text-center">

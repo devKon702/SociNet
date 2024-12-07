@@ -9,11 +9,12 @@ import com.example.userservice.repository.FriendRepository;
 import com.example.userservice.repository.UserRepository;
 import com.example.userservice.util.Helper;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -95,5 +96,60 @@ public class FriendService {
             if(invitationOpt.get().isAccepted()) return FriendStatus.FRIEND.getType();
             else return FriendStatus.INVITED.getType();
         } else return FriendStatus.NO.getType();
+    }
+
+    public List<UserDto> suggestFriend(int size){
+        List<UserDto> suggestion = new ArrayList<>();
+        // Lấy ngẫu nhiên 5 bạn
+        Pageable pageable = PageRequest.of(0, 5);
+        List<Friend> randomFriendList = friendRepository.findRandomFriend(Helper.getUserId(), pageable);
+        if(randomFriendList.isEmpty()){
+            List<UserDto> randomUserList = userRepository.getRandomUser(PageRequest.of(0, 25))
+                    .stream()
+                    .filter(item -> item.getId() != Helper.getUserId())
+                    .map(item -> new UserDto(item))
+                    .collect(Collectors.toList());
+            suggestion.addAll(randomUserList);
+        } else{
+            List<User> randomUserList = randomFriendList
+                    .stream()
+                    .map(friend -> {
+                        if(friend.getSender().getId() != Helper.getUserId()) return friend.getSender();
+                        else return friend.getReceiver();
+                    })
+                    .collect(Collectors.toList());
+
+            // Lấy mỗi người 5 người bạn ngẫu nhiên
+            for(User user : randomUserList){
+                List<User> list = friendRepository.findRandomFriend(user.getId(), PageRequest.of(0, 6))
+                        .stream().map(f -> {
+                            if(f.getSender().getId() != user.getId()) return f.getSender();
+                            else return f.getReceiver();
+                        })
+                        .collect(Collectors.toList());
+                suggestion.addAll(list.stream().filter(item -> item.getId() != Helper.getUserId()).map(item -> new UserDto(item)).limit(5).collect(Collectors.toList()));
+            }
+        }
+        return scoreFriend(suggestion)
+                .stream()
+                .limit(size)
+                .collect(Collectors.toList());
+    }
+    private List<UserDto> scoreFriend(List<UserDto> list){
+        Map<UserDto, Integer> scoreTable = new HashMap<>();
+        User currentUser = Helper.getAccountDetail().getUser();
+        list.forEach(item -> {
+            int score = 0;
+            if(Helper.isSimilar(item.getAddress(), currentUser.getAddress())) score++;
+            if(Helper.isSimilar(item.getSchool(), currentUser.getSchool())) score++;
+            if(item.isMale() == currentUser.isMale()) score++;
+            scoreTable.put(item, score);
+        });
+        // Sắp xếp giảm dần score
+        return scoreTable.entrySet()
+                .stream()
+                .sorted((a,b) -> b.getValue().compareTo(a.getValue()))
+                .map(item -> item.getKey())
+                .collect(Collectors.toList());
     }
 }

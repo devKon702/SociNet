@@ -45,4 +45,13 @@ public class Helper {
         return cookie;
     }
 
+    public static boolean isSimilar(String str1, String str2){
+        if(str1 != null && str2 != null){
+            if(str1.length() > str2.length()){
+                return str1.toLowerCase().contains(str2.toLowerCase());
+            } else return str2.toLowerCase().contains(str1.toLowerCase());
+        }
+        return false;
+    }
+
 }

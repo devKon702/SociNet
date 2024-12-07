@@ -72,16 +72,16 @@ const CreatePostDialog = ({ handleClose }) => {
           />
           <div>
             {fileInputRef.current?.files[0] ? (
-              <div className="w-full h-[200px] relative">
+              <div className="w-fit mx-auto relative">
                 {fileInputRef.current.files[0].type.startsWith("image/") && (
                   <img
                     src={fileSrc}
                     alt=""
-                    className="object-cover w-full h-full"
+                    className="object-cover w-full h-full max-h-[400px] rounded-lg"
                   />
                 )}
                 {fileInputRef.current.files[0].type.startsWith("video/") && (
-                  <video controls className="w-full h-full">
+                  <video controls className="max-w-full max-h-full">
                     <source src={fileSrc} />
                   </video>
                 )}

@@ -71,8 +71,8 @@ public class RoomController {
     }
 
     @DeleteMapping("kick")
-    public ResponseEntity<?> kickMember(@RequestParam Long memberId) throws Exception{
-        RoomActivityDto result = roomMemberService.kickMember(memberId);
+    public ResponseEntity<?> kickMember(@RequestParam Long userId, @RequestParam Long roomId) throws Exception{
+        RoomActivityDto result = roomMemberService.kickMember(userId, roomId);
         return Helper.returnSuccessResponse("Kick member success", result);
     }
 

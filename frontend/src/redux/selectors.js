@@ -10,6 +10,9 @@ export const postSelector = (state) => state.post;
 export const commentSelector = (state) => state.comment;
 export const commentListSelector = (state) => state.comment.commentList;
 
+// FRIEND
+export const friendSelector = (state) => state.friend;
+
 // FORGOT PASSWORD
 export const forgotPasswordSelector = (state) => state.forgotPassword;
 
@@ -55,3 +58,6 @@ export const adminSelector = (state) => state.admin;
 
 // SNACKBAR
 export const snackbarSelector = (state) => state.snackbar;
+
+// LOADING
+export const loadingSelector = (state) => state.loading;

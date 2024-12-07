@@ -29,6 +29,12 @@ const FriendService = {
       .get(`api/v1/friend/check/${userId}`)
       .then((res) => res.data)
       .catch((e) => e.response.data),
+
+  getFriendSuggestion: async () =>
+    axios
+      .get("api/v1/friend/suggestion")
+      .then((res) => res.data)
+      .catch((e) => e.response.data),
 };
 
 export const {
@@ -37,4 +43,5 @@ export const {
   makeInvitation,
   responseInvitation,
   checkIsFriend,
+  getFriendSuggestion,
 } = FriendService;

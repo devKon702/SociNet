@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import SigninPage from "./pages/SigninPage";
 import SignupPage from "./pages/SignupPage";
 import HomePage from "./pages/HomePage";
@@ -11,7 +11,11 @@ import AdminUserPage from "./pages/AdminUserPage";
 import { setupInterceptors } from "./axiosConfig";
 import store from "./redux/store";
 import { useDispatch, useSelector } from "react-redux";
-import { authSelector, snackbarSelector } from "./redux/selectors";
+import {
+  authSelector,
+  loadingSelector,
+  snackbarSelector,
+} from "./redux/selectors";
 import { useEffect } from "react";
 import { refreshToken } from "./api/AuthService";
 import PersonalPostList from "./components/post/PersonalPostList";
@@ -27,6 +31,9 @@ import { Alert, Slide, Snackbar } from "@mui/material";
 import { hideSnackbar } from "./redux/snackbarSlice";
 import RoomPage from "./pages/RoomPage";
 import { signin, signout } from "./redux/authSlice";
+import { hideLoading, showLoading } from "./redux/loadingSlice";
+import EmptyConversationPage from "./pages/EmptyConversationPage";
+import { setNavigate } from "./navigator";
 
 function SlideTransition(props) {
   return <Slide {...props} direction="up" />;
@@ -35,8 +42,10 @@ function SlideTransition(props) {
 function App() {
   setupInterceptors(store);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { isLoading } = useSelector(authSelector);
   const { open, message, type } = useSelector(snackbarSelector);
+  const { isLoading: isShowLoading } = useSelector(loadingSelector);
 
   const handleCloseSnackbar = (event, reason) => {
     if (reason === "clickaway") return;
@@ -44,9 +53,11 @@ function App() {
   };
 
   useEffect(() => {
+    setNavigate(navigate);
     const token = localStorage.getItem("socinet");
     if (!token) dispatch(signout());
     else {
+      dispatch(showLoading());
       refreshToken(localStorage.getItem("socinet"))
         .then((res) => {
           if (res.isSuccess) {
@@ -60,12 +71,23 @@ function App() {
         .catch((e) => {
           console.log(e);
           dispatch(signout());
+        })
+        .finally(() => {
+          dispatch(hideLoading());
         });
     }
   }, []);
 
   if (isLoading) {
-    return <div></div>;
+    return (
+      <div className="fixed inset-0 grid place-items-center z-50">
+        <div className="absolute w-48 h-28 rounded-2xl top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black opacity-90 z-10"></div>
+        <div className="absolute inset-0 bg-black opacity-20"></div>
+        <svg viewBox="25 25 50 50" className="loading-container z-50">
+          <circle cx="50" cy="50" r="20" className="loader"></circle>
+        </svg>
+      </div>
+    );
   }
 
   return (
@@ -110,14 +132,7 @@ function App() {
             >
               <Route
                 path=""
-                element={
-                  <div className="flex flex-col items-center justify-center h-full opacity-50">
-                    <i className="bx bx-search-alt text-[100px]"></i>
-                    <p className="text-2xl">
-                      Hãy tìm một người bạn và bắt đầu cuộc trò chuyện
-                    </p>
-                  </div>
-                }
+                element={<EmptyConversationPage></EmptyConversationPage>}
               ></Route>
               <Route
                 path=":id"
@@ -163,6 +178,15 @@ function App() {
           {message}
         </Alert>
       </Snackbar>
+      {isShowLoading && (
+        <div className="fixed inset-0 grid place-items-center z-50 fade-in">
+          <div className="absolute w-48 h-28 rounded-2xl top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black opacity-90 z-10"></div>
+          <div className="absolute inset-0 bg-black opacity-20"></div>
+          <svg viewBox="25 25 50 50" className="loading-container z-50">
+            <circle cx="50" cy="50" r="20" className="loader"></circle>
+          </svg>
+        </div>
+      )}
     </>
   );
 }

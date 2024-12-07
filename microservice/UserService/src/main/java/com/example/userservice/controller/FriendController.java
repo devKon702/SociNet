@@ -2,6 +2,7 @@ package com.example.userservice.controller;
 
 import com.example.userservice.dto.FriendInvitationDto;
 import com.example.userservice.dto.UserDto;
+import com.example.userservice.entity.User;
 import com.example.userservice.service.FriendService;
 import com.example.userservice.util.Helper;
 import lombok.AllArgsConstructor;
@@ -46,5 +47,11 @@ public class FriendController {
     ResponseEntity<?> checkIsFriend(@PathVariable Long userId) {
         String status = friendService.checkIsFriend(userId);
         return Helper.returnSuccessResponse("Check friend success", status);
+    }
+
+    @GetMapping("suggestion")
+    ResponseEntity<?> suggestFriend(@RequestParam(value = "size", defaultValue = "10") int size){
+        List<UserDto> suggestionList = friendService.suggestFriend(size);
+        return Helper.returnSuccessResponse("Get suggestion success", suggestionList);
     }
 }

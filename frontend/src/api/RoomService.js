@@ -82,9 +82,9 @@ const RoomService = {
       .then((res) => res.data)
       .catch((e) => e.response.data),
 
-  removeMember: async (memberId) =>
+  removeMember: async (userId, roomId) =>
     axios
-      .delete(BASE + "/kick?memberId=" + memberId)
+      .delete(BASE + "/kick?userId=" + userId + "&roomId=" + roomId)
       .then((res) => res.data)
       .catch((e) => e.response.data),
   quitRoom: async (roomId) =>

@@ -45,7 +45,7 @@ export const setupInterceptors = (store) => {
           originalRequest.headers["Authorization"] = `Bearer ${auth.token}`;
           return axios(originalRequest);
         } catch (refreshError) {
-          console.log(JSON.stringify(refreshError));
+          // console.log(JSON.stringify(refreshError));
           store.dispatch(signout());
           // window.location.href = "/auth/signin";
           return Promise.reject(refreshError);

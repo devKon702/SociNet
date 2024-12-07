@@ -32,3 +32,6 @@ jwt:
   secret: 7cLINbr5ayQkxXv1sVld
   refresh:
     secret: 7fhGG38YnDFkjLkL209
+
+firebase:
+  credentials: ${FIREBASE_KEY_PATH:}

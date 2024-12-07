@@ -14,7 +14,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   // <React.StrictMode>
   <Provider store={store}>
     <BrowserRouter>
-      <GoogleOAuthProvider clientId="1054565960382-t27q2n763gg7pgueepvf4t3mclfcq14f.apps.googleusercontent.com">
+      <GoogleOAuthProvider
+        clientId={`${import.meta.env.VITE_GOOGLE_CLIENT_ID}`}
+      >
         <ErrorBoundary FallbackComponent={ErrorPage}>
           <App />
         </ErrorBoundary>

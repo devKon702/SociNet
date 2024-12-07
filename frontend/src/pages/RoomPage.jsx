@@ -2,12 +2,18 @@ import { ClickAwayListener, Collapse, TextareaAutosize } from "@mui/material";
 import EmojiPicker from "emoji-picker-react";
 import { useEffect, useRef, useState } from "react";
 import RoomMessage from "../components/conversation/RoomMessage";
-import { useNavigate, useParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useOutletContext,
+  useParams,
+} from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addNewRoomActivity,
   clearRoomActivity,
   getRoomThunk,
+  newRealtimeMemberKicked,
   removeRoom,
   setCurrentRoom,
   setRoomAction,
@@ -21,11 +27,13 @@ import {
   createChat,
   deleteRoom,
   quitRoom,
+  removeMember,
   updateChat,
 } from "../api/RoomService";
 import { showSnackbar } from "../redux/snackbarSlice";
 import useImageSelect from "../hooks/useImageSelect";
 import { socket } from "../socket";
+import { userInfoSelector } from "../redux/selectors";
 
 const RoomPage = () => {
   const { id } = useParams("id");
@@ -34,6 +42,7 @@ const RoomPage = () => {
   const { currentRoom, activities, action, currentMessage } = useSelector(
     (state) => state.realtime.roomActivity
   );
+  const me = useSelector(userInfoSelector);
   const [content, setContent] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showRoomInfo, setShowRoomInfo] = useState(false);
@@ -43,6 +52,7 @@ const RoomPage = () => {
     initialSrc: "",
     maxSize: 5 * 1024 * 1024,
   });
+  const { toggleMenu } = useOutletContext();
   function handleButtonSendClick() {
     console.log(action);
     switch (action) {
@@ -187,7 +197,10 @@ const RoomPage = () => {
             </div>
           )}
           <section className="flex px-3 py-1 items-center gap-2 shadow-lg">
-            <div className="md:hidden size-10 rounded-full grid place-items-center cursor-pointer">
+            <div
+              className="md:hidden size-10 rounded-full grid place-items-center cursor-pointer"
+              onClick={toggleMenu}
+            >
               <i className="bx bx-menu text-2xl"></i>
             </div>
             <div className="rounded-full overflow-hidden size-10">
@@ -227,7 +240,7 @@ const RoomPage = () => {
                       key={item.id}
                       className="opacity-50 text-center"
                       title={dateDetailFormated(item.createdAt)}
-                    >{`${item.sender.name} đã xóa ${item.receiver.name}`}</p>
+                    >{`${item.sender.name} đã xóa ${item.receiver.name} khỏi nhóm`}</p>
                   );
                 case "QUIT":
                   return (
@@ -332,7 +345,7 @@ const RoomPage = () => {
           </section>
         </section>
         {showRoomInfo && (
-          <section className="w-1/3 h-full bg-white border-l-2 py-4 px-2 flex flex-col overflow-y-auto custom-scroll relative">
+          <section className="w-[300px] md:w-1/3 h-full bg-white border-l-2 py-4 px-2 flex flex-col overflow-y-auto custom-scroll absolute right-0 lg:relative">
             <div
               className="bg-lightGray rounded-full absolute top-0 right-0 mt-1 mr-2 cursor-pointer size-10 grid place-items-center"
               onClick={() => setShowRoomInfo(false)}
@@ -375,8 +388,13 @@ const RoomPage = () => {
               </div>
               <Collapse in={showMember}>
                 <div>
-                  {currentRoom?.members.map((item, index) => (
-                    <MemberItem key={index} member={item}></MemberItem>
+                  {currentRoom?.members.map((item) => (
+                    <MemberItem
+                      key={item.user.id}
+                      member={item}
+                      removable={item.user.id != me.id && currentRoom.isAdmin}
+                      roomId={currentRoom.id}
+                    ></MemberItem>
                   ))}
                   <div
                     className="flex items-center justify-center gap-2 hover:bg-lightGray cursor-pointer p-2 rounded-lg"
@@ -423,22 +441,72 @@ const RoomPage = () => {
   );
 };
 
-const MemberItem = ({ member }) => {
+const MemberItem = ({ member, removable, roomId }) => {
+  const dispatch = useDispatch();
+  const { callFetch: handleKickMember, loading } = useFetch({
+    handleFetch: removeMember,
+    params: [member.user.id, roomId],
+    handleSuccess: (res) => {
+      if (res.isSuccess) {
+        dispatch(
+          showSnackbar({
+            message: `Xóa ${member.user.name} thành công`,
+            type: "success",
+          })
+        );
+        dispatch(
+          newRealtimeMemberKicked({
+            roomId: res.data.roomId,
+            activity: res.data,
+          })
+        );
+        socket.emit("KICK MEMBER", res.data.roomId, res.data);
+      } else {
+        dispatch(
+          showSnackbar({
+            message: `Xóa ${member.user.name} thất bại`,
+            type: "error",
+          })
+        );
+      }
+    },
+  });
+
   return (
-    <div className="p-2 rounded-lg hover:bg-lightGray cursor-pointer flex gap-2">
-      <div className="size-10 rounded-full overflow-hidden">
+    <div className="p-2 rounded-lg hover:bg-lightGray flex gap-2">
+      <div className="size-10 min-w-10 rounded-full overflow-hidden">
         <img
           src={member?.user?.avatarUrl || "/unknown-avatar.png"}
           alt=""
           className="object-cover size-full"
         />
       </div>
-      <div>
-        <p className="font-bold">{member.user.name}</p>
+      <div className="flex-grow truncate">
+        <Link
+          to={`/user/${member.user.id}`}
+          className="font-bold truncate hover:underline cursor-pointer"
+          title={member.user.name}
+        >
+          {member.user.name}
+        </Link>
         <p className="text-sm text-darkGray">
           {member.isAdmin ? "Quản trị viên" : "Thành viên"}
         </p>
       </div>
+      {removable && (
+        <div
+          className="rounded-full bg-red-400 size-6 flex items-center justify-center ml-auto self-center cursor-pointer hover:size-7 duration-100"
+          disabled={loading}
+          onClick={() => {
+            const check = confirm(
+              `Bạn muốn xóa ${member.user.name} khỏi nhóm?`
+            );
+            if (check) handleKickMember();
+          }}
+        >
+          <i className="bx bx-x text-white"></i>
+        </div>
+      )}
     </div>
   );
 };

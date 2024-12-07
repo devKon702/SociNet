@@ -47,7 +47,7 @@ const PersonalPage = () => {
         ></UserInfoDIalog>
       ) : null}
       <section className="bg-white w-full rounded-lg p-4 text-gray-800">
-        <div className="flex items-start gap-5 mb-4">
+        <div className="flex flex-col items-center sm:flex-row sm:items-start gap-5 mb-4">
           <div className="rounded-full size-40 overflow-hidden">
             <img
               src={user.avatarUrl || "/unknown-avatar.png"}
@@ -90,43 +90,43 @@ const PersonalPage = () => {
               />
             </div>
           </div>
-          {user.id === currentUser.id ? (
-            <div className="ml-auto flex flex-col gap-3">
+          {user.id == currentUser.id ? (
+            <div className="sm:ml-auto flex flex-col gap-3 items-stretch w-full sm:w-fit">
               <button
-                className="bg-gray-200 p-3 rounded-md flex items-center gap-2"
+                className="bg-gray-200 p-3 rounded-md flex items-center justify-center gap-2"
                 onClick={() => setShowUpdateInfoModal(true)}
               >
                 <i className="bx bxs-edit-alt text-xl"></i>Chỉnh sửa
               </button>
               <button
-                className="bg-secondary text-white p-3 rounded-md flex items-center gap-2"
+                className="bg-secondary text-white p-3 rounded-md flex items-center justify-center gap-2"
                 onClick={() => setShowCreatePostModal(true)}
               >
                 <i className="bx bxs-duplicate text-xl"></i>Tạo bài đăng
               </button>
             </div>
           ) : (
-            <div className="ml-auto flex flex-col gap-3">
+            <div className="sm:ml-auto flex flex-col gap-3 items-stretch w-full sm:w-fit">
               {friendStatus === "FRIEND" && (
-                <div className="bg-gray-200 p-3 rounded-md flex items-center gap-2 font-bold">
+                <div className="bg-gray-200 p-3 rounded-md flex items-center justify-center gap-2 font-bold">
                   <i className="bx bxs-user-check text-xl"></i>Bạn bè
                 </div>
               )}
               {friendStatus === "NO" && (
                 <button
-                  className="bg-blue-400 text-white font-bold p-3 rounded-md flex items-center gap-2"
+                  className="bg-blue-400 text-white font-bold p-3 rounded-md flex items-center justify-center gap-2"
                   onClick={handleInvite}
                 >
                   <i className="bx bxs-user-plus text-xl"></i>Mời kết bạn
                 </button>
               )}
               {friendStatus === "INVITED" && (
-                <div className="bg-gray-200 font-bold p-3 rounded-md flex items-center gap-2">
+                <div className="bg-gray-200 font-bold p-3 rounded-md flex items-center justify-center gap-2">
                   <i className="bx bxs-user-check text-xl"></i>Đã gửi lời mời
                 </div>
               )}
               <Link
-                className="bg-secondary text-white font-bold p-3 rounded-md flex items-center gap-2"
+                className="bg-secondary text-white font-bold p-3 rounded-md flex items-center justify-center gap-2"
                 to={`/conversation/${id}`}
               >
                 <i className="bx bxs-message-rounded-dots"></i>Nhắn tin
@@ -159,7 +159,7 @@ const PersonalPage = () => {
         </div>
       </section>
 
-      <section className="px-32 bg-white mt-4 rounded-lg">
+      <section className="md:px-32 lg:px-64 bg-white mt-4 rounded-lg">
         <Outlet></Outlet>
       </section>
     </div>

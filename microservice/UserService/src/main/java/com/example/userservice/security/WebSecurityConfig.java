@@ -5,6 +5,7 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -27,6 +28,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 
 @Configuration
@@ -88,10 +90,15 @@ public class WebSecurityConfig {
 //        return new CorsFilter(source);
 //    }
 
+    @Value("${firebase.credentials}")
+    private String firebaseSecretPath;
     @Bean
     public FirebaseApp initializeFirebaseApp() throws Exception{
         Resource resource = new ClassPathResource("firebase-secret.json");
         InputStream serviceAccount = resource.getInputStream();
+        if(firebaseSecretPath != null && !firebaseSecretPath.isEmpty()){
+            serviceAccount = new FileInputStream(firebaseSecretPath);
+        }
 
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))

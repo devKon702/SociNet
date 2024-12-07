@@ -1,6 +1,6 @@
 import { ClickAwayListener, TextareaAutosize } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useOutletContext, useParams } from "react-router-dom";
 import MessageItem from "../components/conversation/MessageItem";
 import { useDispatch, useSelector } from "react-redux";
 import { realtimeSelector } from "../redux/selectors";
@@ -24,6 +24,8 @@ const ConversationPage = () => {
   const [files, setFiles] = useState([]);
   const [imgPreviewSrc, setImgPreviewSrc] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
+  const { toggleMenu } = useOutletContext();
 
   const handleSend = () => {
     if (!content.trim() && !files) return;
@@ -72,7 +74,10 @@ const ConversationPage = () => {
   return (
     <div className="flex flex-col justify-between h-full bg-white">
       <section className="flex px-3 py-1 items-center gap-2 shadow-lg">
-        <div className="md:hidden size-10 rounded-full grid place-items-center cursor-pointer">
+        <div
+          className="md:hidden size-10 rounded-full grid place-items-center cursor-pointer"
+          onClick={toggleMenu}
+        >
           <i className="bx bx-menu text-2xl"></i>
         </div>
         <div className="rounded-full overflow-hidden size-10">

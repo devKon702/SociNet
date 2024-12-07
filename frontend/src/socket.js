@@ -15,12 +15,15 @@ import {
   newRealtimeMemberQuitActivity,
   disableRoom,
   setUnreadRoom,
+  kickedOutOfRoom,
+  newRealtimeMemberKicked,
 } from "./redux/realtimeSlice";
 import { signout } from "./redux/authSlice";
 import { setFriendStatus } from "./redux/personalSlice";
 import { removeAllListenersExcept } from "./helper";
 import { getUserInfo } from "./api/UserService";
 import { getRoom } from "./api/RoomService";
+import { showSnackbar } from "./redux/snackbarSlice";
 
 const USER_URL = import.meta.env.VITE_SOCKET_BASE;
 const ADMIN_URL = `${import.meta.env.VITE_SOCKET_BASE}/admin`;
@@ -128,6 +131,21 @@ const onConnect = () => {
 
   socket.on("MEMBER QUIT", (roomId, activity) => {
     store.dispatch(newRealtimeMemberQuitActivity({ roomId, activity }));
+  });
+
+  socket.on("MEMBER KICKED", (roomId, activity) => {
+    store.dispatch(newRealtimeMemberKicked({ roomId, activity }));
+  });
+
+  socket.on("KICKED", (roomId, activity) => {
+    socket.emit("LEAVE ROOM", roomId);
+    store.dispatch(
+      showSnackbar({
+        message: `Bạn vừa được xóa khỏi nhóm bởi ${activity.sender.name}`,
+        type: "info",
+      })
+    );
+    store.dispatch(kickedOutOfRoom({ roomId }));
   });
 
   socket.on("DISABLE ROOM", (roomId) => {

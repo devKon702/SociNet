@@ -84,7 +84,7 @@ const PostItem = ({ post }) => {
 
           <div className="flex flex-col">
             <Link
-              className="font-bold hover:underline cursor-pointer"
+              className="font-bold hover:underline cursor-pointer w-fit"
               to={`/user/${post.user.id}`}
             >
               {post.user.name}

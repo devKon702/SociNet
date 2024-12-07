@@ -33,7 +33,7 @@ const ForgotPasswordPage = () => {
           }}
         ></ForgotPasswordDialog>
       ) : null}
-      <div className="flex flex-col bg-white rounded-lg py-8 px-20 gap-2 relative h-3/4 w-2/5">
+      <div className="flex flex-col bg-white rounded-lg py-8 px-20 gap-2 relative md:h-3/4 lg:w-2/5 w-full">
         <p className="text-primary font-bold text-3xl text-center">
           Quên mật khẩu
         </p>
