@@ -74,13 +74,15 @@ public class AuthController {
 
     @GetMapping("refresh-token")
     public ResponseEntity<?> doRefreshToken(HttpServletRequest request,
-                                            HttpServletResponse response) throws Exception, ExpiredJwtException {
+                                            HttpServletResponse response,
+                                            @RequestParam(required = false) String ip) throws Exception, ExpiredJwtException {
         String refreshToken = Arrays.stream(request.getCookies())
                 .filter(cookie -> "refreshToken".equals(cookie.getName()))
                 .findFirst()
                 .map(Cookie::getValue)
                 .orElse(null);
-        AuthDto authDto = authService.doRefreshToken(refreshToken);
+        String userAgent = request.getHeader("User-Agent");
+        AuthDto authDto = authService.doRefreshToken(refreshToken, ip, userAgent);
         response.addCookie(Helper.createCookie("refreshToken", authDto.getRefreshToken(), 30 * 24 * 60 * 60, "/api/v1/auth/refresh-token"));
         return Helper.returnSuccessResponse("Refresh token success", authDto);
     }

@@ -6,6 +6,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Objects;
+
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 public class UserDto {
@@ -25,5 +27,16 @@ public class UserDto {
         this.address = user.getAddress();
         this.avatarUrl = user.getAvatarUrl();
         this.isMale = user.isMale();
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        UserDto tmp = (UserDto) obj;
+        return id.equals(tmp.id);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

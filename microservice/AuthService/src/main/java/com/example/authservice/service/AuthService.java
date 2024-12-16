@@ -157,6 +157,7 @@ public class AuthService {
         if(refreshTokenOpt.isPresent()){
             // Cập nhật
             refreshTokenOpt.get().setToken(refreshToken);
+            refreshTokenOpt.get().setUserAgent(userAgent);
             refreshTokenRepo.save(refreshTokenOpt.get());
         } else{
             // Tạo mới
@@ -176,7 +177,7 @@ public class AuthService {
                 .build();
     }
 
-    public AuthDto doRefreshToken(String refreshToken) throws ExpiredJwtException, Exception {
+    public AuthDto doRefreshToken(String refreshToken, String ip, String userAgent) throws ExpiredJwtException, Exception {
         if(refreshToken != null && jwtProvider.validateToken(refreshToken, true)){
             // Kiểm tra subject trong token hợp lệ
             String username = jwtProvider.getSubjectFromJwt(refreshToken, true);
@@ -187,10 +188,15 @@ public class AuthService {
             Optional<RefreshToken> savedTokenOpt = refreshTokenRepo.findByAccount_UsernameAndToken(username, refreshToken);
             // Nếu không -> throw lỗi
             if(savedTokenOpt.isEmpty()) throw new Exception("Unauthenticated");
-            // Nếu có -> generate token mới và cập nhật
+            // Nếu có -> Kiểm tra user agent có giống không?
+            if(!savedTokenOpt.get().getUserAgent().equals(userAgent)) throw new Exception("STRANGE DEVICE");
+            // Nếu giống
             String newRefreshToken = jwtProvider.generateRefreshToken(username);
             String newAccessToken = jwtProvider.generateAccessToken(username);
             savedTokenOpt.get().setToken(newRefreshToken);
+            if(ip != null && !ip.isEmpty() && !savedTokenOpt.get().getIp().equals(ip)) {
+                savedTokenOpt.get().setIp(ip);
+            }
             refreshTokenRepo.save(savedTokenOpt.get());
             return AuthDto.builder()
                     .accessToken(newAccessToken)

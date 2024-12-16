@@ -27,8 +27,6 @@ const HomePage = () => {
     handleFetch: getFriendSuggestion,
     params: [],
     handleSuccess: (res) => {
-      console.log(response);
-
       if (res.isSuccess) {
         dispatch(setSuggestionList(res.data));
       }

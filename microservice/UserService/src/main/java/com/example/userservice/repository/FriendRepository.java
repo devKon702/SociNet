@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface FriendRepository extends JpaRepository<Friend, Long> {
     @Query("SELECT f FROM Friend f WHERE (f.sender.id = :id OR f.receiver.id = :id) AND f.isAccepted = true")
-    List<Friend> findFiends(@Param("id") Long id);
+    List<Friend> findAllFriendsByUserId(@Param("id") Long id);
 
     @Query("SELECT f FROM Friend f WHERE f.receiver.id = :id AND f.isAccepted = false")
     List<Friend> findInvitations(@Param("id") Long id);
