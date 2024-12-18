@@ -96,7 +96,15 @@ const CommentModal = ({ handleClose }) => {
             className="bg-slate-200 rounded-xl outline-none resize-none text-gray-800 p-2 flex-1"
             placeholder={action == "REPLY" ? "Trả lời" : "Bình luận"}
             onChange={(e) => setCommentValue(e.target.value)}
-            // onKeyUp={(e) => (e.code == "Enter" ? handleAdd() : null)}
+            onKeyDown={(e) => {
+              if (e.shiftKey && e.key == "Enter") {
+                e.preventDefault();
+                setCommentValue(commentValue + "\n");
+              } else if (e.key == "Enter") {
+                e.preventDefault();
+                handleAdd();
+              }
+            }}
           />
           <button
             className="py-2 px-3 bg-backgroundSecondary h-fit"

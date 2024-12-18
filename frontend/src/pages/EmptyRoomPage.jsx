@@ -1,7 +1,6 @@
-import React from "react";
 import { useOutletContext } from "react-router-dom";
 
-const EmptyConversationPage = () => {
+const EmptyRoomPage = () => {
   const { toggleMenu } = useOutletContext();
 
   return (
@@ -11,10 +10,10 @@ const EmptyConversationPage = () => {
     >
       <i className="bx bx-search-alt text-[100px]"></i>
       <p className="text-2xl text-center">
-        Hãy tìm một người bạn và bắt đầu cuộc trò chuyện
+        Chọn nhóm và bắt đầu cuộc trò chuyện
       </p>
     </div>
   );
 };
 
-export default EmptyConversationPage;
+export default EmptyRoomPage;

@@ -8,6 +8,7 @@ import { getPersonalInfo, getPersonalPost } from "../../redux/personalSlice";
 import { authSelector } from "../../redux/selectors";
 import { setUserInfo } from "../../redux/authSlice";
 import { showSnackbar } from "../../redux/snackbarSlice";
+import { updateOwnerNameOfPost } from "../../redux/postSlice";
 
 const schema = Yup.object({
   name: Yup.string().max(50, "Tên hiển thị không quá 50 kí tự"),
@@ -66,6 +67,13 @@ const UpdateInfoForm = ({ user, handleClose }) => {
         );
         dispatch(getPersonalInfo(user.id));
         dispatch(getPersonalPost(user.id));
+        dispatch(
+          updateOwnerNameOfPost({
+            userId: res.data.id,
+            name: res.data.name,
+            avatarUrl: res.data.avatarUrl,
+          })
+        );
         if (user.id === auth.user.user.id) {
           dispatch(setUserInfo(res.data));
         }
@@ -101,7 +109,7 @@ const UpdateInfoForm = ({ user, handleClose }) => {
 
   return (
     <form className="h-full overflow-auto custom-scroll">
-      <div className="w-[600px] flex-1 p-3 overflow-auto custom-scroll">
+      <div className="w-full md:w-[600px] flex-1 p-3 overflow-auto custom-scroll">
         <p className="font-bold text-2xl">Avatar</p>
         <div className="rounded-full overflow-hidden w-[200px] h-[200px] mx-auto relative">
           <img

@@ -66,7 +66,7 @@ const OtherMessage = ({ message }) => {
         {message.content && (
           <div className="w-fit self-start">
             <div
-              className="w-fit p-3 bg-gray-300 rounded-2xl "
+              className="w-fit p-3 bg-gray-300 rounded-2xl whitespace-pre-line"
               title={
                 message.createdAt !== message.updatedAt
                   ? `Đã chỉnh sửa ${dateDetailFormated(message.updatedAt)}`
@@ -97,7 +97,6 @@ const SelfMessage = ({ message }) => {
         dispatch(
           showSnackbar({ message: "Thu hồi tin nhắn thất bại", type: "error" })
         );
-        console.log(res);
       }
     },
   });
@@ -128,7 +127,7 @@ const SelfMessage = ({ message }) => {
       {message.content && (
         <div className="w-fit self-end">
           <div
-            className="p-3 w-fit bg-secondary text-white rounded-2xl rounded-ee-none hover:relative ml-auto"
+            className="p-3 w-fit bg-secondary text-white rounded-2xl rounded-ee-none hover:relative ml-auto whitespace-pre-line"
             title={
               message.createdAt !== message.updatedAt
                 ? `Đã chỉnh sửa ${dateDetailFormated(message.updatedAt)}`

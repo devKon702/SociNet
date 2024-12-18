@@ -54,14 +54,12 @@ const RoomPage = () => {
   });
   const { toggleMenu } = useOutletContext();
   function handleButtonSendClick() {
-    console.log(action);
+    if (content.trim().length == 0) return;
     switch (action) {
       case "CREATE":
-        console.log("Gửi chat");
         handleCreateChat();
         break;
       case "EDIT":
-        console.log("Chỉnh sửa chat");
         handleEditChat();
         break;
     }
@@ -105,10 +103,22 @@ const RoomPage = () => {
         dispatch(addNewRoomActivity(res.data));
         socket.emit("NEW ROOM MESSAGE", id, res.data);
       } else {
-        dispatch(
-          showSnackbar({ message: "Gửi tin nhắn thất bại", type: "error" })
-        );
-        console.log(res);
+        switch (res.message) {
+          case "UNSUPPORTED FILE":
+            dispatch(
+              showSnackbar({
+                message: "File quá lớn hoặc không hợp lệ",
+                type: "error",
+              })
+            );
+            break;
+
+          default:
+            dispatch(
+              showSnackbar({ message: "Gửi tin nhắn thất bại", type: "error" })
+            );
+            break;
+        }
       }
     },
   });
@@ -122,13 +132,25 @@ const RoomPage = () => {
         dispatch(updateRoomMessage(res.data));
         socket.emit("UPDATE ROOM MESSAGE", id, res.data);
       } else {
-        dispatch(
-          showSnackbar({
-            message: "Chỉnh sửa tin nhắn thất bại",
-            type: "error",
-          })
-        );
-        console.log(res);
+        switch (res.message) {
+          case "UNSUPPORTED FILE":
+            dispatch(
+              showSnackbar({
+                message: "File quá lớn hoặc không hợp lệ",
+                type: "error",
+              })
+            );
+            break;
+
+          default:
+            dispatch(
+              showSnackbar({
+                message: "Chỉnh sửa tin nhắn thất bại",
+                type: "error",
+              })
+            );
+            break;
+        }
       }
     },
   });
@@ -313,6 +335,15 @@ const RoomPage = () => {
                   className="resize-none py-2 px-3 outline-none bg-transparent w-full"
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.shiftKey && e.key == "Enter") {
+                      setContent(content + "\r\n");
+                      e.preventDefault();
+                    } else if (e.key == "Enter") {
+                      handleButtonSendClick();
+                      e.preventDefault();
+                    }
+                  }}
                 ></TextareaAutosize>
                 <i
                   className="bx bx-smile mr-3 cursor-pointer text-xl"

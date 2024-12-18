@@ -10,6 +10,7 @@ import {
   getPersonalInfo,
   getPersonalPost,
   preparePersonalInfoThunk,
+  resetPersonalState,
 } from "../redux/personalSlice";
 import { setAction } from "../redux/postSlice";
 
@@ -21,7 +22,11 @@ const PersonalPage = () => {
   const { user, friendStatus } = useSelector((state) => state.personal);
   const currentUser = useSelector((state) => state.auth?.user?.user);
   useEffect(() => {
+    dispatch(resetPersonalState());
     dispatch(preparePersonalInfoThunk(id));
+    return () => {
+      dispatch(resetPersonalState());
+    };
   }, [id]);
 
   const handleInvite = () => {

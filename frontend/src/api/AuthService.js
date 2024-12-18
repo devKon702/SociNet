@@ -55,6 +55,11 @@ const AuthService = {
     navigate("/auth/signin");
     socket.disconnect();
   },
+  logout: async () =>
+    axios
+      .delete("api/v1/auth/sign-out")
+      .then((res) => res.data)
+      .catch((e) => e.response.data),
   signUp: async (username, password, email, name, otp) =>
     axios
       .post("api/v1/auth/sign-up", { username, password, email, name, otp })
@@ -79,9 +84,7 @@ const AuthService = {
   //       });
   //   }
   // },
-  refreshToken: async (token) => {
-    // const ipInfo = await getIpInformation();
-    // const userAgent = navigator.userAgent;
+  refreshToken: async () => {
     return axios
       .get(`api/v1/auth/refresh-token`)
       .then((res) => res.data)
@@ -112,6 +115,7 @@ export const {
   signIn,
   signInWithGoogle,
   signOut,
+  logout,
   signUp,
   refreshToken,
   getOtp,

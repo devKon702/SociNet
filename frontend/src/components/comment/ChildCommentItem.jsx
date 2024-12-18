@@ -30,7 +30,7 @@ const ChildCommentItem = ({ comment }) => {
       <div>
         <div className="comment rounded-2xl bg-slate-200 p-2 popup-container w-fit">
           <p className="font-bold">{comment.user.name}</p>
-          <p>{comment.content}</p>
+          <p className="whitespace-pre-line">{comment.content}</p>
 
           {user.id === comment.user.id && (
             <div className="px-2 popup top-1/2 right-0 translate-x-full -translate-y-1/2 flex gap-2 w-20">

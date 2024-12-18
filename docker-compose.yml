@@ -1,6 +1,6 @@
 services:
   frontend:
-    image: devkon702/frontend:0.0.2
+    image: devkon702/frontend:0.0.4
     container_name: frontend
     build:
       context: ./frontend
@@ -10,8 +10,8 @@ services:
       - socinet-network
     environment:
       # - VITE_API_BASE=http://localhost:8888
-      - VITE_API_BASE=http://localhost:88
-      - VITE_SOCKET_BASE=http://localhost:3000
+      - VITE_API_BASE=http://${EC2_IP}:88
+      - VITE_SOCKET_BASE=http://${EC2_IP}:3000
       - VITE_GOOGLE_CLIENT_ID=1054565960382-t27q2n763gg7pgueepvf4t3mclfcq14f.apps.googleusercontent.com
     depends_on:
       - api-gateway
@@ -32,7 +32,7 @@ services:
     
 
   api-gateway:
-    image: devkon702/api-gateway:0.0.2
+    image: devkon702/api-gateway:0.0.4
     container_name: api-gateway
     build:
       context: ./microservice/ApiGateway
@@ -56,7 +56,7 @@ services:
       - admin-service
 
   auth-service:
-    image: devkon702/auth-service:0.0.2
+    image: devkon702/auth-service:0.0.4
     container_name: auth-service
     build:
       context: ./microservice/AuthService
@@ -74,7 +74,7 @@ services:
       - mysql
 
   user-service:
-    image: devkon702/user-service:0.0.2
+    image: devkon702/user-service:0.0.4
     container_name: user-service
     build:
       context: ./microservice/UserService
@@ -92,7 +92,7 @@ services:
       - mysql
     
   post-service:
-    image: devkon702/post-service:0.0.2
+    image: devkon702/post-service:0.0.4
     container_name: post-service
     build:
       context: ./microservice/PostService
@@ -111,7 +111,7 @@ services:
       - mysql
 
   chat-service:
-    image: devkon702/chat-service:0.0.2
+    image: devkon702/chat-service:0.0.4
     container_name: chat-service
     build:
       context: ./microservice/ChatService
@@ -129,7 +129,7 @@ services:
       - mysql
 
   admin-service:
-    image: devkon702/admin-service:0.0.2
+    image: devkon702/admin-service:0.0.4
     container_name: admin-service
     build:
       context: ./microservice/AdminService
@@ -147,7 +147,7 @@ services:
       - mysql
 
   socket-server:
-    image: devkon702/socket-server:0.0.2
+    image: devkon702/socket-server:0.0.4
     container_name: socket-server
     build:
       context: ./socket-server
@@ -156,7 +156,7 @@ services:
     networks:
       - socinet-network
     environment:
-      - FRONTEND_ORIGIN=http://localhost
+      - FRONTEND_ORIGIN=http://${EC2_IP}
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_USER=root

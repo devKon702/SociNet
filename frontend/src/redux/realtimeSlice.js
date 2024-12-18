@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, isPending } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import store from "./store";
 import {
   getFriendList,
@@ -411,13 +411,17 @@ const realtimeSlice = createSlice({
           });
         }
       })
-      .addCase(updateRoomThunk.pending, (state, action) => {
+      .addCase(updateRoomThunk.pending, (state) => {
         state.roomActivity.fetchStatus = "UPDATING";
       })
       .addCase(updateRoomThunk.fulfilled, (state, action) => {
         state.roomActivity.fetchStatus = "";
         if (action.payload.isSuccess) {
           state.roomActivity.currentRoom = action.payload.data;
+          state.realtimeRooms.forEach((room, index) => {
+            if (room.id == action.payload.data.id)
+              state.realtimeRooms[index] = action.payload.data;
+          });
         }
       });
   },
@@ -558,11 +562,17 @@ export const removeConversationThunk = createAsyncThunk(
 export const getRoomThunk = createAsyncThunk(
   "realtime/getRoomThunk",
   async (id, { dispatch }) => {
-    await refreshToken(localStorage.getItem("socinet")).then((res) => {
+    await refreshToken().then((res) => {
       if (res.isSuccess) {
-        const { accessToken, refreshToken, account } = res.data;
-        dispatch(signin({ token: accessToken, user: account }));
-        localStorage.setItem("socinet", refreshToken);
+        const { accessToken, account, loginSessionId } = res.data;
+        dispatch(
+          signin({
+            token: accessToken,
+            user: account,
+            loginSessionId,
+          })
+        );
+        // localStorage.setItem("socinet", refreshToken);
       }
     });
     return await Promise.all([getRoom(id), getActivitiesOfRoom(id)])
@@ -607,12 +617,24 @@ export const createRoomThunk = createAsyncThunk(
         })
       );
     } else {
-      dispatch(
-        showSnackbar({
-          message: "Tạo nhóm thất bại",
-          type: "error",
-        })
-      );
+      switch (res.message) {
+        case "UNSUPPORTED FILE":
+          dispatch(
+            showSnackbar({
+              message: "File quá lớn hoặc không hợp lệ",
+              type: "error",
+            })
+          );
+          break;
+        default:
+          dispatch(
+            showSnackbar({
+              message: "Tạo nhóm thất bại",
+              type: "error",
+            })
+          );
+          break;
+      }
     }
     return res;
   }
@@ -642,8 +664,22 @@ export const updateRoomThunk = createAsyncThunk(
         showSnackbar({ message: "Cập nhật thành công", type: "success" })
       );
     } else {
-      dispatch(showSnackbar({ message: "Cập nhật thất bại", type: "error" }));
-      console.log(res);
+      switch (res.message) {
+        case "UNSUPPORTED FILE":
+          dispatch(
+            showSnackbar({
+              message: "File quá lớn hoặc không hợp lệ",
+              type: "error",
+            })
+          );
+          break;
+
+        default:
+          dispatch(
+            showSnackbar({ message: "Cập nhật thất bại", type: "error" })
+          );
+          break;
+      }
     }
     return res;
   }

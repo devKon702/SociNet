@@ -36,8 +36,8 @@ const Header = () => {
     <div className="w-full h-[60px] flex justify-between items-center bg-slate-700 py-3 px-10 rounded-b-xl">
       <Link
         className={`h-full w-fit flex justify-around cursor-pointer gap-1 ${
-          (isSearching || searchValue != "") && windowSize.width <= 640
-            ? "w-0"
+          (isSearching || searchValue != "") && windowSize.width <= 520
+            ? "w-0 hidden"
             : ""
         }`}
         to="/home"

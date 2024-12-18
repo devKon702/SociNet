@@ -211,6 +211,7 @@ public class FriendService {
 
         if(itemProfileList.size() < size){
             List<Long> excludeIds = new ArrayList<>();
+            excludeIds.add(Helper.getUserId());
             excludeIds.addAll(friendList
                     .stream()
                     .map(item -> item.getId())

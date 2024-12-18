@@ -16,6 +16,7 @@ import { Link } from "react-router-dom";
 import UpdatePostDialog from "../dialog/UpdatePostDialog";
 import { authSelector } from "../../redux/selectors";
 import SharePostDialog from "../dialog/SharePostDialog";
+import { removePersonalPost } from "../../redux/personalSlice";
 
 const PostItem = ({ post }) => {
   const [isShowComment, setIsShowComment] = useState(false);
@@ -225,7 +226,15 @@ const PostItem = ({ post }) => {
                 placeholder="Type your comment"
                 value={commentValue}
                 onChange={(e) => setCommentValue(e.target.value)}
-                onKeyDown={(e) => (e.code === "Enter" ? handleComment() : null)}
+                onKeyDown={(e) => {
+                  if (e.shiftKey && e.key == "Enter") {
+                    setCommentValue(commentValue + "\n");
+                    e.preventDefault();
+                  } else if (e.key == "Enter") {
+                    handleComment();
+                    e.preventDefault();
+                  }
+                }}
               />
               <button
                 className="py-2 px-3 bg-backgroundSecondary"
@@ -256,10 +265,8 @@ const ReactionButton = ({
   const dispatch = useDispatch();
   const handleClick = async (e) => {
     try {
-      if (e.target.tagName !== "BUTTON") return;
+      // if (e.target.tagName !== "BUTTON") return;
       await deleteReactPost(postId);
-      // const updatedPost = await getPost(postId);
-      // dispatch(updatePost(updatedPost.data));
       dispatch(updatePostThunk(postId));
     } catch (e) {
       console.log(e);
@@ -275,10 +282,12 @@ const ReactionButton = ({
           onClick={handleClick}
         >
           {children}
-          <div className="size-6">
+          <div className="size-6" onClick={(e) => {}}>
             <img src="/like.png" alt="" className="size-full object-cover" />
           </div>
-          <span className="hidden md:inline-block">Thích</span>
+          <span className="hidden md:inline-block" onClick={(e) => {}}>
+            Thích
+          </span>
         </button>
       );
     case "LOVE":
@@ -357,7 +366,10 @@ const Emoji = ({ path, postId, type }) => {
   return (
     <div
       className="size-10 hover:scale-150 transition-all ease-in-out"
-      onClick={handleReact}
+      onClick={(e) => {
+        e.stopPropagation();
+        handleReact();
+      }}
     >
       <img src={path} alt="" className="w-full h-full object-cover" />
     </div>

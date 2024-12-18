@@ -9,7 +9,7 @@ import AdminLayout from "./components/layout/AdminLayout";
 import AdminHomePage from "./pages/AdminHomePage";
 import AdminUserPage from "./pages/AdminUserPage";
 import { setupInterceptors } from "./axiosConfig";
-import store from "./redux/store";
+import store, { resetDataStore } from "./redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import {
   authSelector,
@@ -34,6 +34,7 @@ import { signin, signout } from "./redux/authSlice";
 import { hideLoading, showLoading } from "./redux/loadingSlice";
 import EmptyConversationPage from "./pages/EmptyConversationPage";
 import { setNavigate } from "./navigator";
+import EmptyRoomPage from "./pages/EmptyRoomPage";
 
 function SlideTransition(props) {
   return <Slide {...props} direction="up" />;
@@ -43,7 +44,7 @@ function App() {
   setupInterceptors(store);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isLoading } = useSelector(authSelector);
+  const { isLoading, isAuthenticated } = useSelector(authSelector);
   const { open, message, type } = useSelector(snackbarSelector);
   const { isLoading: isShowLoading } = useSelector(loadingSelector);
 
@@ -54,29 +55,39 @@ function App() {
 
   useEffect(() => {
     setNavigate(navigate);
-    const token = localStorage.getItem("socinet");
-    if (!token) dispatch(signout());
-    else {
-      dispatch(showLoading());
-      refreshToken(localStorage.getItem("socinet"))
-        .then((res) => {
-          if (res.isSuccess) {
-            const { accessToken, refreshToken, account } = res.data;
-            dispatch(signin({ token: accessToken, user: account }));
-            localStorage.setItem("socinet", refreshToken);
-          } else {
-            dispatch(signout());
-          }
-        })
-        .catch((e) => {
-          console.log(e);
+    // const token = localStorage.getItem("socinet");
+    // if (!token) dispatch(signout());
+    // else {
+    dispatch(showLoading());
+    refreshToken()
+      .then((res) => {
+        if (res.isSuccess) {
+          const { accessToken, account } = res.data;
+          dispatch(
+            signin({
+              token: accessToken,
+              user: account,
+              loginSessionId: res.loginSessionId,
+            })
+          );
+          // localStorage.setItem("socinet", refreshToken);
+        } else {
           dispatch(signout());
-        })
-        .finally(() => {
-          dispatch(hideLoading());
-        });
-    }
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+        dispatch(signout());
+      })
+      .finally(() => {
+        dispatch(hideLoading());
+      });
+    // }
   }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) dispatch(resetDataStore());
+  }, [isAuthenticated]);
 
   if (isLoading) {
     return (
@@ -138,7 +149,13 @@ function App() {
                 path=":id"
                 element={<ConversationPage></ConversationPage>}
               ></Route>
-              <Route path="room/:id" element={<RoomPage></RoomPage>}></Route>
+              <Route path="room">
+                <Route
+                  path=""
+                  element={<EmptyRoomPage></EmptyRoomPage>}
+                ></Route>
+                <Route path=":id" element={<RoomPage></RoomPage>}></Route>
+              </Route>
             </Route>
           </Route>
 

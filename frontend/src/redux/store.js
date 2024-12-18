@@ -1,4 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, createAction } from "@reduxjs/toolkit";
 import authReducer from "./authSlice";
 import postReducer from "./postSlice";
 import commentReducer from "./commentSlice";
@@ -10,6 +10,8 @@ import realtimeReducer from "./realtimeSlice";
 import adminReducer from "./adminSlice";
 import snackbarReducer from "./snackbarSlice";
 import loadingReducer from "./loadingSlice";
+
+export const resetDataStore = createAction("resetDateStore");
 
 const store = configureStore({
   reducer: {

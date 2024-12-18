@@ -49,6 +49,7 @@ public class AuthController {
         }
         AuthDto authDto = authService.signIn(body, userAgent, ip);
         response.addCookie(Helper.createCookie("refreshToken", authDto.getRefreshToken(), 30 * 24 * 60 * 60, "/api/v1/auth/refresh-token"));
+        response.addCookie(Helper.createCookie("token", authDto.getRefreshToken(), 30 * 24 * 60 * 60, "/api/v1/auth/sign-out"));
         return Helper.returnSuccessResponse("Sign in success", authDto);
     }
 
@@ -69,7 +70,19 @@ public class AuthController {
         }
         AuthDto authDto = authService.signInWithGoogle(email, name, avatarUrl, googleId, userAgent, ip);
         response.addCookie(Helper.createCookie("refreshToken", authDto.getRefreshToken(), 30 * 24 * 60 * 60, "/api/v1/auth/refresh-token"));
+        response.addCookie(Helper.createCookie("token", authDto.getRefreshToken(), 30 * 24 * 60 * 60, "/api/v1/auth/sign-out"));
         return Helper.returnSuccessResponse("Login with google success", authDto);
+    }
+
+    @DeleteMapping("sign-out")
+    public ResponseEntity<?> signOut(HttpServletRequest request){
+        String token = Arrays.stream(request.getCookies())
+                .filter(cookie -> "token".equals(cookie.getName()))
+                .findFirst()
+                .map(Cookie::getValue)
+                .orElse(null);
+        if(token != null) authService.signOut(token);
+        return Helper.returnSuccessResponse("Log out success", null);
     }
 
     @GetMapping("refresh-token")
@@ -84,6 +97,7 @@ public class AuthController {
         String userAgent = request.getHeader("User-Agent");
         AuthDto authDto = authService.doRefreshToken(refreshToken, ip, userAgent);
         response.addCookie(Helper.createCookie("refreshToken", authDto.getRefreshToken(), 30 * 24 * 60 * 60, "/api/v1/auth/refresh-token"));
+        response.addCookie(Helper.createCookie("token", authDto.getRefreshToken(), 30 * 24 * 60 * 60, "/api/v1/auth/sign-out"));
         return Helper.returnSuccessResponse("Refresh token success", authDto);
     }
 

@@ -11,15 +11,20 @@ const UserPage = () => {
   const { user } = useSelector(authSelector);
   const { isLoading } = useSelector(realtimeSelector);
   const dispatch = useDispatch();
+  const handleOnline = () => {
+    getIpInformation().then((res) => dispatch(setIP(res.query)));
+  };
 
   useEffect(() => {
     if (user.roles.includes("USER")) {
       socket.connect();
       socket.emit("NOTIFY ONLINE", user.user);
       dispatch(prepareRealtimeDataThunk());
-      getIpInformation().then((res) => dispatch(setIP(res.query)));
+      handleOnline();
+      window.addEventListener("online", handleOnline);
       return () => {
         socket.disconnect();
+        window.removeEventListener("online", handleOnline);
       };
     }
   }, []);

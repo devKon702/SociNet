@@ -42,10 +42,10 @@ public class RoomService {
         if(FileChecker.isValidImage(roomAvatar, FileChecker.MAX_IMAGE_SIZE)){
             fileUrl = storageService.upload("images", roomAvatar);
         }
-        // Kiem tra video
-        else if (FileChecker.isValidVideo(roomAvatar, FileChecker.MAX_VIDEO_SIZE)) {
-            fileUrl = storageService.upload("videos", roomAvatar);
-        }
+//        // Kiem tra video
+//        else if (FileChecker.isValidVideo(roomAvatar, FileChecker.MAX_VIDEO_SIZE)) {
+//            fileUrl = storageService.upload("videos", roomAvatar);
+//        }
         // Khong phai image va video
         else if(roomAvatar != null) throw new Exception("UNSUPPORTED FILE");
 
@@ -77,9 +77,9 @@ public class RoomService {
                 fileUrl = storageService.upload("images", roomAvatar);
             }
             // Kiem tra video
-            else if (FileChecker.isValidVideo(roomAvatar, FileChecker.MAX_VIDEO_SIZE)) {
-                fileUrl = storageService.upload("videos", roomAvatar);
-            }
+//            else if (FileChecker.isValidVideo(roomAvatar, FileChecker.MAX_VIDEO_SIZE)) {
+//                fileUrl = storageService.upload("videos", roomAvatar);
+//            }
             // Khong phai image va video
             else if(roomAvatar != null) throw new Exception("UNSUPPORTED FILE");
 

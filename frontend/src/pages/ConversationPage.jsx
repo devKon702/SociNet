@@ -162,6 +162,15 @@ const ConversationPage = () => {
               className="resize-none py-2 px-3 outline-none bg-transparent w-full"
               value={content}
               onChange={(e) => setContent(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.shiftKey && e.key == "Enter") {
+                  setContent(content + "\n");
+                  e.preventDefault();
+                } else if (e.key == "Enter") {
+                  handleSend();
+                  e.preventDefault();
+                }
+              }}
             ></TextareaAutosize>
             <i
               className="bx bx-smile mr-3 cursor-pointer text-xl"

@@ -14,7 +14,7 @@ public class JwtProvider {
     private String ACCESS_KEY;
     @Value("${jwt.refresh.secret}")
     private String REFRESH_KEY;
-    private final long accessExpired = 50 * 1000;
+    private final long accessExpired = 5 * 1000;
     private final long refreshExpired = 30L * 24 * 60 * 60 * 1000;
 
     public String generateAccessToken(String username){

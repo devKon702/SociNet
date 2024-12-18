@@ -8,16 +8,19 @@ import {
 } from "../api/FriendService";
 import { socket } from "../socket";
 
+const initialState = {
+  user: null,
+  postList: [],
+  friendList: [],
+  isLoading: false,
+  friendStatus: "NO",
+};
+
 const personalSlice = createSlice({
   name: "personal",
-  initialState: {
-    user: null,
-    postList: [],
-    friendList: [],
-    isLoading: false,
-    friendStatus: "NO",
-  },
+  initialState,
   reducers: {
+    resetPersonalState: () => initialState,
     setInfo: (state, action) => {
       state.user = action.payload;
     },
@@ -140,6 +143,7 @@ export const createInvitationThunk = createAsyncThunk(
 );
 
 export const {
+  resetPersonalState,
   setInfo,
   setFriendStatus,
   addNewPost,

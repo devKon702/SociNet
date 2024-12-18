@@ -1,5 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { refreshToken, signIn, signInWithGoogle } from "../api/AuthService";
+import {
+  logout,
+  refreshToken,
+  signIn,
+  signInWithGoogle,
+} from "../api/AuthService";
 import { socket } from "../socket";
 import { showSnackbar } from "./snackbarSlice";
 
@@ -12,6 +17,7 @@ const authSlice = createSlice({
     isLoading: true,
     error: null,
     isAuthenticated: false,
+    loginSessionId: -1,
   },
   reducers: {
     signin: (state, action) => {
@@ -19,14 +25,16 @@ const authSlice = createSlice({
       state.user = action.payload.user;
       state.isAuthenticated = true;
       state.isLoading = false;
+      state.loginSessionId = action.payload.loginSessionId;
     },
     signout: (state) => {
       state.token = null;
       state.user = null;
       state.isAuthenticated = false;
       state.isLoading = false;
-      localStorage.removeItem("socinet");
+      // localStorage.removeItem("socinet");
       socket.disconnect();
+      logout();
     },
     setPending: (state) => {
       state.isLoading = true;
@@ -57,10 +65,11 @@ const authSlice = createSlice({
     builder
       .addCase(signInThunk.fulfilled, (state, action) => {
         if (action.payload.isSuccess) {
-          const { accessToken, refreshToken, account } = action.payload.data;
+          const { accessToken, account, loginSessionId } = action.payload.data;
           state.token = accessToken;
           state.user = account;
-          localStorage.setItem("socinet", refreshToken);
+          state.loginSessionId = loginSessionId;
+          // localStorage.setItem("socinet", refreshToken);
           state.isAuthenticated = true;
         } else {
           setError(action.payload.message);
@@ -68,10 +77,11 @@ const authSlice = createSlice({
       })
       .addCase(signinWithGoogleThunk.fulfilled, (state, action) => {
         if (action.payload.isSuccess) {
-          const { accessToken, refreshToken, account } = action.payload.data;
+          const { accessToken, account, loginSessionId } = action.payload.data;
           state.token = accessToken;
-          localStorage.setItem("socinet", refreshToken);
+          // localStorage.setItem("socinet", refreshToken);
           state.user = account;
+          state.loginSessionId = loginSessionId;
           state.isAuthenticated = true;
         } else {
           console.log(action.payload);

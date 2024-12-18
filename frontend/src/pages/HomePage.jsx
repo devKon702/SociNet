@@ -21,6 +21,7 @@ const HomePage = () => {
   const user = useSelector(userInfoSelector);
   const { realtimeFriends } = useSelector(realtimeSelector);
   const [showTools, setShowTools] = useState(true);
+  const [showUserAside, setShowUserAside] = useState(false);
   const { suggestionList } = useSelector(friendSelector);
 
   const { callFetch: hanldeGetSuggestion, response } = useFetch({
@@ -39,7 +40,7 @@ const HomePage = () => {
 
   if (user == null) return null;
   return (
-    <div className="flex justify-center h-full gap-2 px-2">
+    <div className="flex justify-center h-full gap-2 px-2 relative">
       {isShowCreatePostModal && (
         <CreatePostDialog
           handleClose={() => {
@@ -92,7 +93,11 @@ const HomePage = () => {
 
       <PostList></PostList>
       {/* Online Friend */}
-      <section className="hidden w-3/12 h-fit max-h-full text-gray-800 md:flex flex-col gap-3 custom-scroll overflow-auto">
+      <section
+        className={`${
+          showUserAside ? "sm:w-1/3 w-52 px-2" : "w-0 px-0"
+        } absolute transition-all duration-500 md:p-0 md:w-3/12 h-11/12 max-h-full text-gray-800 flex md:relative right-0 top-0 bottom-0 flex-col gap-3 custom-scroll overflow-auto bg-lightGray`}
+      >
         <div className="bg-white py-4 px-3 rounded-xl text-gray-800 flex flex-col">
           <div className="flex items-start flex-col mb-4 gap-2 justify-between">
             <h1 className="font-bold text-xl text-secondary">
@@ -157,11 +162,13 @@ const HomePage = () => {
           </div>
         )}
       </section>
-      {/* <section className="h-fit w-fit bg-white py-4 px-2 rounded-xl md:hidden">
-        <div className="size-fit p-2 md:hidden grid place-items-center bg-white cursor-pointer hover:bg-slate-100">
-          <i className="bx bxs-conversation text-secondary text-2xl"></i>
-        </div>
-      </section> */}
+      <div
+        className="md:hidden h-10 bg-gray-500 fixed grid place-items-center right-0 top-40 opacity-80 rounded-tl-md rounded-bl-md"
+        onClick={() => setShowUserAside(!showUserAside)}
+        title="Lối tắt"
+      >
+        <i className={`bx bx-chevron-${showUserAside ? "right" : "left"}`}></i>
+      </div>
     </div>
   );
 };

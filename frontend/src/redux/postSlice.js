@@ -6,21 +6,24 @@ import {
   removePersonalPost,
   updatePersonalPost,
 } from "./personalSlice";
+import { resetDataStore } from "./store";
+
+const initialState = {
+  postList: [],
+  currentScrollPosition: 0,
+  isLoading: false,
+  error: null,
+  action: {
+    create: "",
+    edit: "",
+    remove: "",
+    share: "",
+  },
+};
 
 const postSlice = createSlice({
   name: "post",
-  initialState: {
-    postList: [],
-    currentScrollPosition: 0,
-    isLoading: false,
-    error: null,
-    action: {
-      create: "",
-      edit: "",
-      remove: "",
-      share: "",
-    },
-  },
+  initialState,
   reducers: {
     setAction: (state, action) => {
       state.action = { ...state.action, ...action.payload };
@@ -45,6 +48,19 @@ const postSlice = createSlice({
       );
       state.postList[index] = action.payload;
     },
+    updateOwnerNameOfPost: (state, action) => {
+      const { userId, name, avatarUrl } = action.payload;
+      state.postList.forEach((post) => {
+        if (post.user.id == userId) {
+          post.user.name = name;
+          post.user.avatarUrl = avatarUrl;
+        }
+        if (post.sharedPost != null && post.sharedPost.user.id == userId) {
+          post.sharedPost.user.name = name;
+          post.sharedPost.user.avatarUrl = avatarUrl;
+        }
+      });
+    },
     setLoading: (state) => {
       state.isLoading = true;
     },
@@ -59,6 +75,7 @@ const postSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(resetDataStore, () => initialState)
       .addCase(createPostThunk.pending, (state) => {
         state.action.create = "creating";
         state.action.share = "sharing";
@@ -193,6 +210,7 @@ export const editPostThunk = createAsyncThunk(
       dispatch(
         showSnackbar({ message: "Chỉnh sửa thành công", type: "success" })
       );
+      dispatch(updatePersonalPost(res.data));
     } else {
       let message = "";
       switch (res.message) {
@@ -239,12 +257,14 @@ export const removePostThunk = createAsyncThunk(
 );
 
 export const {
+  resetPostSlice,
   setAction,
   setPostList,
   setCurrentScroll,
   addPost,
   removeFromPostList,
   updatePost,
+  updateOwnerNameOfPost,
   setLoading,
   setError,
   setSuccess,

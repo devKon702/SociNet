@@ -15,6 +15,7 @@ import com.example.authservice.request.SignUpRequest;
 import com.example.authservice.response.Response;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -98,29 +99,37 @@ public class AuthService {
             if(!accountDto.isActive()) throw new Exception("INACTIVE ACCOUNT");
             String accessToken = jwtProvider.generateAccessToken(accountDto.getUsername());
             String refreshToken = jwtProvider.generateRefreshToken(accountDto.getUsername());
-            // Kiểm tra đã có thiết bị đăng nhập chưa = tài khoản đã lưu một refresh token chưa
-            Optional<RefreshToken> refreshTokenOpt = refreshTokenRepo.findByAccount_UsernameAndIp(accountDto.getUsername(), ip);
-            if(refreshTokenOpt.isPresent()){
-                // Cập nhật
-                refreshTokenOpt.get().setToken(refreshToken);
-                refreshTokenOpt.get().setUserAgent(userAgent);
-                refreshTokenRepo.save(refreshTokenOpt.get());
-            } else{
-                // Tạo mới
-                RefreshToken newRefreshToken = RefreshToken.builder()
+//            // Kiểm tra đã có thiết bị đăng nhập chưa = tài khoản đã lưu một refresh token chưa
+//            Optional<RefreshToken> refreshTokenOpt = refreshTokenRepo.findByAccount_UsernameAndIp(accountDto.getUsername(), ip);
+//            if(refreshTokenOpt.isPresent()){
+//                // Cập nhật
+//                refreshTokenOpt.get().setToken(refreshToken);
+//                refreshTokenOpt.get().setUserAgent(userAgent);
+//                refreshTokenRepo.save(refreshTokenOpt.get());
+//            } else{
+//                // Tạo mới
+//                RefreshToken newRefreshToken = RefreshToken.builder()
+//                        .account(account.get())
+//                        .token(refreshToken)
+//                        .ip(ip)
+//                        .userAgent(userAgent)
+//                        .build();
+//                refreshTokenRepo.save(newRefreshToken);
+//            }
+            RefreshToken newRefreshToken = RefreshToken.builder()
                         .account(account.get())
                         .token(refreshToken)
                         .ip(ip)
                         .userAgent(userAgent)
                         .build();
-                refreshTokenRepo.save(newRefreshToken);
-            }
+            Long loginSessionId = refreshTokenRepo.save(newRefreshToken).getId();
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             return AuthDto.builder()
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
                     .account(accountDto)
+                    .loginSessionId(loginSessionId)
                     .build();
         } else{
             throw new Exception("INCORRECT PASSWORD");
@@ -153,13 +162,13 @@ public class AuthService {
         String accessToken = jwtProvider.generateAccessToken(account.getUsername());
         String refreshToken = jwtProvider.generateRefreshToken(account.getUsername());
         // Kiểm tra đã có thiết bị đăng nhập chưa = tài khoản đã lưu một refresh token chưa
-        Optional<RefreshToken> refreshTokenOpt = refreshTokenRepo.findByAccount_UsernameAndIp(account.getUsername(), ip);
-        if(refreshTokenOpt.isPresent()){
-            // Cập nhật
-            refreshTokenOpt.get().setToken(refreshToken);
-            refreshTokenOpt.get().setUserAgent(userAgent);
-            refreshTokenRepo.save(refreshTokenOpt.get());
-        } else{
+//        Optional<RefreshToken> refreshTokenOpt = refreshTokenRepo.findByAccount_UsernameAndIp(account.getUsername(), ip);
+//        if(refreshTokenOpt.isPresent()){
+//            // Cập nhật
+//            refreshTokenOpt.get().setToken(refreshToken);
+//            refreshTokenOpt.get().setUserAgent(userAgent);
+//            refreshTokenRepo.save(refreshTokenOpt.get());
+//        } else{
             // Tạo mới
             RefreshToken newRefreshToken = RefreshToken.builder()
                     .account(account)
@@ -167,14 +176,22 @@ public class AuthService {
                     .ip(ip)
                     .userAgent(userAgent)
                     .build();
-            refreshTokenRepo.save(newRefreshToken);
-        }
+            Long loginSessionId = refreshTokenRepo.save(newRefreshToken).getId();
+//        }
 
         return AuthDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .account(new AccountDto(account))
+                .loginSessionId(loginSessionId)
                 .build();
+    }
+
+    public void signOut(@NonNull String refreshToken) {
+        RefreshToken savedToken = refreshTokenRepo.findByToken(refreshToken).orElse(null);
+        if(savedToken!=null){
+            refreshTokenRepo.delete(savedToken);
+        }
     }
 
     public AuthDto doRefreshToken(String refreshToken, String ip, String userAgent) throws ExpiredJwtException, Exception {
@@ -202,6 +219,7 @@ public class AuthService {
                     .accessToken(newAccessToken)
                     .refreshToken(newRefreshToken)
                     .account(new AccountDto(accountOpt.get()))
+                    .loginSessionId(savedTokenOpt.get().getId())
                     .build();
         } else{
             throw new Exception("INVALID TOKEN");

@@ -45,7 +45,7 @@ const OtherMessage = ({ message }) => {
       ) : null}
       {message.content && (
         <div className="w-fit self-start">
-          <div className="w-fit p-3 bg-gray-300 rounded-2xl rounded-ss-none">
+          <div className="w-fit p-3 bg-gray-300 rounded-2xl rounded-ss-none whitespace-pre-line">
             {message.content}
           </div>
           <span className="text-xs ml-3">
@@ -93,7 +93,7 @@ const SelfMessage = ({ message }) => {
       ) : null}
       {message.content && (
         <div className="w-fit self-end">
-          <div className="p-3 w-fit bg-secondary text-white rounded-2xl rounded-ee-none hover:relative ml-auto">
+          <div className="p-3 w-fit bg-secondary text-white rounded-2xl rounded-ee-none hover:relative ml-auto whitespace-pre-line">
             {message.content}
             <div className="px-2 h-fit absolute top-1/2 left-0 -translate-x-full -translate-y-1/2 flex gap-2 text-gray-800">
               <i

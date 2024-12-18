@@ -31,11 +31,17 @@ export const setupInterceptors = (store) => {
         originalRequest._retry = true;
         try {
           const auth = store.getState().auth;
-          await refreshToken(localStorage.getItem("socinet")).then((res) => {
+          await refreshToken().then((res) => {
             if (res.isSuccess) {
-              const { accessToken, refreshToken, account } = res.data;
-              store.dispatch(signin({ token: accessToken, user: account }));
-              localStorage.setItem("socinet", refreshToken);
+              const { accessToken, account, loginSessionId } = res.data;
+              store.dispatch(
+                signin({
+                  token: accessToken,
+                  user: account,
+                  loginSessionId,
+                })
+              );
+              // localStorage.setItem("socinet", refreshToken);
             }
           });
           axios.defaults.headers.common[

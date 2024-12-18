@@ -97,7 +97,7 @@ const AccountPage = () => {
           className="flex justify-between items-center p-4 w-full rounded-md hover:bg-gray-100 cursor-pointer shadow-lg"
           onClick={() => setShowEmailForm(!showEmailForm)}
         >
-          <p>
+          <p className="truncate" title={account?.email}>
             <span className="font-bold">Email: </span>
             {account?.email}
           </p>
@@ -107,7 +107,7 @@ const AccountPage = () => {
 
         <div>
           <Collapse in={showEmailForm} unmountOnExit>
-            <div className="progress flex items-center justify-center w-3/4 mx-auto">
+            <div className="progress flex items-center justify-center w-11/12 sm:w-3/4 mx-auto">
               <button
                 className=" shadow-md rounded-full border-[8px] border-secondary font-bold size-10 flex items-center justify-center"
                 onClick={() =>
@@ -154,7 +154,10 @@ const AccountPage = () => {
               <div className="progress-1 min-h-[250px] flex flex-col items-center justify-center py-4 gap-8">
                 <p className="font-bold text-xl text-center">Chỉnh sửa email</p>
                 <div>
-                  <label htmlFor="input-email" className="font-bold mr-4">
+                  <label
+                    htmlFor="input-email"
+                    className="font-bold mr-4 hidden sm:inline-block"
+                  >
                     Email:
                   </label>
                   <input
@@ -208,7 +211,7 @@ const AccountPage = () => {
                     onChange={(e) => dispatch(setOtp({ otp: e.target.value }))}
                   />
                 </div>
-                <div className="">
+                <div className="w-full sm:w-fit flex flex-col sm:flex-row items-stretch justify-center gap-2 sm:gap-6">
                   <button
                     className="mx-auto py-2 px-6 text-secondary rounded-lg shadow-lg font-bold outline-none"
                     disabled={manageEmail.otpPending}
@@ -219,7 +222,7 @@ const AccountPage = () => {
                     {manageEmail.otpPending ? "Đang gửi..." : "Gửi lại mã"}
                   </button>
                   <button
-                    className="mx-auto py-2 px-6 bg-secondary rounded-lg text-white font-bold ms-6"
+                    className="mx-auto py-2 px-6 bg-secondary rounded-lg text-white font-bold"
                     onClick={handleChangeEmail}
                     disabled={manageEmail.otpPending}
                   >
@@ -263,7 +266,7 @@ const AccountPage = () => {
 
         <div>
           <Collapse in={showPasswordForm}>
-            <div className="mx-auto flex flex-col gap-1 w-1/3 my-3">
+            <div className="mx-auto flex flex-col gap-1 min-w-60 w-3/5 my-3">
               <label htmlFor="" className="font-bold mr-4">
                 Mật khẩu cũ:
               </label>
@@ -359,8 +362,9 @@ const AccountPage = () => {
 
 const LoginSessionItem = ({ loginSession, handleRemove }) => {
   const deviceType = getDeviceType(loginSession.userAgent);
+  const currentUserAgent = navigator.userAgent;
   const [ipInfo, setIpInfo] = useState({});
-  const { ip } = useSelector(authSelector);
+  const { ip, loginSessionId } = useSelector(authSelector);
   useEffect(() => {
     getIpInformation(loginSession.ip).then((res) => {
       setIpInfo(res);
@@ -391,7 +395,8 @@ const LoginSessionItem = ({ loginSession, handleRemove }) => {
         </div>
       </div>
       <div className="flex items-center gap-4">
-        {loginSession.ip == ip ? (
+        {/* {loginSession.ip == ip && currentUserAgent == loginSession.userAgent ? ( */}
+        {loginSession.id == loginSessionId ? (
           <span className="text-bold text-green-500">Hiện tại</span>
         ) : (
           <>
