@@ -2,6 +2,7 @@ package com.example.chatservice.controller;
 
 import com.example.chatservice.dto.RoomActivityDto;
 import com.example.chatservice.dto.RoomDto;
+import com.example.chatservice.dto.RoomMemberDto;
 import com.example.chatservice.entity.Room;
 import com.example.chatservice.enums.ActivityType;
 import com.example.chatservice.repository.RoomRepository;
@@ -42,6 +43,12 @@ public class RoomController {
         return null;
     }
 
+    @GetMapping("member")
+    public ResponseEntity<?> getRoomMember(@RequestParam Long userId,
+                                           @RequestParam Long roomId) throws Exception{
+        RoomMemberDto memberDto = roomMemberService.getMember(userId, roomId);
+        return Helper.returnSuccessResponse("Get member success", memberDto);
+    }
     @PostMapping("")
     public ResponseEntity<?> createRoom(@RequestParam String name,
                                         @RequestParam(required = false) MultipartFile avatarFile) throws Exception{

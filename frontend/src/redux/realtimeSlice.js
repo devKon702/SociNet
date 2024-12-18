@@ -218,11 +218,13 @@ const realtimeSlice = createSlice({
       }
     },
     newRealtimeRoomMember: (state, action) => {
-      const { roomId, activity } = action.payload;
+      const { roomId, activity, member } = action.payload;
       if (state.roomActivity.currentRoom?.id == roomId) {
         state.roomActivity.activities.unshift(activity);
-        state.roomActivity.currentRoom.members.push(activity.receiver);
+        state.roomActivity.currentRoom.members.push(member);
       }
+      // state.roomActivity.activities.unshift(activity);
+      // state.roomActivity.currentRoom.members.push(activity.receiver);
     },
     newRealtimeJoinedRoom: (state, action) => {
       const room = action.payload;

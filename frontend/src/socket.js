@@ -22,7 +22,7 @@ import { signout } from "./redux/authSlice";
 import { setFriendStatus } from "./redux/personalSlice";
 import { removeAllListenersExcept } from "./helper";
 import { getUserInfo } from "./api/UserService";
-import { getRoom } from "./api/RoomService";
+import { getRoom, getRoomMember } from "./api/RoomService";
 import { showSnackbar } from "./redux/snackbarSlice";
 
 const USER_URL = import.meta.env.VITE_SOCKET_BASE;
@@ -115,7 +115,13 @@ const onConnect = () => {
   });
 
   socket.on("NEW MEMBER", (roomId, activity) => {
-    store.dispatch(newRealtimeRoomMember({ roomId, activity }));
+    getRoomMember(activity.receiver.id, roomId).then((res) => {
+      if (res.isSuccess) {
+        store.dispatch(
+          newRealtimeRoomMember({ roomId, activity, member: res.data })
+        );
+      }
+    });
   });
 
   socket.on("INVITE TO ROOM", (roomId) => {

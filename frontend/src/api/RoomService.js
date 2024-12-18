@@ -14,6 +14,12 @@ const RoomService = {
       .then((res) => res.data)
       .catch((e) => e.response.data),
 
+  getRoomMember: async (userId, roomId) =>
+    axios
+      .get(BASE + "/member?userId=" + userId + "&roomId=" + roomId)
+      .then((res) => res.data)
+      .catch((e) => e.response.data),
+
   createRoom: async (name, file) =>
     axios
       .post(
@@ -97,6 +103,7 @@ const RoomService = {
 export const {
   getJoinedRoom,
   getRoom,
+  getRoomMember,
   createRoom,
   updateRoom,
   deleteRoom,

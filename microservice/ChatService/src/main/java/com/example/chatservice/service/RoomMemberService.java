@@ -25,31 +25,28 @@ public class RoomMemberService {
     private final UserRepository userRepository;
     private final RoomActivityService roomActivityService;
 
-    public List<RoomMemberDto> getMembersOfRoom(Long roomId){
-        List<RoomMemberDto> memberListDto = new ArrayList<>();
-        roomMemberRepository.findAllByRoom_Id(roomId).forEach((member) -> {
-            memberListDto.add(new RoomMemberDto(member));
-        });
-        return memberListDto;
+    public RoomMemberDto getMember(Long userId, Long roomId) throws Exception{
+        RoomMember member = roomMemberRepository.findByUser_IdAndRoom_Id(userId, roomId).orElseThrow(() -> new Exception("NOT FOUND"));
+        return new RoomMemberDto(member);
     }
 
-    public RoomMemberDto addMember(Long userId, Long roomId) throws Exception{
-        // Kiem tra user ton tai
-        User user = userRepository.findById(userId).orElseThrow(() ->  new Exception("USER NOT EXIST"));
-        // Kiem tra room ton tai
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new Exception("ROOM NOT EXIST"));
-        // Kiem tra la thanh vien cua nhom
-        if(roomMemberRepository.existsByUser_IdAndRoom_Id(Helper.getUserId(), roomId)) {
-            // Kiem tra user hien dang la thanh vien
-            if(roomMemberRepository.existsByUser_IdAndRoom_Id(userId, roomId)) throw new Exception("USER JOINED");
-            RoomMember newMember = RoomMember.builder()
-                    .user(user)
-                    .room(room)
-                    .isAdmin(false)
-                    .build();
-            return new RoomMemberDto(roomMemberRepository.save(newMember));
-        } else throw new Exception("PERMISSION DENY");
-    }
+//    public RoomMemberDto addMember(Long userId, Long roomId) throws Exception{
+//        // Kiem tra user ton tai
+//        User user = userRepository.findById(userId).orElseThrow(() ->  new Exception("USER NOT EXIST"));
+//        // Kiem tra room ton tai
+//        Room room = roomRepository.findById(roomId).orElseThrow(() -> new Exception("ROOM NOT EXIST"));
+//        // Kiem tra la thanh vien cua nhom
+//        if(roomMemberRepository.existsByUser_IdAndRoom_Id(Helper.getUserId(), roomId)) {
+//            // Kiem tra user hien dang la thanh vien
+//            if(roomMemberRepository.existsByUser_IdAndRoom_Id(userId, roomId)) throw new Exception("USER JOINED");
+//            RoomMember newMember = RoomMember.builder()
+//                    .user(user)
+//                    .room(room)
+//                    .isAdmin(false)
+//                    .build();
+//            return new RoomMemberDto(roomMemberRepository.save(newMember));
+//        } else throw new Exception("PERMISSION DENY");
+//    }
 
     public List<RoomActivityDto> addMultiMember(Long roomId, List<Long> usersId) throws Exception{
         // Kiem tra room ton tai
